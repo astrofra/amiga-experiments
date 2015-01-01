@@ -22,15 +22,21 @@ INT_SET							= INT_ON+INT_VERTB
 BURST_SET						= BURST_NONE
 
 ;*******************************************************************************
-;	Définition du Playfield
+;	Logo playfield definition
 ;*******************************************************************************
 PF_WIDTH 						= 320
-PF_HEIGHT 					= 256
-PF_DEPTH 						= 1
-PF_INTER 						= 0
+PF_HEIGHT 					= 80
+PF_DEPTH 						= 4
+PF_INTER 						= 1
 PF_SIZE							= (PF_WIDTH/8)*PF_HEIGHT*PF_DEPTH
 PF_MOD1							= (PF_WIDTH/8)*(PF_DEPTH-1)*PF_INTER
 PF_MOD2							= (PF_WIDTH/8)*(PF_DEPTH-1)*PF_INTER
+
+; Logo image defintion
+BGPIC_WIDTH					= 320
+BGPIC_HEIGHT				= 80
+BGPIC_DEPTH					= 4
+BGPIC_SIZE					= (BGPIC_WIDTH/8)*BGPIC_HEIGHT*BGPIC_DEPTH
 
 ;*******************************************************************************
 	SECTION PROGRAM,CODE
@@ -44,6 +50,8 @@ Start:
 .Initialize:
 	bsr			InitScreen										; Initialise l'écran
 	bsr			InitCopper										; Initialise la Copper list
+
+	jsr			InitBackground	
 
 .SetVBL:
 	move.l	VbrBase,a6
@@ -74,7 +82,9 @@ WaitVBL:
 	tst.w		FlagVBL
 	beq.s		WaitVBL												; On attend la vbl
 
-	btst		#MOUSE_BUTTON1,CIAA+CIAPRA		; Test la souris
+	move.w 	#$F0F, CUSTOM+COLOR00
+
+	btst		#MOUSE_BUTTON1,CIAA+CIAPRA		; Mouse button test
 	bne.s		MainLoop
 
 ;*******************************************************************************
@@ -134,6 +144,29 @@ InitCopper:
 	dbf			d1,.SetSpritePtr							; Sprite suivant
 	rts
 
+; Logo image initialisation
+InitBackground:
+	lea			Background,a0
+;	lea			PaletteBuffer,a1
+	lea			PictureBuffer,a2
+	jsr			DecodePicture
+	tst.l		d0
+	beq			.DecodeError
+	move.l	PhysicBase,a0
+	move.w	#BGPIC_HEIGHT-1,d0						; On transfert notre image
+.NextLine:
+	move.w	#PF_DEPTH-1,d1								; Sur un écran 3 plans double largeur
+.NextPlan:
+	move.w	#(BGPIC_WIDTH/32)-1,d2
+.NextBlock:
+	move.l	(a2)+,(a0)+
+	dbf			d2,.NextBlock
+;	move.l	a1,a0
+	dbf			d1,.NextPlan
+	dbf			d0,.NextLine
+.DecodeError:
+	rts	
+
 ;*******************************************************************************
 ;	Routines d'animation
 ;*******************************************************************************
@@ -166,6 +199,12 @@ PhysicBase:
 ;*******************************************************************************
 ScreenBuffer:
 	ds.b		PF_SIZE
+
+PaletteBuffer:
+	ds.l		16
+
+PictureBuffer:
+	ds.b		BGPIC_SIZE	
 
 ;*******************************************************************************
 	SECTION SPRITE,DATA_C
@@ -200,7 +239,7 @@ CLScreenDef:
 	CWAIT		$0001,$002A
 	CMOVE		$0038,DDFSTRT
 	CMOVE		$00D0,DDFSTOP
-	CMOVE		$1200,BPLCON0									; Ecran 2 couleurs lowres
+	CMOVE		$4200,BPLCON0									; 100001000000000
 	CMOVE		$0000,BPLCON1
 	CMOVE		$0000,BPLCON2
 	CMOVE		$0C00,BPLCON3
@@ -212,11 +251,29 @@ CLBitplaneAdr:
 	CMOVE		$0000,$0000
 	CMOVE		$0000,$0000
 	ENDR
-CLPalette:
+CLPaletteLogo:
 	CMOVE		$0000,COLOR00
-	CMOVE		$0FFF,COLOR01
+	CMOVE		$0111,COLOR01
+	CMOVE		$0222,COLOR02
+	CMOVE		$0333,COLOR03
+	CMOVE		$0444,COLOR04
+	CMOVE		$0555,COLOR05
+	CMOVE		$0666,COLOR06
+	CMOVE		$0777,COLOR07
+	CMOVE		$0888,COLOR08
+	CMOVE		$0999,COLOR09
+	CMOVE		$0AAA,COLOR10
+	CMOVE		$0BBB,COLOR11
+	CMOVE		$0CCC,COLOR12
+	CMOVE		$0DDD,COLOR13
+	CMOVE		$0EEE,COLOR14
+	CMOVE		$0FFF,COLOR15
+
 CLEnd:
 	CEND
+
+Background:
+	INCBIN	"System:Sources/data/mandarine_logo.iff"	
 
 ;*******************************************************************************
 ; Fonctions utiles
