@@ -147,7 +147,7 @@ InitCopper:
 ; Logo image initialisation
 InitBackground:
 	lea			Background,a0
-;	lea			PaletteBuffer,a1
+	lea			PaletteBuffer,a1
 	lea			PictureBuffer,a2
 	jsr			DecodePicture
 	tst.l		d0
@@ -164,6 +164,13 @@ InitBackground:
 ;	move.l	a1,a0
 	dbf			d1,.NextPlan
 	dbf			d0,.NextLine
+.LoadPalette
+	lea			PaletteBuffer,a0
+	lea			CLPaletteLogo,a1
+	move.l 	#16,d0
+.NextColor	
+;	move.w	(a0)+,(a1)+
+	dbf 		d0,.NextColor
 .DecodeError:
 	rts	
 
@@ -204,7 +211,7 @@ PaletteBuffer:
 	ds.l		16
 
 PictureBuffer:
-	ds.b		BGPIC_SIZE	
+	ds.b		BGPIC_SIZE*2
 
 ;*******************************************************************************
 	SECTION SPRITE,DATA_C
@@ -253,21 +260,21 @@ CLBitplaneAdr:
 	ENDR
 CLPaletteLogo:
 	CMOVE		$0000,COLOR00
-	CMOVE		$0111,COLOR01
-	CMOVE		$0222,COLOR02
-	CMOVE		$0333,COLOR03
-	CMOVE		$0444,COLOR04
-	CMOVE		$0555,COLOR05
-	CMOVE		$0666,COLOR06
-	CMOVE		$0777,COLOR07
-	CMOVE		$0888,COLOR08
-	CMOVE		$0999,COLOR09
-	CMOVE		$0AAA,COLOR10
-	CMOVE		$0BBB,COLOR11
-	CMOVE		$0CCC,COLOR12
-	CMOVE		$0DDD,COLOR13
-	CMOVE		$0EEE,COLOR14
-	CMOVE		$0FFF,COLOR15
+	CMOVE		$0E86,COLOR01
+	CMOVE		$0FA4,COLOR02
+	CMOVE		$0546,COLOR03
+	CMOVE		$0435,COLOR04
+	CMOVE		$0202,COLOR05
+	CMOVE		$0313,COLOR06
+	CMOVE		$0769,COLOR07
+	CMOVE		$0FD0,COLOR08
+	CMOVE		$0A7A,COLOR09
+	CMOVE		$0413,COLOR10
+	CMOVE		$0324,COLOR11
+	CMOVE		$0514,COLOR12
+	CMOVE		$0536,COLOR13
+	CMOVE		$0FFF,COLOR14
+	CMOVE		$0625,COLOR15
 
 CLEnd:
 	CEND
