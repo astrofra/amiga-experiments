@@ -21,9 +21,7 @@ INT_SET							= INT_ON+INT_VERTB
 ; AGA Burst
 BURST_SET						= BURST_NONE
 
-;*******************************************************************************
-;	Logo playfield definition
-;*******************************************************************************
+;	Logo playfield definition ****************************************************
 PF_WIDTH 						= 320
 PF_HEIGHT 					= 80
 PF_DEPTH 						= 4
@@ -32,7 +30,25 @@ PF_SIZE							= (PF_WIDTH/8)*PF_HEIGHT*PF_DEPTH
 PF_MOD1							= (PF_WIDTH/8)*(PF_DEPTH-1)*PF_INTER
 PF_MOD2							= (PF_WIDTH/8)*(PF_DEPTH-1)*PF_INTER
 
-; Logo image defintion
+;	Scrolltext playfield definition **********************************************
+PF2_WIDTH 					= 320
+PF2_HEIGHT 					= 16
+PF2_DEPTH 					= 2
+PF2_INTER 					= 1
+PF2_SIZE						= (PF2_WIDTH/8)*PF2_HEIGHT*PF2_DEPTH
+PF2_MOD1						= (PF2_WIDTH/8)*(PF2_DEPTH-1)*PF2_INTER
+PF2_MOD2						= (PF2_WIDTH/8)*(PF2_DEPTH-1)*PF2_INTER
+
+;	Logo playfield definition ****************************************************
+PF3_WIDTH 					= 320
+PF3_HEIGHT 					= 140
+PF3_DEPTH 					= 4
+PF3_INTER 					= 1
+PF3_SIZE						= (PF3_WIDTH/8)*PF3_HEIGHT*PF3_DEPTH
+PF3_MOD1						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
+PF3_MOD2						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
+
+; Logo image defintion *********************************************************
 BGPIC_WIDTH					= 320
 BGPIC_HEIGHT				= 80
 BGPIC_DEPTH					= 4
@@ -164,13 +180,13 @@ InitBackground:
 ;	move.l	a1,a0
 	dbf			d1,.NextPlan
 	dbf			d0,.NextLine
-.LoadPalette
-	lea			PaletteBuffer,a0
-	lea			CLPaletteLogo,a1
-	move.l 	#16,d0
-.NextColor	
+;.LoadPalette
+;	lea			PaletteBuffer,a0
+;	lea			CLPaletteLogo,a1
+;	move.l 	#16,d0
+;.NextColor	
 ;	move.w	(a0)+,(a1)+
-	dbf 		d0,.NextColor
+;	dbf 		d0,.NextColor
 .DecodeError:
 	rts	
 
@@ -206,9 +222,18 @@ PhysicBase:
 ;*******************************************************************************
 ScreenBuffer:
 	ds.b		PF_SIZE
-
 PaletteBuffer:
 	ds.l		16
+
+ScreenBuffer2:
+	ds.b		PF2_SIZE
+PaletteBuffer2:
+	ds.l		4
+
+ScreenBuffer3:
+	ds.b		PF3_SIZE
+PaletteBuffer3:
+	ds.l		2		
 
 PictureBuffer:
 	ds.b		BGPIC_SIZE*2
