@@ -69,7 +69,7 @@ Start:
 	bsr			InitScreen3										; Checkerboard screen
 	bsr			InitCopper										; Initialise la Copper list
 
-;	jsr			InitBackground	
+	jsr			InitBackground	
 
 .SetVBL:
 	move.l	VbrBase,a6
@@ -181,6 +181,49 @@ InitCopper:
 	swap		d0
 	adda.l	#8,a0
 	dbf			d1,.SetSpritePtr							; Sprite suivant
+
+;	viewport 2
+	lea			CLBitplaneAdr2,a0							; Les bitplans de la CL
+	move.l	PhysicBase2,d0								; Notre écran
+	move.w	#BPL1PT,d1										; Registre BP
+	move.w	#PF2_DEPTH-1,d7
+.SetBplPointer2:
+	move.w	d1,(a0)+											; Adresse registre
+	swap		d0
+	move.w	d0,(a0)+											; Adresse bitplane
+	addq.w	#2,d1													; Registre suivant
+	move.w	d1,(a0)+											; Adresse registre
+	swap		d0
+	move.w	d0,(a0)+											; Adresse bitplane
+	addq.w	#2,d1													; Registre suivant
+	IFEQ		PF2_INTER
+	addi.l	#PF2_WIDTH/8*PF2_HEIGHT,d0		; Bitplane suivant (non interleave)
+	ELSE
+	addi.l	#PF2_WIDTH/8,d0								; Bitplane suivant (interleave)
+	ENDC
+	dbf			d7,.SetBplPointer2
+
+;	viewport 3
+	lea			CLBitplaneAdr3,a0							; Les bitplans de la CL
+	move.l	PhysicBase3,d0								; Notre écran
+	move.w	#BPL1PT,d1										; Registre BP
+	move.w	#PF3_DEPTH-1,d7
+.SetBplPointer3:
+	move.w	d1,(a0)+											; Adresse registre
+	swap		d0
+	move.w	d0,(a0)+											; Adresse bitplane
+	addq.w	#2,d1													; Registre suivant
+	move.w	d1,(a0)+											; Adresse registre
+	swap		d0
+	move.w	d0,(a0)+											; Adresse bitplane
+	addq.w	#2,d1													; Registre suivant
+	IFEQ		PF3_INTER
+	addi.l	#PF3_WIDTH/8*PF3_HEIGHT,d0		; Bitplane suivant (non interleave)
+	ELSE
+	addi.l	#PF3_WIDTH/8,d0								; Bitplane suivant (interleave)
+	ENDC
+	dbf			d7,.SetBplPointer3
+
 	rts
 
 ;***************************************
@@ -324,20 +367,43 @@ CLPaletteLogo:
 	CMOVE		$0536,COLOR13
 	CMOVE		$0FFF,COLOR14
 	CMOVE		$0625,COLOR15
+
 ;	Viewport 2
 CLScreenDef2:
 	CWAIT		$0001,$002A+PF_HEIGHT
+	CMOVE		$0000,BPLCON0
+	CMOVE		$0000,BPLCON1	
+	CWAIT		$0001,$002A+PF_HEIGHT+1
 	CMOVE		$0038,DDFSTRT
 	CMOVE		$00D0,DDFSTOP
-	CMOVE		$4200,BPLCON0
+	CMOVE		$2000,BPLCON0
 	CMOVE		$0000,BPLCON1
 	CMOVE		PF2_MOD1,BPL1MOD
 	CMOVE 	PF2_MOD2,BPL2MOD	
-CLBitplaneAd2r:
+CLBitplaneAdr2:
 	REPT		PF2_DEPTH
 	CMOVE		$0000,$0000
 	CMOVE		$0000,$0000
 	ENDR
+
+;	Viewport 3
+CLScreenDef3:
+	CWAIT		$0001,$002A+PF_HEIGHT+PF2_HEIGHT+1
+	CMOVE		$0000,BPLCON0
+	CMOVE		$0000,BPLCON1
+	CWAIT		$0001,$002A+PF_HEIGHT+PF2_HEIGHT+2
+	CMOVE		$0038,DDFSTRT
+	CMOVE		$00D0,DDFSTOP
+	CMOVE		$1000,BPLCON0
+	CMOVE		$0000,BPLCON1
+	CMOVE		PF2_MOD1,BPL1MOD
+	CMOVE 	PF2_MOD2,BPL2MOD	
+CLBitplaneAdr3:
+	REPT		PF3_DEPTH
+	CMOVE		$0000,$0000
+	CMOVE		$0000,$0000
+	ENDR
+
 CLEnd:
 	CEND
 
