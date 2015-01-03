@@ -64,10 +64,12 @@ Start:
 	beq			Restore												; Restaure en cas d'erreur
 
 .Initialize:
-	bsr			InitScreen										; Initialise l'écran
+	bsr			InitScreen										; Logo screen
+	bsr			InitScreen2										; Scrolltext screen
+	bsr			InitScreen3										; Checkerboard screen
 	bsr			InitCopper										; Initialise la Copper list
 
-	jsr			InitBackground	
+;	jsr			InitBackground	
 
 .SetVBL:
 	move.l	VbrBase,a6
@@ -125,9 +127,30 @@ InitScreen:
 	dbf			d0,.FillScreen	
 	rts
 
+InitScreen2:
+	move.l	#ScreenBuffer2,PhysicBase2
+	move.l	PhysicBase2,a0
+	move.l	#$CCCCCCCC,d1
+	move.w	#(PF2_SIZE/4)-1,d0
+.FillScreen:
+	move.l	d1,(a0)+
+	dbf			d0,.FillScreen	
+	rts
+
+InitScreen3:
+	move.l	#ScreenBuffer3,PhysicBase3
+	move.l	PhysicBase3,a0
+	move.l	#$C3C3C3C3,d1
+	move.w	#(PF3_SIZE/4)-1,d0
+.FillScreen:
+	move.l	d1,(a0)+
+	dbf			d0,.FillScreen	
+	rts	
+
 ;***************************************
 
 InitCopper:
+;	viewport 1
 	lea			CLBitplaneAdr,a0							; Les bitplans de la CL
 	move.l	PhysicBase,d0									; Notre écran
 	move.w	#BPL1PT,d1										; Registre BP
@@ -160,6 +183,8 @@ InitCopper:
 	dbf			d1,.SetSpritePtr							; Sprite suivant
 	rts
 
+;***************************************
+
 ; Logo image initialisation
 InitBackground:
 	lea			Background,a0
@@ -171,22 +196,14 @@ InitBackground:
 	move.l	PhysicBase,a0
 	move.w	#BGPIC_HEIGHT-1,d0						; On transfert notre image
 .NextLine:
-	move.w	#PF_DEPTH-1,d1								; Sur un écran 3 plans double largeur
+	move.w	#PF_DEPTH-1,d1								; Sur un écran 4 plans
 .NextPlan:
 	move.w	#(BGPIC_WIDTH/32)-1,d2
 .NextBlock:
 	move.l	(a2)+,(a0)+
 	dbf			d2,.NextBlock
-;	move.l	a1,a0
 	dbf			d1,.NextPlan
 	dbf			d0,.NextLine
-;.LoadPalette
-;	lea			PaletteBuffer,a0
-;	lea			CLPaletteLogo,a1
-;	move.l 	#16,d0
-;.NextColor	
-;	move.w	(a0)+,(a1)+
-;	dbf 		d0,.NextColor
 .DecodeError:
 	rts	
 
@@ -216,6 +233,12 @@ FlagVBL:
 
 PhysicBase:
 	dc.l		0 
+
+PhysicBase2:
+	dc.l		0 
+
+PhysicBase3:
+	dc.l		0	
 
 ;*******************************************************************************
 	SECTION SCREEN,BSS_C
@@ -248,6 +271,7 @@ DefaultSprite:
 	SECTION COPPER,DATA_C
 ;*******************************************************************************
 CopperList:
+;	Viewport 1
 	CMOVE		$2C81,DIWSTRT
 	CMOVE		$2CC1,DIWSTOP
 CLSpriteAdr:
@@ -271,7 +295,7 @@ CLScreenDef:
 	CWAIT		$0001,$002A
 	CMOVE		$0038,DDFSTRT
 	CMOVE		$00D0,DDFSTOP
-	CMOVE		$4200,BPLCON0									; 100001000000000
+	CMOVE		$4200,BPLCON0
 	CMOVE		$0000,BPLCON1
 	CMOVE		$0000,BPLCON2
 	CMOVE		$0C00,BPLCON3
@@ -300,7 +324,20 @@ CLPaletteLogo:
 	CMOVE		$0536,COLOR13
 	CMOVE		$0FFF,COLOR14
 	CMOVE		$0625,COLOR15
-
+;	Viewport 2
+CLScreenDef2:
+	CWAIT		$0001,$002A+PF_HEIGHT
+	CMOVE		$0038,DDFSTRT
+	CMOVE		$00D0,DDFSTOP
+	CMOVE		$4200,BPLCON0
+	CMOVE		$0000,BPLCON1
+	CMOVE		PF2_MOD1,BPL1MOD
+	CMOVE 	PF2_MOD2,BPL2MOD	
+CLBitplaneAd2r:
+	REPT		PF2_DEPTH
+	CMOVE		$0000,$0000
+	CMOVE		$0000,$0000
+	ENDR
 CLEnd:
 	CEND
 
