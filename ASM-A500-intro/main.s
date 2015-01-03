@@ -230,7 +230,7 @@ InitCopper:
 
 ; Logo image initialisation
 InitBackground:
-	lea			Background,a0
+	lea			MandarineLogo,a0
 	lea			PaletteBuffer,a1
 	lea			PictureBuffer,a2
 	jsr			DecodePicture
@@ -407,8 +407,11 @@ CLBitplaneAdr3:
 CLEnd:
 	CEND
 
-Background:
-	INCBIN	"System:Sources/data/mandarine_logo.iff"	
+MandarineLogo:
+	INCBIN	"System:Sources/data/mandarine_logo.iff"
+
+Checkerboard:
+	INCBIN	"System:Sources/data/checkerboard_stripe.iff"
 
 ;*******************************************************************************
 ; Fonctions utiles
