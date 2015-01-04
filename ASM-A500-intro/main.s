@@ -21,6 +21,7 @@ INT_SET							= INT_ON+INT_VERTB
 ; AGA Burst
 BURST_SET						= BURST_NONE
 
+;	Plafields
 ;	Logo playfield definition ****************************************************
 PF_WIDTH 						= 384
 PF_WIDTH_DISPLAY 		= 320
@@ -28,8 +29,8 @@ PF_HEIGHT 					= 80
 PF_DEPTH 						= 4
 PF_INTER 						= 1
 PF_SIZE							= (PF_WIDTH/8)*PF_HEIGHT*PF_DEPTH
-PF_MOD1							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)
-PF_MOD2							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)
+PF_MOD1							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)-2
+PF_MOD2							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)-2
 
 ;	Scrolltext playfield definition **********************************************
 PF2_WIDTH 					= 320
@@ -40,20 +41,29 @@ PF2_SIZE						= (PF2_WIDTH/8)*PF2_HEIGHT*PF2_DEPTH
 PF2_MOD1						= (PF2_WIDTH/8)*(PF2_DEPTH-1)*PF2_INTER
 PF2_MOD2						= (PF2_WIDTH/8)*(PF2_DEPTH-1)*PF2_INTER
 
-;	Logo playfield definition ****************************************************
-PF3_WIDTH 					= 320
-PF3_HEIGHT 					= 140
+;	Checkboard playfield definition ****************************************************
+PF3_WIDTH 					= 292
+PF3_DISPLAY_HEIGHT 	= 140
+PF3_STRIP_SIZE			=	10
+PF3_HEIGHT 					= PF3_DISPLAY_HEIGHT*PF3_STRIP_SIZE
 PF3_DEPTH 					= 4
 PF3_INTER 					= 1
 PF3_SIZE						= (PF3_WIDTH/8)*PF3_HEIGHT*PF3_DEPTH
 PF3_MOD1						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
 PF3_MOD2						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
 
-; Logo image defintion *********************************************************
+;	Images
+; Logo image definition *********************************************************
 BGPIC_WIDTH					= 384
 BGPIC_HEIGHT				= 80
 BGPIC_DEPTH					= 4
 BGPIC_SIZE					= (BGPIC_WIDTH/8)*BGPIC_HEIGHT*BGPIC_DEPTH
+
+; Checkboard image definition *********************************************************
+CHKPIC_WIDTH				= 292
+CHKPIC_HEIGHT				= 1000
+CHKPIC_DEPTH				= 1
+CHKPIC_SIZE					= (CHKPIC_WIDTH/8)*CHKPIC_HEIGHT*CHKPIC_DEPTH
 
 ;*******************************************************************************
 	SECTION PROGRAM,CODE
@@ -70,7 +80,8 @@ Start:
 	bsr			InitScreen3										; Checkerboard screen
 	bsr			InitCopper										; Initialise la Copper list
 
-	jsr			InitBackground	
+	jsr			DrawLogo
+;	jsr			DrawCheckboard
 
 .SetVBL:
 	move.l	VbrBase,a6
@@ -230,7 +241,7 @@ InitCopper:
 ;***************************************
 
 ; Logo image initialisation
-InitBackground:
+DrawLogo:
 	lea			MandarineLogo,a0
 	lea			PaletteBuffer,a1
 	lea			PictureBuffer,a2
@@ -247,6 +258,25 @@ InitBackground:
 	move.l	(a2)+,(a0)+
 	dbf			d2,.NextBlock
 	dbf			d1,.NextPlan
+	dbf			d0,.NextLine
+.DecodeError:
+	rts	
+
+; Checkerboard image initialisation
+DrawCheckboard:
+	lea			Checkerboard,a0
+	lea			PaletteBuffer,a1
+	lea			PictureBuffer,a2
+	jsr			DecodePicture
+	tst.l		d0
+	beq			.DecodeError
+	move.l	PhysicBase3,a0
+	move.w	#CHKPIC_HEIGHT-1,d0						; On transfert notre image
+.NextLine:
+	move.w	#(CHKPIC_WIDTH/32)-1,d2
+.NextBlock:
+	move.l	(a2)+,(a0)+
+	dbf			d2,.NextBlock
 	dbf			d0,.NextLine
 .DecodeError:
 	rts	
@@ -303,7 +333,7 @@ PaletteBuffer3:
 	ds.l		2		
 
 PictureBuffer:
-	ds.b		BGPIC_SIZE*2
+	ds.b		CHKPIC_SIZE
 
 ;*******************************************************************************
 	SECTION SPRITE,DATA_C
@@ -337,7 +367,7 @@ CLSpriteAdr:
 	CMOVE		$0000,SPR7PTL
 CLScreenDef:
 	CWAIT		$0001,$002A
-	CMOVE		$0038,DDFSTRT
+	CMOVE		$0030,DDFSTRT
 	CMOVE		$00D0,DDFSTOP
 	CMOVE		$4200,BPLCON0
 	CMOVE		$0000,BPLCON1
@@ -374,8 +404,8 @@ CLScreenDef2:
 	CWAIT		$0001,$002A+PF_HEIGHT
 	CMOVE		$0000,BPLCON0
 	CMOVE		$0000,BPLCON1	
-	CWAIT		$0001,$002A+PF_HEIGHT+1
-	CMOVE		$0038,DDFSTRT
+	CWAIT		$0001,$002A+PF_HEIGHT+2
+	CMOVE		$0030,DDFSTRT
 	CMOVE		$00D0,DDFSTOP
 	CMOVE		$2000,BPLCON0
 	CMOVE		$0000,BPLCON1
@@ -393,7 +423,7 @@ CLScreenDef3:
 	CMOVE		$0000,BPLCON0
 	CMOVE		$0000,BPLCON1
 	CWAIT		$0001,$002A+PF_HEIGHT+PF2_HEIGHT+2
-	CMOVE		$0038,DDFSTRT
+	CMOVE		$0030,DDFSTRT
 	CMOVE		$00D0,DDFSTOP
 	CMOVE		$1000,BPLCON0
 	CMOVE		$0000,BPLCON1
@@ -404,15 +434,20 @@ CLBitplaneAdr3:
 	CMOVE		$0000,$0000
 	CMOVE		$0000,$0000
 	ENDR
+CLPaletteCheckboard:
+	CMOVE		$0000,COLOR00
+	CMOVE		$0FFF,COLOR01	
 
 CLEnd:
 	CEND
 
+	EVEN
 MandarineLogo:
 	INCBIN	"System:Sources/data/mandarine_logo.iff"
 
+	EVEN
 Checkerboard:
-	INCBIN	"System:Sources/data/checkerboard_stripe.iff"
+	INCBIN	"System:Sources/data/checkerboard_strip.iff"
 
 ;*******************************************************************************
 ; Fonctions utiles
