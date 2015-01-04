@@ -22,13 +22,14 @@ INT_SET							= INT_ON+INT_VERTB
 BURST_SET						= BURST_NONE
 
 ;	Logo playfield definition ****************************************************
-PF_WIDTH 						= 320
+PF_WIDTH 						= 384
+PF_WIDTH_DISPLAY 		= 320
 PF_HEIGHT 					= 80
 PF_DEPTH 						= 4
 PF_INTER 						= 1
 PF_SIZE							= (PF_WIDTH/8)*PF_HEIGHT*PF_DEPTH
-PF_MOD1							= (PF_WIDTH/8)*(PF_DEPTH-1)*PF_INTER
-PF_MOD2							= (PF_WIDTH/8)*(PF_DEPTH-1)*PF_INTER
+PF_MOD1							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)
+PF_MOD2							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)
 
 ;	Scrolltext playfield definition **********************************************
 PF2_WIDTH 					= 320
@@ -49,7 +50,7 @@ PF3_MOD1						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
 PF3_MOD2						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
 
 ; Logo image defintion *********************************************************
-BGPIC_WIDTH					= 320
+BGPIC_WIDTH					= 384
 BGPIC_HEIGHT				= 80
 BGPIC_DEPTH					= 4
 BGPIC_SIZE					= (BGPIC_WIDTH/8)*BGPIC_HEIGHT*BGPIC_DEPTH
