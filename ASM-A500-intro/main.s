@@ -27,7 +27,7 @@ PF_WIDTH 						= 384
 PF_WIDTH_DISPLAY 		= 320
 PF_HEIGHT 					= 80
 PF_DEPTH 						= 4
-PF_INTER 						= 1
+PF_INTER 						= 0
 PF_SIZE							= (PF_WIDTH/8)*PF_HEIGHT*PF_DEPTH
 PF_MOD1							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)-2
 PF_MOD2							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)-2
@@ -36,21 +36,22 @@ PF_MOD2							= (PF_WIDTH-PF_WIDTH_DISPLAY)/8+PF_INTER*(PF_WIDTH*(PF_DEPTH-1)/8)
 PF2_WIDTH 					= 320
 PF2_HEIGHT 					= 16
 PF2_DEPTH 					= 2
-PF2_INTER 					= 1
+PF2_INTER 					= 0
 PF2_SIZE						= (PF2_WIDTH/8)*PF2_HEIGHT*PF2_DEPTH
 PF2_MOD1						= (PF2_WIDTH/8)*(PF2_DEPTH-1)*PF2_INTER
 PF2_MOD2						= (PF2_WIDTH/8)*(PF2_DEPTH-1)*PF2_INTER
 
 ;	Checkboard playfield definition ****************************************************
-PF3_WIDTH 					= 292
+PF3_WIDTH 					= 304
+PF3_WIDTH_DISPLAY 	= 304
 PF3_DISPLAY_HEIGHT 	= 140
 PF3_STRIP_SIZE			=	10
 PF3_HEIGHT 					= PF3_DISPLAY_HEIGHT*PF3_STRIP_SIZE
-PF3_DEPTH 					= 4
-PF3_INTER 					= 1
+PF3_DEPTH 					= 1
+PF3_INTER 					= 0
 PF3_SIZE						= (PF3_WIDTH/8)*PF3_HEIGHT*PF3_DEPTH
-PF3_MOD1						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
-PF3_MOD2						= (PF3_WIDTH/8)*(PF3_DEPTH-1)*PF3_INTER
+PF3_MOD1						= (PF3_WIDTH-PF3_WIDTH_DISPLAY)/8+PF3_INTER*(PF3_WIDTH*(PF3_DEPTH-1)/8)-2
+PF3_MOD2						= (PF3_WIDTH-PF3_WIDTH_DISPLAY)/8+PF3_INTER*(PF3_WIDTH*(PF3_DEPTH-1)/8)-2
 
 ;	Images
 ; Logo image definition *********************************************************
@@ -60,7 +61,7 @@ BGPIC_DEPTH					= 4
 BGPIC_SIZE					= (BGPIC_WIDTH/8)*BGPIC_HEIGHT*BGPIC_DEPTH
 
 ; Checkboard image definition *********************************************************
-CHKPIC_WIDTH				= 292
+CHKPIC_WIDTH				= 304
 CHKPIC_HEIGHT				= 1000
 CHKPIC_DEPTH				= 1
 CHKPIC_SIZE					= (CHKPIC_WIDTH/8)*CHKPIC_HEIGHT*CHKPIC_DEPTH
@@ -80,7 +81,7 @@ Start:
 	bsr			InitScreen3										; Checkerboard screen
 	bsr			InitCopper										; Initialise la Copper list
 
-	jsr			DrawLogo
+;	jsr			DrawLogo
 ;	jsr			DrawCheckboard
 
 .SetVBL:
@@ -130,13 +131,13 @@ Restore:
 ;*******************************************************************************
 
 InitScreen:
-	move.l	#ScreenBuffer,PhysicBase
+	move.l	#MandarineLogo,PhysicBase
 	move.l	PhysicBase,a0
-	move.l	#$33333333,d1
-	move.w	#(PF_SIZE/4)-1,d0
-.FillScreen:
-	move.l	d1,(a0)+
-	dbf			d0,.FillScreen	
+;	move.l	#$33333333,d1
+;	move.w	#(PF_SIZE/4)-1,d0
+;.FillScreen:
+;	move.l	d1,(a0)+
+;	dbf			d0,.FillScreen	
 	rts
 
 InitScreen2:
@@ -150,13 +151,13 @@ InitScreen2:
 	rts
 
 InitScreen3:
-	move.l	#ScreenBuffer3,PhysicBase3
+	move.l	#Checkerboard,PhysicBase3
 	move.l	PhysicBase3,a0
-	move.l	#$C3C3C3C3,d1
-	move.w	#(PF3_SIZE/4)-1,d0
-.FillScreen:
-	move.l	d1,(a0)+
-	dbf			d0,.FillScreen	
+;	move.l	#$C3C3C3C3,d1
+;	move.w	#(PF3_SIZE/4)-1,d0
+;.FillScreen:
+;	move.l	d1,(a0)+
+;	dbf			d0,.FillScreen	
 	rts	
 
 ;***************************************
@@ -237,49 +238,6 @@ InitCopper:
 	dbf			d7,.SetBplPointer3
 
 	rts
-
-;***************************************
-
-; Logo image initialisation
-DrawLogo:
-	lea			MandarineLogo,a0
-	lea			PaletteBuffer,a1
-	lea			PictureBuffer,a2
-	jsr			DecodePicture
-	tst.l		d0
-	beq			.DecodeError
-	move.l	PhysicBase,a0
-	move.w	#BGPIC_HEIGHT-1,d0						; On transfert notre image
-.NextLine:
-	move.w	#PF_DEPTH-1,d1								; Sur un écran 4 plans
-.NextPlan:
-	move.w	#(BGPIC_WIDTH/32)-1,d2
-.NextBlock:
-	move.l	(a2)+,(a0)+
-	dbf			d2,.NextBlock
-	dbf			d1,.NextPlan
-	dbf			d0,.NextLine
-.DecodeError:
-	rts	
-
-; Checkerboard image initialisation
-DrawCheckboard:
-	lea			Checkerboard,a0
-	lea			PaletteBuffer,a1
-	lea			PictureBuffer,a2
-	jsr			DecodePicture
-	tst.l		d0
-	beq			.DecodeError
-	move.l	PhysicBase3,a0
-	move.w	#CHKPIC_HEIGHT-1,d0						; On transfert notre image
-.NextLine:
-	move.w	#(CHKPIC_WIDTH/32)-1,d2
-.NextBlock:
-	move.l	(a2)+,(a0)+
-	dbf			d2,.NextBlock
-	dbf			d0,.NextLine
-.DecodeError:
-	rts	
 
 ;*******************************************************************************
 ;	Routines d'animation
@@ -443,18 +401,18 @@ CLEnd:
 
 	EVEN
 MandarineLogo:
-	INCBIN	"System:Sources/data/mandarine_logo.iff"
+	INCBIN	"System:Sources/data/mandarine_logo.bin"
 
 	EVEN
 Checkerboard:
-	INCBIN	"System:Sources/data/checkerboard_strip.iff"
+	INCBIN	"System:Sources/data/checkerboard_strip.bin"
 
 ;*******************************************************************************
 ; Fonctions utiles
 ;*******************************************************************************
 
 	INCLUDE "System:Sources/includes/system.s"
-	INCLUDE "System:Sources/includes/iff_tool.s"
+;	INCLUDE "System:Sources/includes/iff_tool.s"
 ;	INCLUDE "System:Sources/includes/mod_player.s"
 
 	END
