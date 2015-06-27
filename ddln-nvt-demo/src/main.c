@@ -33,6 +33,7 @@ Routines
 Graphic assets
 */
 #include "screen_size.h"
+#include "copper_lists.h"
 
 /* Music */
 struct Library *PTReplayBase;
@@ -276,11 +277,16 @@ void main()
 	buildPointListFromMatrix();
 	angle = 0;
 
+	for(loop = 0; loop < 8; loop++)
+	{
+		SetAPen(&rast_port1, loop);
+		RectFill(&rast_port1, WIDTH1 * loop / 8, 0, (WIDTH1 * (loop + 1) / 8) - 1, HEIGHT1 - 1);		
+	}	
+
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
-		// SetRast(&rast_port1, 0);
 		SetAPen(&rast_port1, 0);
-		RectFill(&rast_port1, (DISPL_WIDTH1 >> 1) - 64, (DISPL_HEIGHT1 >> 1) - 64 + dbuffer_offset, (DISPL_WIDTH1 >> 1) + 64, (DISPL_HEIGHT1 >> 1) + 64 + dbuffer_offset);
+		// RectFill(&rast_port1, (DISPL_WIDTH1 >> 1) - 64, (DISPL_HEIGHT1 >> 1) - 64 + dbuffer_offset, (DISPL_WIDTH1 >> 1) + 64, (DISPL_HEIGHT1 >> 1) + 64 + dbuffer_offset);
 		drawPointListToViewport(&rast_port1);
 		angle++;
 		angle &= 0x1FF;
