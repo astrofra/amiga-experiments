@@ -17,14 +17,14 @@ def main():
 
 	print('png_to_vertical_copper_list')
 
-	fc = open('copper_lists.c', 'w')
+	fc = open('../src/copper_lists.c', 'w')
 	fc.write('/* Copper list palettes */\n')
 	fc.write('\n')
 	fc.write('#include <exec/types.h>\n')
 	fc.write('#include <intuition/intuition.h>\n')
 	fc.write('\n')
 
-	fh = open('copper_lists.h', 'w')
+	fh = open('../src/copper_lists.h', 'w')
 	fh.write('/* Copper list palettes (headers) */\n')
 	fh.write('\n')
 	fh.write('#include <exec/types.h>\n')
@@ -42,12 +42,10 @@ def main():
 		fc.write('{\n')
 		fc.write('\t/* Line number, number of colors to update, color list [index, RGB4]*/\n')
 
-		# fh.write('extern UWORD cl_' + filename_out + '[' + str(h) + '];\n')
-		# fh.close()
-
 		# Scan PNG line by line
 
 		prev_line_palette = []
+		uword_counter = 0
 
 		for y in range(0, h):
 			print("Line " + str(y))
@@ -102,9 +100,11 @@ def main():
 				idx += 1
 
 			if len(packed_line_palette) > 0:
+				uword_counter += 2
 				fc.write('\t' + str(y) + ', ' + str(len(packed_line_palette)) + ', ')
 				for color_tuple in packed_line_palette:
 					fc.write(str(color_tuple[0]) + ', ' + str(hex(color_tuple[1])) + ', ')
+					uword_counter += 1
 				fc.write('\n')
 
 			prev_line_palette = copy.deepcopy(current_line_palette)
@@ -112,6 +112,9 @@ def main():
 		fc.write('\n')
 		fc.write('};\n')
 		fc.write('\n')
+
+		fh.write('extern UWORD cl_' + filename_out + '[' + str(uword_counter) + '];\n')
+		fh.close()
 
 	fc.close()
 	return 1
