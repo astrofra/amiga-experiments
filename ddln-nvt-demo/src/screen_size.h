@@ -1,0 +1,15 @@
+#ifndef SCREEN_SIZE
+#define SCREEN_SIZE
+
+#define DEFAULT_WIDTH 320
+#define DEFAULT_HEIGHT 160
+
+/* ViewPort 1 */
+#define WIDTH1   DEFAULT_WIDTH
+#define HEIGHT1  (DEFAULT_HEIGHT << 1)
+#define DISPL_WIDTH1   DEFAULT_WIDTH
+#define DISPL_HEIGHT1  DEFAULT_HEIGHT
+#define DEPTH1     1
+#define COLOURS1  (1 << DEPTH1)
+
+#endif // #ifndef SCREEN_SIZE
