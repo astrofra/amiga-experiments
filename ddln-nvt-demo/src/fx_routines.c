@@ -26,28 +26,29 @@ UWORD chip blank_pointer[4]=
 
 void setCityCopperList(struct ViewPort *vp)
 {
-	UWORD loop, c_loop, max_color, line_index;
+	UWORD loop, zloop, c_loop, max_color, line_index;
 
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
 
-    CINIT(copper, 32);
+    CINIT(copper, CL_CITY_LEN);
     CWAIT(copper, 0, 0);
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
     CMOVE(copper, *((UWORD *)SPR0PTL_ADDR), (LONG)&blank_pointer);
 
     loop = 0;
+    printf("CL_CITY_LEN = %d\n", CL_CITY_LEN);
+
     while(loop < CL_CITY_LEN)
     {
     	/*	Scanline position */
     	CWAIT(copper, cl_city[loop++], 0);
 
     	/*	How many color registers ? */
-
-        max_color = cl_city[loop];
+        max_color = cl_city[loop++];
     	for (c_loop = 0; c_loop < max_color; c_loop++)
-    		CMOVE(copper, custom.color[++loop], cl_city[++loop]);
+    		CMOVE(copper, custom.color[cl_city[loop++]], cl_city[loop++]);
     }
     // CWAIT(copper, 63, 0);
     // CMOVE(copper, custom.color[0], 0xF0F);

@@ -28,6 +28,7 @@ Routines
 #include "font_routines.h"
 #include "color_routines.h"
 #include "voxel_routines.h"
+#include "fx_routines.h"
 
 /*
 Graphic assets
@@ -247,7 +248,7 @@ void main()
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
 
-	initMusic();
+	// initMusic();
 
 	WaitTOF();
 
@@ -287,14 +288,15 @@ void main()
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
-		SetAPen(&rast_port1, 0);
-		// RectFill(&rast_port1, (DISPL_WIDTH1 >> 1) - 64, (DISPL_HEIGHT1 >> 1) - 64 + dbuffer_offset, (DISPL_WIDTH1 >> 1) + 64, (DISPL_HEIGHT1 >> 1) + 64 + dbuffer_offset);
-		drawPointListToViewport(&rast_port1);
-		angle++;
-		angle &= 0x1FF;
+		// SetAPen(&rast_port1, 0);
+		// // RectFill(&rast_port1, (DISPL_WIDTH1 >> 1) - 64, (DISPL_HEIGHT1 >> 1) - 64 + dbuffer_offset, (DISPL_WIDTH1 >> 1) + 64, (DISPL_HEIGHT1 >> 1) + 64 + dbuffer_offset);
+		// drawPointListToViewport(&rast_port1);
+		// angle++;
+		// angle &= 0x1FF;
 
-		rotatePointsOnAxisY(angle);
+		// rotatePointsOnAxisY(angle);
 
+		(&view_port1)->RasInfo->RxOffset = angle;
 		(&view_port1)->RasInfo->RyOffset = dbuffer_offset;
 		ScrollVPort(&view_port1);
 
@@ -302,6 +304,8 @@ void main()
 			dbuffer_offset = DISPL_HEIGHT1;
 		else
 			dbuffer_offset = 0;
+
+		angle++;
 
 		WaitTOF();
 	}

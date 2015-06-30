@@ -19,5 +19,5 @@ sound_routines.o: sound_routines.c sound_routines.h
 voxel_routines.o: voxel_routines.c voxel_routines.h	
 cosine_table.o: cosine_table.c
 font_desc.o: font_desc.c
-copper_lists.o: copper_lists.c
-fx_routines.o: fx_routines.c
+copper_lists.o: copper_lists.c copper_lists.h
+fx_routines.o: fx_routines.c fx_routines.h

@@ -2,7 +2,7 @@
 #define SCREEN_SIZE
 
 #define DEFAULT_WIDTH 320
-#define DEFAULT_HEIGHT 160
+#define DEFAULT_HEIGHT 256
 
 /* ViewPort 1 */
 #define WIDTH1   DEFAULT_WIDTH
