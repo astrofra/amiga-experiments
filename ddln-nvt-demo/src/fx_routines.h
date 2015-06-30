@@ -5,4 +5,6 @@
 #include <intuition/intuition.h>
 #include <graphics/gfxbase.h>
 
+void setCityCopperList(struct ViewPort *vp);
+
 #endif // #ifndef FX_ROUTINES

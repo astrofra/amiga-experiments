@@ -251,6 +251,8 @@ void main()
 
 	WaitTOF();
 
+	setCityCopperList(&view_port1);
+
 	MrgCop(&my_view);
 
 	/*	Wait until the DF0: motor stops */
