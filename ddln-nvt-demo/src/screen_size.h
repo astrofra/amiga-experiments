@@ -9,7 +9,7 @@
 #define HEIGHT1  (DEFAULT_HEIGHT << 1)
 #define DISPL_WIDTH1   DEFAULT_WIDTH
 #define DISPL_HEIGHT1  DEFAULT_HEIGHT
-#define DEPTH1     3
+#define DEPTH1     5
 #define COLOURS1  (1 << DEPTH1)
 
 #endif // #ifndef SCREEN_SIZE

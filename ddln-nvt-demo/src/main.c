@@ -29,6 +29,7 @@ Routines
 #include "color_routines.h"
 #include "voxel_routines.h"
 #include "fx_routines.h"
+#include "tinfl.c"
 
 /*
 Graphic assets
@@ -184,6 +185,8 @@ void main()
 	OpenLibrary( "graphics.library", 0 );
 	if( !GfxBase )
 		close_demo( "Could NOT open the Graphics library!" );
+
+	tinflDiag();
 
 	printf("DEMO IS LOADING!\n");
 
