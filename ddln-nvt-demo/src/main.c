@@ -87,7 +87,8 @@ void initMusic(void)
 		exit(0); //FIXME
 	}
 
-	// mod = load_getchipmem((UBYTE *)"assets/brazil-by-med.mod", 413506);
+	// mod = load_unzip_getchipmem((UBYTE *)"assets/miami_vice.mod.gz", 756, 7394);
+	mod = load_getchipmem((UBYTE *)"assets/miami_vice.mod", 7394);
 #else
 	background = PrepareSound( "assets/music_loop.8svx" );
 	if( !background )
@@ -139,7 +140,7 @@ void close_demo(STRPTR message)
 	{
 		PTStop(theMod);
 		PTFreeMod(theMod);
-		FreeMem(mod, 413506);
+		FreeMem(mod, 7394);
 	}
 
 	if (PTReplayBase) CloseLibrary(PTReplayBase);
@@ -251,7 +252,7 @@ void main()
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
 
-	// initMusic();
+	initMusic();
 
 	WaitTOF();
 

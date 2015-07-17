@@ -7,6 +7,8 @@
 extern struct DosLibrary *DOSBase;
 extern struct GfxBase *GfxBase;
 
+extern size_t tinfl_decompress_mem_to_mem(void *pOut_buf, size_t out_buf_len, const void *pSrc_buf, size_t src_buf_len, int flags);
+
 /*
   Image loading 
 */
@@ -24,6 +26,34 @@ PLANEPTR load_getchipmem(UBYTE *name, ULONG size)
 
   Read(fileHandle, mem, size);
   Close(fileHandle);
+
+  return (mem);
+}
+
+PLANEPTR load_unzip_getchipmem(UBYTE *name, ULONG input_size, ULONG output_size)
+{
+  BPTR fileHandle;
+  PLANEPTR mem, unzip_mem, tinfl_return_value;
+
+  if (!(fileHandle = Open(name, MODE_OLDFILE)))
+    return (NULL);
+
+  if (!(mem = AllocMem(input_size, MEMF_CHIP)))
+    return (NULL);
+
+  Read(fileHandle, mem, input_size);
+
+  if (!(unzip_mem = AllocMem(output_size, MEMF_CHIP)))
+  {
+    FreeMem(mem, input_size);
+    return (NULL);  
+  }
+
+  Close(fileHandle);
+
+  tinfl_return_value = tinfl_decompress_mem_to_mem(unzip_mem, output_size, mem, input_size, 0);
+  printf("tinfl_decompress_mem_to_mem() returned %d\n", tinfl_return_value);
+  FreeMem(mem, input_size);
 
   return (mem);
 }
