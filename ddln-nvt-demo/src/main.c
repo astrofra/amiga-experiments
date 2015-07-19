@@ -87,8 +87,9 @@ void initMusic(void)
 		exit(0); //FIXME
 	}
 
-	// mod = load_unzip_getchipmem((UBYTE *)"assets/miami_vice.mod.gz", 756, 7394);
-	mod = load_getchipmem((UBYTE *)"assets/miami_vice.mod", 7394);
+	mod = load_unzip_getchipmem((UBYTE *)"assets/miami_vice.dat", 712, 7394);
+	// mod = NULL;
+	// mod = load_getchipmem((UBYTE *)"assets/miami_vice.mod", 7394);
 #else
 	background = PrepareSound( "assets/music_loop.8svx" );
 	if( !background )

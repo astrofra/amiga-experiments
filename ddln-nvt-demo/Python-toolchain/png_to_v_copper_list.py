@@ -7,7 +7,7 @@ import colorsys
 
 
 global fc, fh
-max_color_index = 6
+max_color_index = 7
 
 def main():
 
@@ -104,7 +104,7 @@ def main():
 				fc.write('\t' + str(y) + ', ' + str(len(packed_line_palette)) + ', ')
 				for color_tuple in packed_line_palette:
 					fc.write(str(color_tuple[0]) + ', ' + str(hex(color_tuple[1])) + ', ')
-					uword_counter += 1
+					uword_counter += 2
 				fc.write('\n')
 
 			prev_line_palette = copy.deepcopy(current_line_palette)
@@ -113,6 +113,7 @@ def main():
 		fc.write('};\n')
 		fc.write('\n')
 
+		fh.write('#define CL_' + filename_out.upper() + '_LEN ' + str(uword_counter) + '\n')
 		fh.write('extern UWORD cl_' + filename_out + '[' + str(uword_counter) + '];\n')
 		fh.close()
 
