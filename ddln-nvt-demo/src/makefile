@@ -5,7 +5,7 @@
 	sc NOLINK CODE=F DATA=F OPTI TO $@ $*.c
 
 OBJ = main.o \
-color_routines.o bitmap_routines.o font_routines.o sound_routines.o voxel_routines.o fx_routines.o cosine_table.o font_desc.o copper_lists.o
+color_routines.o bitmap_routines.o font_routines.o sound_routines.o voxel_routines.o fx_routines.o bitmap_desc.o cosine_table.o font_desc.o copper_lists.o
 
 main.exe: $(OBJ) includes.gst
 	sc LINK CODE=F DATA=F OBJ $(OBJ) TO main.exe
@@ -19,5 +19,6 @@ sound_routines.o: sound_routines.c sound_routines.h
 voxel_routines.o: voxel_routines.c voxel_routines.h	
 cosine_table.o: cosine_table.c
 font_desc.o: font_desc.c
+bitmap_desc.o: bitmap_desc.c
 copper_lists.o: copper_lists.c copper_lists.h
 fx_routines.o: fx_routines.c fx_routines.h

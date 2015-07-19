@@ -58,6 +58,9 @@ struct BitMap bit_map1;
 struct RastPort rast_port1;
 UWORD dbuffer_offset = 0;
 
+/* Data */
+struct BitMap *bitmap_element_city = NULL;
+
 #define PTREPLAY_MUSIC
 struct SoundInfo *background = NULL;
 
@@ -87,7 +90,7 @@ void initMusic(void)
 		exit(0); //FIXME
 	}
 
-	mod = load_unzip_getchipmem((UBYTE *)"assets/miami_vice.dat", 712, 7394);
+	mod = load_zlib_getchipmem((UBYTE *)"assets/miami_vice.dat", 712, 7394);
 	// mod = NULL;
 	// mod = load_getchipmem((UBYTE *)"assets/miami_vice.mod", 7394);
 #else
@@ -121,6 +124,9 @@ void playMusic(void)
 void close_demo(STRPTR message)
 {
 	int loop;
+
+	WaitBlit();
+	free_allocated_bitmap(bitmap_element_city);
 
 	/*	Free the voxel structures */
 	deleteMatrix();
@@ -285,11 +291,13 @@ void main()
 	buildPointListFromMatrix();
 	angle = 0;
 
-	for(loop = 0; loop < 8; loop++)
-	{
-		SetAPen(&rast_port1, loop);
-		RectFill(&rast_port1, WIDTH1 * loop / 8, 0, (WIDTH1 * (loop + 1) / 8) - 1, HEIGHT1 - 1);		
-	}	
+	drawElementCity(&bit_map1);
+
+	// for(loop = 0; loop < 8; loop++)
+	// {
+	// 	SetAPen(&rast_port1, loop);
+	// 	RectFill(&rast_port1, WIDTH1 * loop / 8, 0, (WIDTH1 * (loop + 1) / 8) - 1, HEIGHT1 - 1);		
+	// }	
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
@@ -305,10 +313,10 @@ void main()
 		(&view_port1)->RasInfo->RyOffset = dbuffer_offset;
 		ScrollVPort(&view_port1);
 
-		if (dbuffer_offset == 0)
-			dbuffer_offset = DISPL_HEIGHT1;
-		else
-			dbuffer_offset = 0;
+		// if (dbuffer_offset == 0)
+		// 	dbuffer_offset = DISPL_HEIGHT1;
+		// else
+		// 	dbuffer_offset = 0;
 
 		angle++;
 

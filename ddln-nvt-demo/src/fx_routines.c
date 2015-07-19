@@ -16,6 +16,9 @@ extern struct Custom far custom;
 extern struct GfxBase *GfxBase;
 extern struct ViewPort view_port1;
 
+extern struct Image element_city;
+extern struct BitMap *bitmap_element_city;
+
 struct UCopList *copper;
 
 UWORD chip blank_pointer[4]=
@@ -23,6 +26,16 @@ UWORD chip blank_pointer[4]=
     0x0000, 0x0000,
     0x0000, 0x0000
 };
+
+void drawElementCity(struct BitMap *dest_bitmap)
+{
+    bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 12065, 75264, element_city.Width, element_city.Height, element_city.Depth);
+    BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 0, 0);
+
+    WaitBlit();
+
+    free_allocated_bitmap(bitmap_element_city);
+}
 
 void setCityCopperList(struct ViewPort *vp)
 {

@@ -5,6 +5,7 @@
 #include <intuition/intuition.h>
 #include <graphics/gfxbase.h>
 
+void drawElementCity(struct BitMap *dest_bitmap);
 void setCityCopperList(struct ViewPort *vp);
 
 #endif // #ifndef FX_ROUTINES

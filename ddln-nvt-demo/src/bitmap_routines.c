@@ -30,7 +30,7 @@ PLANEPTR load_getchipmem(UBYTE *name, ULONG size)
   return (mem);
 }
 
-PLANEPTR load_unzip_getchipmem(UBYTE *name, ULONG input_size, ULONG output_size)
+PLANEPTR load_zlib_getchipmem(UBYTE *name, ULONG input_size, ULONG output_size)
 {
   BPTR fileHandle;
   PLANEPTR mem, unzip_mem, tinfl_return_value;
@@ -87,12 +87,6 @@ struct BitMap *load_file_as_bitmap(UBYTE *name, ULONG byte_size, UWORD width, UW
 
   new_bitmap = (struct BitMap *)AllocMem((LONG)sizeof(struct BitMap), MEMF_CLEAR);
   InitBitMap(new_bitmap, depth, width, height);
-  // printf("new_bitmap, BytesPerRow = %d, Rows = %d, Depth = %d, pad = %d, byte_size = %i, \n",
-  //       (*new_bitmap).BytesPerRow,
-  //       (*new_bitmap).Rows,
-  //       (*new_bitmap).Depth,
-  //       (int)(*new_bitmap).pad,
-  //       byte_size);
 
   for (i = 0; i < depth; i++)
     (*new_bitmap).Planes[i] = (PLANEPTR)AllocMem(RASSIZE(width, height), MEMF_CHIP);
@@ -100,6 +94,38 @@ struct BitMap *load_file_as_bitmap(UBYTE *name, ULONG byte_size, UWORD width, UW
   for (i = 0; i < depth; i++)
     Read(fileHandle, (*new_bitmap).Planes[i], byte_size / depth);
   Close(fileHandle);
+
+  return new_bitmap;
+}
+
+struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG byte_size_zlib, ULONG output_size, UWORD width, UWORD height, UWORD depth)
+{
+  BPTR fileHandle;
+  struct BitMap *new_bitmap;
+  UWORD i;
+  PLANEPTR mem;
+
+  if (!(fileHandle = Open(name, MODE_OLDFILE)))
+    return (NULL);
+
+  new_bitmap = (struct BitMap *)AllocMem((LONG)sizeof(struct BitMap), MEMF_CLEAR);
+  InitBitMap(new_bitmap, depth, width, height);
+
+  for (i = 0; i < depth; i++)
+    (*new_bitmap).Planes[i] = (PLANEPTR)AllocMem(RASSIZE(width, height), MEMF_CHIP);
+
+  // for (i = 0; i < depth; i++)
+  //   Read(fileHandle, (*new_bitmap).Planes[i], output_size / depth);
+  // Close(fileHandle);
+
+  if (!(mem = AllocMem(byte_size_zlib, MEMF_CHIP)))
+    return (NULL);
+
+  Read(fileHandle, mem, byte_size_zlib);
+
+  tinfl_decompress_mem_to_mem((*new_bitmap).Planes[0], output_size, mem, byte_size_zlib, 1);
+  FreeMem(mem, byte_size_zlib);
+  mem = NULL;
 
   return new_bitmap;
 }
