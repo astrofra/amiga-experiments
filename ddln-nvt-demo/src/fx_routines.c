@@ -35,6 +35,7 @@ void drawElementCity(struct BitMap *dest_bitmap)
     WaitBlit();
 
     free_allocated_bitmap(bitmap_element_city);
+    bitmap_element_city = NULL;
 }
 
 void setCityCopperList(struct ViewPort *vp)

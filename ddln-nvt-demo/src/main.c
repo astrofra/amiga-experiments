@@ -325,6 +325,8 @@ void main()
 
 	// ON_VBLANK;
 
+	WaitTOF();
+
 	/*	Wait for mouse up
 		to prevent the mouse up event
 		to mess with the OS gui

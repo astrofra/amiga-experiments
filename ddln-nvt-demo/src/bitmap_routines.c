@@ -33,27 +33,27 @@ PLANEPTR load_getchipmem(UBYTE *name, ULONG size)
 PLANEPTR load_zlib_getchipmem(UBYTE *name, ULONG input_size, ULONG output_size)
 {
   BPTR fileHandle;
-  PLANEPTR mem, unzip_mem, tinfl_return_value;
+  PLANEPTR temp_mem, unzip_mem, tinfl_return_value;
 
   if (!(fileHandle = Open(name, MODE_OLDFILE)))
     return (NULL);
 
-  if (!(mem = AllocMem(input_size, MEMF_CHIP)))
+  if (!(temp_mem = AllocMem(input_size, MEMF_PUBLIC)))
     return (NULL);
 
-  Read(fileHandle, mem, input_size);
+  Read(fileHandle, temp_mem, input_size);
 
   if (!(unzip_mem = AllocMem(output_size, MEMF_CHIP)))
   {
-    FreeMem(mem, input_size);
+    FreeMem(temp_mem, input_size);
     return (NULL);  
   }
 
   Close(fileHandle);
 
-  tinfl_return_value = tinfl_decompress_mem_to_mem(unzip_mem, output_size, mem, input_size, 1);
+  tinfl_return_value = tinfl_decompress_mem_to_mem(unzip_mem, output_size, temp_mem, input_size, 1);
   printf("tinfl_decompress_mem_to_mem() returned %d\n", tinfl_return_value);
-  FreeMem(mem, input_size);
+  FreeMem(temp_mem, input_size);
 
   return (unzip_mem);
 }
@@ -98,12 +98,12 @@ struct BitMap *load_file_as_bitmap(UBYTE *name, ULONG byte_size, UWORD width, UW
   return new_bitmap;
 }
 
-struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG byte_size_zlib, ULONG output_size, UWORD width, UWORD height, UWORD depth)
+struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG output_size, UWORD width, UWORD height, UWORD depth)
 {
   BPTR fileHandle;
   struct BitMap *new_bitmap;
   UWORD i;
-  PLANEPTR mem;
+  PLANEPTR temp_mem;
 
   if (!(fileHandle = Open(name, MODE_OLDFILE)))
     return (NULL);
@@ -118,14 +118,14 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG byte_size_zlib, ULONG
   //   Read(fileHandle, (*new_bitmap).Planes[i], output_size / depth);
   // Close(fileHandle);
 
-  if (!(mem = AllocMem(byte_size_zlib, MEMF_CHIP)))
+  if (!(temp_mem = AllocMem(input_size, MEMF_PUBLIC)))
     return (NULL);
 
-  Read(fileHandle, mem, byte_size_zlib);
+  Read(fileHandle, temp_mem, input_size);
 
-  tinfl_decompress_mem_to_mem((*new_bitmap).Planes[0], output_size, mem, byte_size_zlib, 1);
-  FreeMem(mem, byte_size_zlib);
-  mem = NULL;
+  tinfl_decompress_mem_to_mem((*new_bitmap).Planes[0], output_size, temp_mem, input_size, 1);
+  FreeMem(temp_mem, input_size);
+  temp_mem = NULL;
 
   return new_bitmap;
 }
