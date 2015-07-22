@@ -56,6 +56,9 @@ struct ViewPort view_port1;
 struct RasInfo ras_info1;
 struct BitMap bit_map1;
 struct RastPort rast_port1;
+struct RasInfo ras_info2;
+struct BitMap bit_map2;
+struct RastPort rast_port2;
 UWORD dbuffer_offset = 0;
 
 /* Data */
@@ -141,6 +144,10 @@ void close_demo(STRPTR message)
 		if( bit_map1.Planes[ loop ] )
 			FreeRaster( bit_map1.Planes[ loop ], WIDTH1, HEIGHT1 );
 
+	for( loop = 0; loop < DEPTH1; loop++ )
+		if( bit_map2.Planes[ loop ] )
+			FreeRaster( bit_map2.Planes[ loop ], WIDTH1, HEIGHT1 );		
+
 #ifdef PTREPLAY_MUSIC
 	/*	Stop music */
 	if (mod != NULL)
@@ -217,7 +224,7 @@ void main()
 	view_port1.DxOffset = 0;         /* X position.                   */
 	view_port1.DyOffset = 0;         /* Y position.                   */
 	view_port1.RasInfo = &ras_info1; /* Give it a pointer to RasInfo. */
-	view_port1.Modes = NULL;         /* Low resolution.               */
+	view_port1.Modes = DUALPF|PFBA;         /* Low resolution.               */
 	view_port1.Next = NULL;   /* Pointer to next ViewPort.     */
 
 	/* 3. Get a colour map, link it to the ViewPort, and prepare it: */
@@ -227,8 +234,8 @@ void main()
 	if( view_port1.ColorMap == NULL )
 		close_demo( "Could NOT get a ColorMap!" );
 
-	/* Prepare the BitMap */
-	/* ViewPort 1 */
+	/* Prepare the BitMaps */
+	/* ViewPort 1, Bitmap 1 */
 	InitBitMap( &bit_map1, DEPTH1, WIDTH1, HEIGHT1 );
 	/* Allocate memory for the Raster: */ 
 	for( loop = 0; loop < DEPTH1; loop++ )
@@ -240,21 +247,41 @@ void main()
 		BltClear( bit_map1.Planes[ loop ], RASSIZE( WIDTH1, HEIGHT1 ), 0 );
 	}
 
+	/* ViewPort 1, Bitmap 2 */
+	InitBitMap( &bit_map2, DEPTH1, WIDTH1, HEIGHT1 );
+	/* Allocate memory for the Raster: */ 
+	for( loop = 0; loop < DEPTH1; loop++ )
+	{
+		bit_map2.Planes[ loop ] = (PLANEPTR) AllocRaster( WIDTH1, HEIGHT1 );
+		if( bit_map2.Planes[ loop ] == NULL )
+			close_demo( "Could NOT allocate enough memory for the raster!" );
+	/* Clear the display memory with help of the Blitter: */
+		BltClear( bit_map2.Planes[ loop ], RASSIZE( WIDTH1, HEIGHT1 ), 0 );
+	}
+
 	/* Prepare the RasInfo structure */
 
-	/* ViewPort 1 */
+	/* ViewPort 1, Raster 1 */
 	ras_info1.BitMap = &bit_map1; /* Pointer to the BitMap structure.  */
 	ras_info1.RxOffset = 0;       /* The top left corner of the Raster */
 	ras_info1.RyOffset = 0;       /* should be at the top left corner  */
 	              /* of the display.                   */
-	ras_info1.Next = NULL;        /* Single playfield - only one       */
-	              /* RasInfo structure is necessary.   */
+	ras_info1.Next = &ras_info2;        /* Dual playfield */
 
+	/* ViewPort 1, Raster 2 */
+	ras_info2.BitMap = &bit_map2; /* Pointer to the BitMap structure.  */
+	ras_info2.RxOffset = 0;       /* The top left corner of the Raster */
+	ras_info2.RyOffset = 0;       /* should be at the top left corner  */
+	              					/* of the display.                   */
+	ras_info2.Next = NULL;        /* Single playfield - only one       */
+	              				/* RasInfo structure is necessary.   */
 
 	/* Prepare the RastPort, and give it a pointer to the BitMap. */
 	/* ViewPort 1 */
 	InitRastPort( &rast_port1 );
 	rast_port1.BitMap = &bit_map1;
+	InitRastPort( &rast_port2 );
+	rast_port2.BitMap = &bit_map2;
 
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
@@ -268,8 +295,8 @@ void main()
 	MrgCop(&my_view);
 
 	/*	Wait until the DF0: motor stops */
-	for(loop = 0; loop < 150; loop++)
-		WaitTOF();
+	// for(loop = 0; loop < 150; loop++)
+	// 	WaitTOF();
 
 	/* 8. Show the new View: */
 	LoadView( &my_view );	
@@ -293,11 +320,11 @@ void main()
 
 	drawElementCity(&bit_map1);
 
-	// for(loop = 0; loop < 8; loop++)
-	// {
-	// 	SetAPen(&rast_port1, loop);
-	// 	RectFill(&rast_port1, WIDTH1 * loop / 8, 0, (WIDTH1 * (loop + 1) / 8) - 1, HEIGHT1 - 1);		
-	// }	
+	for(loop = 0; loop < 8; loop++)
+	{
+		SetAPen(&rast_port2, loop);
+		RectFill(&rast_port2, WIDTH1 * loop / 8, 16, (WIDTH1 * (loop + 1) / 8) - 4, (HEIGHT1 >> 2) - 1);		
+	}	
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{

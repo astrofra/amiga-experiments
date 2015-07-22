@@ -69,3 +69,17 @@ struct Image trabant_facing_car_l0 =
 	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
 	NULL		/* NextImage */
 };
+
+UWORD title_placePaletteRGB4[4] =
+{
+	0x00F0,0x0525,0x0A47,0x0F59
+};
+
+struct Image title_place =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	312, 68, 2,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0003, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
