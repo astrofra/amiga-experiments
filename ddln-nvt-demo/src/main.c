@@ -93,7 +93,7 @@ void initMusic(void)
 		exit(0); //FIXME
 	}
 
-	mod = load_zlib_getchipmem((UBYTE *)"assets/miami_vice.dat", 712, 7394);
+	mod = load_zlib_getchipmem((UBYTE *)"assets/jhericurl-med-mandarine.dat", 131577, 254488);
 	// mod = NULL;
 	// mod = load_getchipmem((UBYTE *)"assets/miami_vice.mod", 7394);
 #else
@@ -154,7 +154,7 @@ void close_demo(STRPTR message)
 	{
 		PTStop(theMod);
 		PTFreeMod(theMod);
-		FreeMem(mod, 7394);
+		FreeMem(mod, 254488);
 	}
 
 	if (PTReplayBase) CloseLibrary(PTReplayBase);
@@ -299,9 +299,7 @@ void main()
 	// 	WaitTOF();
 
 	/* 8. Show the new View: */
-	LoadView( &my_view );	
-
-	playMusic();
+	LoadView( &my_view );
 
 	WaitTOF();
 	WaitTOF();
@@ -324,7 +322,9 @@ void main()
 	{
 		SetAPen(&rast_port2, loop);
 		RectFill(&rast_port2, WIDTH1 * loop / 8, 16, (WIDTH1 * (loop + 1) / 8) - 4, (HEIGHT1 >> 2) - 1);		
-	}	
+	}
+
+	playMusic();
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
@@ -338,6 +338,7 @@ void main()
 
 		(&view_port1)->RasInfo->RxOffset = angle;
 		(&view_port1)->RasInfo->RyOffset = dbuffer_offset;
+		(&view_port1)->RasInfo->Next->RxOffset = angle << 1;
 		ScrollVPort(&view_port1);
 
 		// if (dbuffer_offset == 0)
