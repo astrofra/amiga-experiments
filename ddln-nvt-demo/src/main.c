@@ -93,7 +93,7 @@ void initMusic(void)
 		exit(0); //FIXME
 	}
 
-	mod = load_zlib_getchipmem((UBYTE *)"assets/jhericurl-med-mandarine.dat", 131577, 254488);
+	mod = load_zlib_getchipmem((UBYTE *)"assets/jhericurl-med-mandarine.dat", 120930, 232562);
 	// mod = NULL;
 	// mod = load_getchipmem((UBYTE *)"assets/miami_vice.mod", 7394);
 #else
@@ -154,7 +154,7 @@ void close_demo(STRPTR message)
 	{
 		PTStop(theMod);
 		PTFreeMod(theMod);
-		FreeMem(mod, 254488);
+		FreeMem(mod, 232562);
 	}
 
 	if (PTReplayBase) CloseLibrary(PTReplayBase);
