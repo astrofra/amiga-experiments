@@ -42,6 +42,8 @@ struct Library *PTReplayBase;
 struct Module *theMod;
 UBYTE *mod = NULL;
 
+UBYTE tin_fl_enable_waittof = 0;
+
 struct IntuitionBase *IntuitionBase;
 struct GfxBase *GfxBase;
 extern struct ExecBase *SysBase;
@@ -63,6 +65,9 @@ UWORD dbuffer_offset = 0;
 
 /* Data */
 struct BitMap *bitmap_element_city = NULL;
+
+extern UWORD trabant_facing_groundPaletteRGB4[8];
+extern UWORD trabant_facing_carPaletteRGB4[8];
 
 #define PTREPLAY_MUSIC
 struct SoundInfo *background = NULL;
@@ -230,7 +235,7 @@ void main()
 	/* 3. Get a colour map, link it to the ViewPort, and prepare it: */
 
 	/* ViewPort 1 */
-	view_port1.ColorMap = (struct ColorMap *) GetColorMap(COLOURS1);
+	view_port1.ColorMap = (struct ColorMap *) GetColorMap(COLOURS1 * 4);
 	if( view_port1.ColorMap == NULL )
 		close_demo( "Could NOT get a ColorMap!" );
 
@@ -290,7 +295,7 @@ void main()
 
 	WaitTOF();
 
-	setCityCopperList(&view_port1);
+	// setCityCopperList(&view_port1);
 
 	MrgCop(&my_view);
 
@@ -316,15 +321,31 @@ void main()
 	buildPointListFromMatrix();
 	angle = 0;
 
-	drawElementCity(&bit_map1);
-
-	for(loop = 0; loop < 8; loop++)
-	{
-		SetAPen(&rast_port2, loop);
-		RectFill(&rast_port2, WIDTH1 * loop / 8, 16, (WIDTH1 * (loop + 1) / 8) - 4, (HEIGHT1 >> 2) - 1);		
-	}
-
 	playMusic();
+
+	tin_fl_enable_waittof = 1;
+
+	// drawElementCity(&bit_map1);
+	// drawElementCity(&bit_map2);
+	// LoadRGB4(&view_port1, trabant_facing_groundPaletteRGB4, 8);
+	for(loop = 1; loop < 8; loop++)
+	{
+		UWORD tmp_col = trabant_facing_groundPaletteRGB4[loop];
+		printf("color = %x, ", tmp_col);
+		SetRGB4(&view_port1, loop, (tmp_col & 0x0f00) >> 8, (tmp_col & 0x00f0) >> 4, tmp_col & 0x000f);
+	}
+	printf("\n");
+
+	for(loop = 1; loop < 8; loop++)
+	{
+		UWORD tmp_col = trabant_facing_carPaletteRGB4[loop];
+		printf("color = %x, ", tmp_col);
+		SetRGB4(&view_port1, loop + 8, (tmp_col & 0x0f00) >> 8, (tmp_col & 0x00f0) >> 4, tmp_col & 0x000f);
+	}	
+	printf("\n");
+
+	drawTrabantFacingGround(&bit_map1);
+	drawTrabantFacingCar(&bit_map2);
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
@@ -336,7 +357,7 @@ void main()
 
 		// rotatePointsOnAxisY(angle);
 
-		(&view_port1)->RasInfo->RxOffset = angle;
+		(&view_port1)->RasInfo->RxOffset = angle >> 1;
 		(&view_port1)->RasInfo->RyOffset = dbuffer_offset;
 		(&view_port1)->RasInfo->Next->RxOffset = angle << 1;
 		ScrollVPort(&view_port1);

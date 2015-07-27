@@ -19,6 +19,9 @@ extern struct ViewPort view_port1;
 extern struct Image element_city;
 extern struct BitMap *bitmap_element_city;
 
+extern struct Image trabant_facing_ground;
+extern struct Image trabant_facing_car;
+
 struct UCopList *copper;
 
 UWORD chip blank_pointer[4]=
@@ -26,6 +29,24 @@ UWORD chip blank_pointer[4]=
     0x0000, 0x0000,
     0x0000, 0x0000
 };
+
+void drawTrabantFacingGround(struct BitMap *dest_bitmap)
+{
+    struct BitMap *tmp_bitmap;
+    tmp_bitmap = load_zlib_file_as_bitmap("assets/trabant_facing_ground.dat", 5933, 12960, trabant_facing_ground.Width, trabant_facing_ground.Height, trabant_facing_ground.Depth);
+    BLIT_BITMAP_S(tmp_bitmap, dest_bitmap, trabant_facing_ground.Width, trabant_facing_ground.Height, 0, HEIGHT1 - trabant_facing_ground.Height);
+
+    free_allocated_bitmap(tmp_bitmap);
+}
+
+void drawTrabantFacingCar(struct BitMap *dest_bitmap)
+{
+    struct BitMap *tmp_bitmap;
+    tmp_bitmap = load_zlib_file_as_bitmap("assets/trabant_facing_car.dat", 2662, 6480, trabant_facing_car.Width, trabant_facing_car.Height, trabant_facing_car.Depth);
+    BLIT_BITMAP_S(tmp_bitmap, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, 0, HEIGHT1 - trabant_facing_car.Height - 16);
+
+    free_allocated_bitmap(tmp_bitmap);
+}
 
 void drawElementCity(struct BitMap *dest_bitmap)
 {

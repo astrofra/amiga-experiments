@@ -25,7 +25,7 @@ struct Image element_city =
 
 UWORD trabant_facing_groundPaletteRGB4[8] =
 {
-	0x0101,0x0312,0x0513,0x0824,0x0B36,0x0C47,0x0000,0x0000
+	0x0000,0x0312,0x0513,0x0824,0x0B36,0x0C47,0x0000,0x0000
 };
 
 struct Image trabant_facing_ground =
@@ -81,5 +81,47 @@ struct Image title_place =
 	312, 68, 2,	/* Width, Height, Depth */
 	NULL,	/* ImageData */
 	0x0003, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+UWORD trabant_side_000PaletteRGB4[8] =
+{
+	0x0F0F,0x0111,0x0333,0x0455,0x0378,0x01AC,0x0BBB,0x00EF
+};
+
+struct Image trabant_side_000 =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	246, 102, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+UWORD trabant_side_001PaletteRGB4[8] =
+{
+	0x0F0F,0x0111,0x0333,0x0455,0x0378,0x01AC,0x0BBB,0x00EF
+};
+
+struct Image trabant_side_001 =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	246, 102, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+UWORD trabant_side_002PaletteRGB4[8] =
+{
+	0x0F0F,0x0111,0x0333,0x0455,0x0378,0x01AC,0x0BBB,0x00EF
+};
+
+struct Image trabant_side_002 =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	246, 102, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
 	NULL		/* NextImage */
 };
