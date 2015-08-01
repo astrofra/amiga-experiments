@@ -135,6 +135,8 @@ void close_demo(STRPTR message)
 
 	WaitBlit();
 	free_allocated_bitmap(bitmap_element_city);
+	freeTrabantFacingCar();
+	freeTrabantLight();
 
 	/*	Free the voxel structures */
 	deleteMatrix();
@@ -357,10 +359,10 @@ void main()
 
 		// rotatePointsOnAxisY(angle);
 
-		(&view_port1)->RasInfo->RxOffset = angle >> 1;
-		(&view_port1)->RasInfo->RyOffset = dbuffer_offset;
-		(&view_port1)->RasInfo->Next->RxOffset = angle << 1;
-		ScrollVPort(&view_port1);
+		// (&view_port1)->RasInfo->RxOffset = angle >> 1;
+		// (&view_port1)->RasInfo->RyOffset = dbuffer_offset;
+		// (&view_port1)->RasInfo->Next->RxOffset = angle << 1;
+		// ScrollVPort(&view_port1);
 
 		// if (dbuffer_offset == 0)
 		// 	dbuffer_offset = DISPL_HEIGHT1;
