@@ -143,6 +143,7 @@ void close_demo(STRPTR message)
 
 	WaitBlit();
 	free_allocated_bitmap(bitmap_element_city);
+	freeTrabantFacingGround();
 	freeTrabantFacingCar();
 	freeTrabantLight();
 
@@ -198,7 +199,7 @@ void close_demo(STRPTR message)
 	exit(0);
 }
 
-void swapDoubleBuffer1(void)
+void __inline swapDoubleBuffer1(void)
 {
 	if (dbuffer_offset_1 <= 0)
 		dbuffer_offset_1 = DISPL_WIDTH1;
@@ -206,7 +207,7 @@ void swapDoubleBuffer1(void)
 		dbuffer_offset_1 = -DISPL_WIDTH1;
 }
 
-void swapDoubleBuffer2(void)
+void __inline swapDoubleBuffer2(void)
 {		
 	if (dbuffer_offset_2 <= 0)
 		dbuffer_offset_2 = DISPL_WIDTH1;
@@ -346,10 +347,10 @@ void main()
 	OFF_SPRITE;
 	// OFF_VBLANK;
 
-	setupMatrix();
-	fillMatrixWithRandomData();
-	buildPointListFromMatrix();
-	angle = 0;
+	// setupMatrix();
+	// fillMatrixWithRandomData();
+	// buildPointListFromMatrix();
+	// angle = 0;
 
 	playMusic();
 
@@ -357,6 +358,8 @@ void main()
 
 	setPaletteFacingCar();
 
+	loadTrabantFacingGround();
+	loadTrabantFacingCar();
 	loadTrabantLight();
 
 	// drawElementCity(&bit_map1);
@@ -374,6 +377,7 @@ void main()
 		// angle &= 0x1FF;
 
 		// rotatePointsOnAxisY(angle);
+		// angle++;
 
 		if (scr2_x_offset)
 			(&view_port1)->RasInfo->Next->RxOffset += scr2_x_offset;
@@ -383,25 +387,17 @@ void main()
 		if (dbuffer_offset_1 != 0)
 			(&view_port1)->RasInfo->RxOffset += dbuffer_offset_1;
 		if (dbuffer_offset_2 != 0)
-			(&view_port1)->RasInfo->Next->RxOffset += dbuffer_offset_2;		
+			(&view_port1)->RasInfo->Next->RxOffset += dbuffer_offset_2;
 
-		// (&view_port1)->RasInfo->RxOffset = angle >> 1;
-		// (&view_port1)->RasInfo->RyOffset = dbuffer_offset;
-		// (&view_port1)->RasInfo->Next->RxOffset = angle << 1;
-
-		// if (scr1_x_offset || scr1_y_offset || scr2_x_offset || scr2_y_offset)
 		ScrollVPort(&view_port1);
 
 		if (enable_dbuffer_1)
 			swapDoubleBuffer1();
-
 		if (enable_dbuffer_2)
 			swapDoubleBuffer2();
 
 		if (fxFacingCar(demo_clock))
 			demo_clock++;
-
-		// angle++;
 
 		dbuffer_offset_1 = 0;
 		dbuffer_offset_2 = 0;
@@ -458,7 +454,6 @@ void setPaletteFacingCar(void)
 BOOL fxFacingCar(unsigned int demo_clock)
 {
 	scr2_y_offset = 0;
-	// enable_dbuffer_2 = TRUE;
 
 	switch(demo_clock)
 	{
@@ -510,11 +505,12 @@ BOOL fxFacingCar(unsigned int demo_clock)
 			break;
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 40:
-			// enable_dbuffer_2 = FALSE;
+			// freeTrabantFacingGround();
+			// freeTrabantFacingCar();
+			// freeTrabantLight();
 			dbuffer_offset_2 = 0;
 			return FALSE;
 			break;
-
 	}
 
 	return TRUE;
