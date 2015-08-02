@@ -53,6 +53,9 @@ extern struct Custom far custom;
 struct View my_view;
 struct View *my_old_view;
 
+short scr1_x_offset = 0, scr1_y_offset = 0;
+short scr2_x_offset = 0, scr2_y_offset = 0;
+
 /* ViewPort 1 */
 struct ViewPort view_port1;
 struct RasInfo ras_info1;
@@ -351,10 +354,17 @@ void main()
 
 		// rotatePointsOnAxisY(angle);
 
+		if (scr2_x_offset)
+			(&view_port1)->RasInfo->Next->RxOffset += scr2_x_offset;
+		if (scr2_y_offset)
+			(&view_port1)->RasInfo->Next->RyOffset += scr2_y_offset;
+
 		// (&view_port1)->RasInfo->RxOffset = angle >> 1;
 		// (&view_port1)->RasInfo->RyOffset = dbuffer_offset;
 		// (&view_port1)->RasInfo->Next->RxOffset = angle << 1;
-		// ScrollVPort(&view_port1);
+
+		if (scr1_x_offset || scr1_y_offset || scr2_x_offset || scr2_y_offset)
+			ScrollVPort(&view_port1);
 
 		// if (dbuffer_offset == 0)
 		// 	dbuffer_offset = DISPL_HEIGHT1;
@@ -418,6 +428,7 @@ void setPaletteFacingCar(void)
 BOOL fxFacingCar(unsigned int demo_clock)
 {
 	// printf("demo_clock = %d\n", demo_clock);
+	scr2_y_offset = 0;
 
 	switch(demo_clock)
 	{
@@ -427,27 +438,39 @@ BOOL fxFacingCar(unsigned int demo_clock)
 			break;
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 0):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 3):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 6):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 9):
 			drawTrabantLight(&bit_map2, &rast_port2, 0);
 			break;
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 1):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 4):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 7):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 10):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 3):
 			drawTrabantLight(&bit_map2, &rast_port2, 1);
 			break;
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 5):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 8):
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 11):
 			drawTrabantLight(&bit_map2, &rast_port2, 2);
-			break;			
+			break;
 
-		case FX_TRAB_CARLIGHT_DELAY + FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 12):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 1:	
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 6:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 10:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 14:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 19:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 24:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 32:		
+			scr2_y_offset = -1;
+			break;
+
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 3:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 8:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 12:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 16:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 22:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 28:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 35:		
+			scr2_y_offset = 1;
+			break;
+
+		case FX_TRAB_CARLIGHT_DELAY + FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 15):
 			return FALSE;
 			break;
 
