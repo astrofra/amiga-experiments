@@ -16,6 +16,9 @@ extern struct Custom far custom;
 extern struct GfxBase *GfxBase;
 extern struct ViewPort view_port1;
 
+extern int dbuffer_offset_1;
+extern int dbuffer_offset_2;
+
 extern struct Image element_city;
 extern struct BitMap *bitmap_element_city;
 
@@ -40,7 +43,7 @@ void drawTrabantFacingGround(struct BitMap *dest_bitmap)
 {
     struct BitMap *tmp_bitmap;
     tmp_bitmap = load_zlib_file_as_bitmap("assets/trabant_facing_ground.dat", 5933, 12960, trabant_facing_ground.Width, trabant_facing_ground.Height, trabant_facing_ground.Depth);
-    BLIT_BITMAP_S(tmp_bitmap, dest_bitmap, trabant_facing_ground.Width, trabant_facing_ground.Height, (DISPL_WIDTH1 - trabant_facing_ground.Width) >> 1, HEIGHT1 - trabant_facing_ground.Height);
+    BLIT_BITMAP_S(tmp_bitmap, dest_bitmap, trabant_facing_ground.Width, trabant_facing_ground.Height, ((DISPL_WIDTH1 - trabant_facing_ground.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_ground.Height);
 
     free_allocated_bitmap(tmp_bitmap);
 }
@@ -48,7 +51,7 @@ void drawTrabantFacingGround(struct BitMap *dest_bitmap)
 void drawTrabantFacingCar(struct BitMap *dest_bitmap)
 {
     bitmap_facing_car = load_zlib_file_as_bitmap("assets/trabant_facing_car.dat", 2662, 6480, trabant_facing_car.Width, trabant_facing_car.Height, trabant_facing_car.Depth);
-    BLIT_BITMAP_S(bitmap_facing_car, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, (DISPL_WIDTH1 - trabant_facing_car.Width) >> 1, HEIGHT1 - trabant_facing_car.Height - 32);
+    BLIT_BITMAP_S(bitmap_facing_car, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, ((DISPL_WIDTH1 - trabant_facing_car.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32);
     // printf("DISPL_WIDTH1 - trabant_facing_car.Width = %d\n", DISPL_WIDTH1 - trabant_facing_car.Width);
 }
 
@@ -61,7 +64,7 @@ void loadTrabantLight(void)
     bitmap_carlight_1 = load_zlib_file_as_bitmap("assets/trabant_facing_car_l1.dat", 2164, 5568, trabant_facing_car_l1.Width, trabant_facing_car_l1.Height, trabant_facing_car_l1.Depth);
 }
 
-#define FX_CLEAR_CARLIGHT SetAPen(rp, 0); RectFill(rp, 0, HEIGHT1 - trabant_facing_car.Height - 32 + 35, DISPL_WIDTH1 - 1, (HEIGHT1 - trabant_facing_car.Height - 32 + 35) + trabant_facing_car_l0.Height - 1);
+#define FX_CLEAR_CARLIGHT SetAPen(rp, 0); RectFill(rp, dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32 + 35, DISPL_WIDTH1 - 1 + dbuffer_offset_2, (HEIGHT1 - trabant_facing_car.Height - 32 + 35) + trabant_facing_car_l0.Height - 1);
 void drawTrabantLight(struct BitMap *dest_bitmap, struct RastPort *rp, UBYTE light_level)
 {
     switch(light_level)
@@ -69,17 +72,17 @@ void drawTrabantLight(struct BitMap *dest_bitmap, struct RastPort *rp, UBYTE lig
         case 0:
             FX_CLEAR_CARLIGHT;
             if (bitmap_facing_car)
-                BLIT_BITMAP_S(bitmap_facing_car, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, (DISPL_WIDTH1 - trabant_facing_car.Width) >> 1, HEIGHT1 - trabant_facing_car.Height - 32);
+                BLIT_BITMAP_S(bitmap_facing_car, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, ((DISPL_WIDTH1 - trabant_facing_car.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32);
             break;
         case 1:
             FX_CLEAR_CARLIGHT;
             if (bitmap_carlight_0)
-                BLIT_BITMAP_S(bitmap_carlight_0, dest_bitmap, trabant_facing_car_l0.Width, trabant_facing_car_l0.Height, ((DISPL_WIDTH1 - trabant_facing_car_l0.Width) >> 1) + 9, HEIGHT1 - trabant_facing_car.Height - 32 + 35);
+                BLIT_BITMAP_S(bitmap_carlight_0, dest_bitmap, trabant_facing_car_l0.Width, trabant_facing_car_l0.Height, ((DISPL_WIDTH1 - trabant_facing_car_l0.Width) >> 1) + 9 + dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32 + 35);
             break;
         case 2:
             FX_CLEAR_CARLIGHT;
             if (bitmap_carlight_1)
-                BLIT_BITMAP_S(bitmap_carlight_1, dest_bitmap, trabant_facing_car_l0.Width, trabant_facing_car_l0.Height, (DISPL_WIDTH1 - trabant_facing_car_l1.Width) >> 1, HEIGHT1 - trabant_facing_car.Height - 32 + 35);
+                BLIT_BITMAP_S(bitmap_carlight_1, dest_bitmap, trabant_facing_car_l0.Width, trabant_facing_car_l0.Height, ((DISPL_WIDTH1 - trabant_facing_car_l1.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32 + 35);
             break;
     }
 }

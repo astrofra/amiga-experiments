@@ -64,7 +64,12 @@ struct RastPort rast_port1;
 struct RasInfo ras_info2;
 struct BitMap bit_map2;
 struct RastPort rast_port2;
-UWORD dbuffer_offset = 0;
+
+int dbuffer_offset_1 = 0;
+int dbuffer_offset_2 = 0;
+
+BOOL enable_dbuffer_1 = FALSE;
+BOOL enable_dbuffer_2 = FALSE;
 
 /* Data */
 struct BitMap *bitmap_element_city = NULL;
@@ -191,6 +196,22 @@ void close_demo(STRPTR message)
 	printf( "%s\n", message );
 
 	exit(0);
+}
+
+void swapDoubleBuffer1(void)
+{
+	if (dbuffer_offset_1 <= 0)
+		dbuffer_offset_1 = DISPL_WIDTH1;
+	else
+		dbuffer_offset_1 = -DISPL_WIDTH1;
+}
+
+void swapDoubleBuffer2(void)
+{		
+	if (dbuffer_offset_2 <= 0)
+		dbuffer_offset_2 = DISPL_WIDTH1;
+	else
+		dbuffer_offset_2 = -DISPL_WIDTH1;
 }
 
 void setPaletteFacingCar(void);
@@ -359,22 +380,31 @@ void main()
 		if (scr2_y_offset)
 			(&view_port1)->RasInfo->Next->RyOffset += scr2_y_offset;
 
+		if (dbuffer_offset_1 != 0)
+			(&view_port1)->RasInfo->RxOffset += dbuffer_offset_1;
+		if (dbuffer_offset_2 != 0)
+			(&view_port1)->RasInfo->Next->RxOffset += dbuffer_offset_2;		
+
 		// (&view_port1)->RasInfo->RxOffset = angle >> 1;
 		// (&view_port1)->RasInfo->RyOffset = dbuffer_offset;
 		// (&view_port1)->RasInfo->Next->RxOffset = angle << 1;
 
-		if (scr1_x_offset || scr1_y_offset || scr2_x_offset || scr2_y_offset)
-			ScrollVPort(&view_port1);
+		// if (scr1_x_offset || scr1_y_offset || scr2_x_offset || scr2_y_offset)
+		ScrollVPort(&view_port1);
 
-		// if (dbuffer_offset == 0)
-		// 	dbuffer_offset = DISPL_HEIGHT1;
-		// else
-		// 	dbuffer_offset = 0;
+		if (enable_dbuffer_1)
+			swapDoubleBuffer1();
+
+		if (enable_dbuffer_2)
+			swapDoubleBuffer2();
 
 		if (fxFacingCar(demo_clock))
 			demo_clock++;
 
 		// angle++;
+
+		dbuffer_offset_1 = 0;
+		dbuffer_offset_2 = 0;
 
 		WaitTOF();
 	}
@@ -427,27 +457,36 @@ void setPaletteFacingCar(void)
 #define FX_TRAB_CARLIGHT_INTERVAL	5
 BOOL fxFacingCar(unsigned int demo_clock)
 {
-	// printf("demo_clock = %d\n", demo_clock);
 	scr2_y_offset = 0;
+	// enable_dbuffer_2 = TRUE;
 
 	switch(demo_clock)
 	{
 		case 0:
 			drawTrabantFacingGround(&bit_map1);
 			drawTrabantFacingCar(&bit_map2);
+			swapDoubleBuffer2();
 			break;
+
+		case 1:
+			drawTrabantFacingCar(&bit_map2);
+			swapDoubleBuffer2();
+			break;			
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 0):
 			drawTrabantLight(&bit_map2, &rast_port2, 0);
+			swapDoubleBuffer2();
 			break;
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 1):
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 3):
 			drawTrabantLight(&bit_map2, &rast_port2, 1);
+			swapDoubleBuffer2();
 			break;
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2):
 			drawTrabantLight(&bit_map2, &rast_port2, 2);
+			swapDoubleBuffer2();
 			break;
 
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 1:	
@@ -456,7 +495,7 @@ BOOL fxFacingCar(unsigned int demo_clock)
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 14:
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 19:
 		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 24:
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 32:		
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 32:
 			scr2_y_offset = -1;
 			break;
 
@@ -470,7 +509,9 @@ BOOL fxFacingCar(unsigned int demo_clock)
 			scr2_y_offset = 1;
 			break;
 
-		case FX_TRAB_CARLIGHT_DELAY + FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 15):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 40:
+			// enable_dbuffer_2 = FALSE;
+			dbuffer_offset_2 = 0;
 			return FALSE;
 			break;
 

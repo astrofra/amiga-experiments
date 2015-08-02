@@ -13,7 +13,7 @@
 
 extern struct GfxBase *GfxBase;
 extern struct ViewPort view_port1;
-extern UWORD dbuffer_offset;
+extern int dbuffer_offset_2;
 
 short 	*matrix = NULL;
 short	*point_list = NULL;
@@ -187,11 +187,11 @@ void drawPointListToViewport(struct RastPort *rp)
 	{
 		// WritePixel(rp, t_point_list[loop] + (DEFAULT_WIDTH >> 1), t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1));
 
-		// RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset,
-		// 			t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE + dbuffer_offset);
+		// RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset_2,
+		// 			t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE + dbuffer_offset_2);
 
-		RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset,
-					t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE + dbuffer_offset);		
+		RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE,
+					t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE);		
 
 		// printf("(%d,%d), ", t_point_list[loop], t_point_list[loop + 1]);
 	}
