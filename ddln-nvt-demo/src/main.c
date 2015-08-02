@@ -190,9 +190,13 @@ void close_demo(STRPTR message)
 	exit(0);
 }
 
+void setPaletteFacingCar(void);
+BOOL fxFacingCar(unsigned int);
+
 void main()
 {
 	int loop;
+	unsigned int demo_clock = 0;
 
 	UWORD angle;
 
@@ -327,27 +331,15 @@ void main()
 
 	tin_fl_enable_waittof = 1;
 
+	setPaletteFacingCar();
+
+	loadTrabantLight();
+
 	// drawElementCity(&bit_map1);
 	// drawElementCity(&bit_map2);
 	// LoadRGB4(&view_port1, trabant_facing_groundPaletteRGB4, 8);
-	for(loop = 1; loop < 8; loop++)
-	{
-		UWORD tmp_col = trabant_facing_groundPaletteRGB4[loop];
-		printf("color = %x, ", tmp_col);
-		SetRGB4(&view_port1, loop, (tmp_col & 0x0f00) >> 8, (tmp_col & 0x00f0) >> 4, tmp_col & 0x000f);
-	}
-	printf("\n");
 
-	for(loop = 1; loop < 8; loop++)
-	{
-		UWORD tmp_col = trabant_facing_carPaletteRGB4[loop];
-		printf("color = %x, ", tmp_col);
-		SetRGB4(&view_port1, loop + 8, (tmp_col & 0x0f00) >> 8, (tmp_col & 0x00f0) >> 4, tmp_col & 0x000f);
-	}	
-	printf("\n");
-
-	drawTrabantFacingGround(&bit_map1);
-	drawTrabantFacingCar(&bit_map2);
+	demo_clock = 0;
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
@@ -369,7 +361,10 @@ void main()
 		// else
 		// 	dbuffer_offset = 0;
 
-		angle++;
+		if (fxFacingCar(demo_clock))
+			demo_clock++;
+
+		// angle++;
 
 		WaitTOF();
 	}
@@ -391,4 +386,72 @@ void main()
 	Permit();
 
 	close_demo("Stay 16/32!");
+}
+
+/*
+	Screen with a facing trabant
+	Set the palette with both dual playfield layers
+*/
+void setPaletteFacingCar(void)
+{
+	UBYTE loop;
+
+	for(loop = 1; loop < 8; loop++)
+	{
+		UWORD tmp_col = trabant_facing_groundPaletteRGB4[loop];
+		SetRGB4(&view_port1, loop, (tmp_col & 0x0f00) >> 8, (tmp_col & 0x00f0) >> 4, tmp_col & 0x000f);
+	}
+
+	for(loop = 1; loop < 8; loop++)
+	{
+		UWORD tmp_col = trabant_facing_carPaletteRGB4[loop];
+		SetRGB4(&view_port1, loop + 8, (tmp_col & 0x0f00) >> 8, (tmp_col & 0x00f0) >> 4, tmp_col & 0x000f);
+	}
+}
+
+/*
+	Screen with a facing trabant
+	Draws the car & carlights
+*/
+#define FX_TRAB_CARLIGHT_DELAY	150
+#define FX_TRAB_CARLIGHT_INTERVAL	5
+BOOL fxFacingCar(unsigned int demo_clock)
+{
+	// printf("demo_clock = %d\n", demo_clock);
+
+	switch(demo_clock)
+	{
+		case 0:
+			drawTrabantFacingGround(&bit_map1);
+			drawTrabantFacingCar(&bit_map2);
+			break;
+
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 0):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 3):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 6):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 9):
+			drawTrabantLight(&bit_map2, &rast_port2, 0);
+			break;
+
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 1):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 4):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 7):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 10):
+			drawTrabantLight(&bit_map2, &rast_port2, 1);
+			break;
+
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 5):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 8):
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 11):
+			drawTrabantLight(&bit_map2, &rast_port2, 2);
+			break;			
+
+		case FX_TRAB_CARLIGHT_DELAY + FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 12):
+			return FALSE;
+			break;
+
+	}
+
+	return TRUE;
 }

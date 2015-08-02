@@ -11,7 +11,7 @@ void drawTrabantFacingGround(struct BitMap *dest_bitmap);
 void drawTrabantFacingCar(struct BitMap *dest_bitmap);
 void freeTrabantFacingCar(void);
 void loadTrabantLight(void);
-void drawTrabantLight(struct BitMap *dest_bitmap, UBYTE light_level);
+void drawTrabantLight(struct BitMap *dest_bitmap, struct RastPort *rp, UBYTE light_level);
 void freeTrabantLight(void);
 
 #endif // #ifndef FX_ROUTINES
