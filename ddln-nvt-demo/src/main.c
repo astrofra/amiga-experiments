@@ -77,6 +77,9 @@ struct BitMap *bitmap_element_city = NULL;
 extern UWORD trabant_facing_groundPaletteRGB4[8];
 extern UWORD trabant_facing_carPaletteRGB4[8];
 
+UWORD *pal_facing_car_fadein = NULL;
+UWORD *pal_facing_car_fadeout = NULL;
+
 #define PTREPLAY_MUSIC
 struct SoundInfo *background = NULL;
 
@@ -147,6 +150,11 @@ void close_demo(STRPTR message)
 	freeTrabantFacingCar();
 	freeTrabantLight();
 
+	if (pal_facing_car_fadein != NULL)
+		FreeMem(pal_facing_car_fadein, sizeof(UWORD) * 16 * 16);
+	if (pal_facing_car_fadeout != NULL)
+		FreeMem(pal_facing_car_fadeout, sizeof(UWORD) * 16 * 16);
+
 	/*	Free the voxel structures */
 	deleteMatrix();
 	deletePointList();
@@ -215,13 +223,17 @@ void __inline swapDoubleBuffer2(void)
 		dbuffer_offset_2 = -DISPL_WIDTH1;
 }
 
+void setPaletteToBlack(void);
 void setPaletteFacingCar(void);
+void precalculateFacingCarFades(void);
 BOOL fxFacingCar(unsigned int);
 
 void main()
 {
 	int loop;
 	unsigned int demo_clock = 0;
+	unsigned short demo_phase = 0;
+	unsigned int palette_fade;
 
 	UWORD angle;
 
@@ -352,20 +364,23 @@ void main()
 	// buildPointListFromMatrix();
 	// angle = 0;
 
-	playMusic();
 
-	tin_fl_enable_waittof = 1;
+	// setPaletteFacingCar();
+	setPaletteToBlack();
 
-	setPaletteFacingCar();
-
+	precalculateFacingCarFades();
 	loadTrabantFacingGround();
 	loadTrabantFacingCar();
 	loadTrabantLight();
 
+	tin_fl_enable_waittof = 1;
+
+	playMusic();
 	// drawElementCity(&bit_map1);
 	// drawElementCity(&bit_map2);
 	// LoadRGB4(&view_port1, trabant_facing_groundPaletteRGB4, 8);
 
+	demo_phase = 0;
 	demo_clock = 0;
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
@@ -379,25 +394,69 @@ void main()
 		// rotatePointsOnAxisY(angle);
 		// angle++;
 
-		if (scr2_x_offset)
-			(&view_port1)->RasInfo->Next->RxOffset += scr2_x_offset;
-		if (scr2_y_offset)
-			(&view_port1)->RasInfo->Next->RyOffset += scr2_y_offset;
+		// printf("demo_phase = %d\n", demo_phase);
+		// printf("Songpos = %d, Patpos = %d\n", PTSongPos(theMod), PTPatternPos(theMod));
 
-		if (dbuffer_offset_1 != 0)
-			(&view_port1)->RasInfo->RxOffset += dbuffer_offset_1;
-		if (dbuffer_offset_2 != 0)
-			(&view_port1)->RasInfo->Next->RxOffset += dbuffer_offset_2;
+		switch(demo_phase)
+		{
+			case 0:
+				if (PTSongPos(theMod) == 1 && PTPatternPos(theMod) > 4)
+					demo_phase++;
+				break;			
+			case 1:
+				palette_fade = 0;
+				drawTrabantFacingGround(&bit_map1);
+				drawTrabantFacingCar(&bit_map2);
+				demo_phase++;
+				break;
 
-		ScrollVPort(&view_port1);
+			case 2:
+				/* Fade in */
+				LoadRGB4(&view_port1, pal_facing_car_fadein + (palette_fade << 4), 16);
+				palette_fade++;
+				if (palette_fade >= 16)
+				{
+					palette_fade = 0;
+					demo_phase++;
+				}
+				break;
 
-		if (enable_dbuffer_1)
-			swapDoubleBuffer1();
-		if (enable_dbuffer_2)
-			swapDoubleBuffer2();
+			case 3:
+				if (scr2_x_offset)
+					(&view_port1)->RasInfo->Next->RxOffset += scr2_x_offset;
+				if (scr2_y_offset)
+					(&view_port1)->RasInfo->Next->RyOffset += scr2_y_offset;
 
-		if (fxFacingCar(demo_clock))
-			demo_clock++;
+				if (dbuffer_offset_1 != 0)
+					(&view_port1)->RasInfo->RxOffset += dbuffer_offset_1;
+				if (dbuffer_offset_2 != 0)
+					(&view_port1)->RasInfo->Next->RxOffset += dbuffer_offset_2;
+
+				ScrollVPort(&view_port1);
+
+				if (enable_dbuffer_1)
+					swapDoubleBuffer1();
+				if (enable_dbuffer_2)
+					swapDoubleBuffer2();
+
+				if (fxFacingCar(demo_clock))
+					demo_clock++;
+				else
+					demo_phase++;
+
+				break;
+
+			case 4:
+				/* Fade in */
+				LoadRGB4(&view_port1, pal_facing_car_fadeout + (palette_fade << 4), 16);
+				palette_fade++;
+				if (palette_fade >= 16)
+				{
+					palette_fade = 0;
+					demo_phase++;
+				}
+				break;				
+		}
 
 		dbuffer_offset_1 = 0;
 		dbuffer_offset_2 = 0;
@@ -424,6 +483,13 @@ void main()
 	close_demo("Stay 16/32!");
 }
 
+void setPaletteToBlack(void)
+{
+	short loop;
+	for(loop = 1; loop < 16; loop++)
+		SetRGB4(&view_port1, loop, 0x0, 0x0, 0x0);
+}
+
 /*
 	Screen with a facing trabant
 	Set the palette with both dual playfield layers
@@ -443,6 +509,39 @@ void setPaletteFacingCar(void)
 		UWORD tmp_col = trabant_facing_carPaletteRGB4[loop];
 		SetRGB4(&view_port1, loop + 8, (tmp_col & 0x0f00) >> 8, (tmp_col & 0x00f0) >> 4, tmp_col & 0x000f);
 	}
+}
+
+void precalculateFacingCarFades(void)
+{
+	short palette_fade, palette_idx;
+	UWORD tmp_col;
+
+	/* Precalc the fade in/out */
+	pal_facing_car_fadein = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+	{
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+				tmp_col = trabant_facing_groundPaletteRGB4[palette_idx];
+			else
+				tmp_col = trabant_facing_carPaletteRGB4[palette_idx - 8];
+
+			pal_facing_car_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0x000, tmp_col, palette_fade);
+		}
+	}
+
+	pal_facing_car_fadeout = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+				tmp_col = trabant_facing_groundPaletteRGB4[palette_idx];
+			else
+				tmp_col = trabant_facing_carPaletteRGB4[palette_idx - 8];
+
+			pal_facing_car_fadeout[palette_idx + (palette_fade << 4)] = mixRGB4Colors(tmp_col, 0x000, palette_fade);
+		}
 }
 
 /*
@@ -504,7 +603,7 @@ BOOL fxFacingCar(unsigned int demo_clock)
 			scr2_y_offset = 1;
 			break;
 
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 40:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 50:
 			// freeTrabantFacingGround();
 			// freeTrabantFacingCar();
 			// freeTrabantLight();
