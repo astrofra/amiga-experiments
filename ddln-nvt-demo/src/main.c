@@ -77,8 +77,13 @@ struct BitMap *bitmap_element_city = NULL;
 extern UWORD trabant_facing_groundPaletteRGB4[8];
 extern UWORD trabant_facing_carPaletteRGB4[8];
 
+extern UWORD trabant_side_PaletteRGB4[8];
+
 UWORD *pal_facing_car_fadein = NULL;
 UWORD *pal_facing_car_fadeout = NULL;
+
+UWORD *pal_side_car_fadein = NULL;
+UWORD *pal_side_car_fadeout = NULL;
 
 #define PTREPLAY_MUSIC
 struct SoundInfo *background = NULL;
@@ -226,12 +231,13 @@ void __inline swapDoubleBuffer2(void)
 void setPaletteToBlack(void);
 void setPaletteFacingCar(void);
 void precalculateFacingCarFades(void);
+void precalculateSideCarFades(void);
 BOOL fxFacingCar(unsigned int);
 
 void main()
 {
 	int loop;
-	unsigned int demo_clock = 0;
+	unsigned int fx_clock = 0;
 	unsigned short demo_phase = 0;
 	unsigned int palette_fade;
 
@@ -364,7 +370,6 @@ void main()
 	// buildPointListFromMatrix();
 	// angle = 0;
 
-
 	// setPaletteFacingCar();
 	setPaletteToBlack();
 
@@ -373,6 +378,8 @@ void main()
 	loadTrabantFacingCar();
 	loadTrabantLight();
 
+	precalculateSideCarFades();
+
 	tin_fl_enable_waittof = 1;
 
 	playMusic();
@@ -380,8 +387,10 @@ void main()
 	// drawElementCity(&bit_map2);
 	// LoadRGB4(&view_port1, trabant_facing_groundPaletteRGB4, 8);
 
+	#define DMPHASE_FACING_CAR 0
+	#define DMPHASE_SIDE_CAR 1 << 4
 	demo_phase = 0;
-	demo_clock = 0;
+	fx_clock = 0;
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
@@ -399,18 +408,19 @@ void main()
 
 		switch(demo_phase)
 		{
-			case 0:
+			/*	Facing car */
+			case DMPHASE_FACING_CAR:
 				if (PTSongPos(theMod) == 1 && PTPatternPos(theMod) > 4)
 					demo_phase++;
 				break;			
-			case 1:
+			case DMPHASE_FACING_CAR | 1:
 				palette_fade = 0;
 				drawTrabantFacingGround(&bit_map1);
 				drawTrabantFacingCar(&bit_map2);
 				demo_phase++;
 				break;
 
-			case 2:
+			case DMPHASE_FACING_CAR | 2:
 				/* Fade in */
 				LoadRGB4(&view_port1, pal_facing_car_fadein + (palette_fade << 4), 16);
 				palette_fade++;
@@ -421,7 +431,7 @@ void main()
 				}
 				break;
 
-			case 3:
+			case DMPHASE_FACING_CAR | 3:
 				if (scr2_x_offset)
 					(&view_port1)->RasInfo->Next->RxOffset += scr2_x_offset;
 				if (scr2_y_offset)
@@ -439,14 +449,14 @@ void main()
 				if (enable_dbuffer_2)
 					swapDoubleBuffer2();
 
-				if (fxFacingCar(demo_clock))
-					demo_clock++;
+				if (fxFacingCar(fx_clock))
+					fx_clock++;
 				else
 					demo_phase++;
 
 				break;
 
-			case 4:
+			case DMPHASE_FACING_CAR | 4:
 				/* Fade in */
 				LoadRGB4(&view_port1, pal_facing_car_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
@@ -455,7 +465,12 @@ void main()
 					palette_fade = 0;
 					demo_phase++;
 				}
-				break;				
+				break;
+
+			/*	Side car */
+			case DMPHASE_SIDE_CAR:
+				break;
+
 		}
 
 		dbuffer_offset_1 = 0;
@@ -511,6 +526,11 @@ void setPaletteFacingCar(void)
 	}
 }
 
+
+/*
+	Prepare the fade in/fade out palette
+	for the "facing trabant" scene
+*/
 void precalculateFacingCarFades(void)
 {
 	short palette_fade, palette_idx;
@@ -519,7 +539,6 @@ void precalculateFacingCarFades(void)
 	/* Precalc the fade in/out */
 	pal_facing_car_fadein = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
 	for(palette_fade = 0; palette_fade < 16; palette_fade++)
-	{
 		for(palette_idx = 0; palette_idx < 16; palette_idx++)
 		{
 			if (palette_idx < 8)
@@ -529,7 +548,6 @@ void precalculateFacingCarFades(void)
 
 			pal_facing_car_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0x000, tmp_col, palette_fade);
 		}
-	}
 
 	pal_facing_car_fadeout = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
 	for(palette_fade = 0; palette_fade < 16; palette_fade++)
@@ -545,16 +563,51 @@ void precalculateFacingCarFades(void)
 }
 
 /*
+	Prepare the fade in/fade out palette
+	for the "side trabant" scene
+*/
+void precalculateSideCarFades(void)
+{
+	short palette_fade, palette_idx;
+	UWORD tmp_col;
+
+	/* Precalc the fade in/out */
+	pal_side_car_fadein = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+				tmp_col = trabant_facing_groundPaletteRGB4[palette_idx];
+			else
+				tmp_col = trabant_side_PaletteRGB4[palette_idx - 8];
+
+			pal_side_car_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0x000, tmp_col, palette_fade);
+		}
+
+	pal_side_car_fadeout = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+				tmp_col = trabant_facing_groundPaletteRGB4[palette_idx];
+			else
+				tmp_col = trabant_side_PaletteRGB4[palette_idx - 8];
+
+			pal_side_car_fadeout[palette_idx + (palette_fade << 4)] = mixRGB4Colors(tmp_col, 0x000, palette_fade);
+		}
+}
+
+/*
 	Screen with a facing trabant
 	Draws the car & carlights
 */
 #define FX_TRAB_CARLIGHT_DELAY	150
 #define FX_TRAB_CARLIGHT_INTERVAL	5
-BOOL fxFacingCar(unsigned int demo_clock)
+BOOL fxFacingCar(unsigned int fx_clock)
 {
 	scr2_y_offset = 0;
 
-	switch(demo_clock)
+	switch(fx_clock)
 	{
 		case 0:
 			drawTrabantFacingGround(&bit_map1);
@@ -612,5 +665,14 @@ BOOL fxFacingCar(unsigned int demo_clock)
 			break;
 	}
 
+	return TRUE;
+}
+
+/*
+	Screen with trabant seen from side
+	Draws the car & shutting door
+*/
+BOOL fxSideCar(unsigned int fx_clock)
+{
 	return TRUE;
 }
