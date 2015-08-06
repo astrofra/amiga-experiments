@@ -84,6 +84,15 @@ struct Image title_place =
 	NULL		/* NextImage */
 };
 
+struct Image trabant_side_ground =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	280, 60, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
 UWORD trabant_side_PaletteRGB4[8] =
 {
 	0x0000,0x0111,0x0333,0x0455,0x0378,0x01AC,0x0BBB,0x00EF

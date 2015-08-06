@@ -20,4 +20,8 @@ void loadTrabantLight(void);
 void drawTrabantLight(struct BitMap *dest_bitmap, struct RastPort *rp, UBYTE light_level);
 void freeTrabantLight(void);
 
+void loadTrabantSideGround(void);
+void drawTrabantSideGround(struct BitMap *dest_bitmap);
+void freeTrabantSideGround(void);
+
 #endif // #ifndef FX_ROUTINES

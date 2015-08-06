@@ -27,10 +27,14 @@ extern struct Image trabant_facing_car;
 extern struct Image trabant_facing_car_l0;
 extern struct Image trabant_facing_car_l1;
 
+extern struct Image trabant_side_ground;
+
 struct BitMap *bitmap_facing_ground = NULL;
 struct BitMap *bitmap_facing_car = NULL;
 struct BitMap *bitmap_carlight_0 = NULL;
 struct BitMap *bitmap_carlight_1 = NULL;
+
+struct BitMap *bitmap_side_ground = NULL;
 
 struct UCopList *copper;
 
@@ -40,36 +44,26 @@ UWORD chip blank_pointer[4]=
     0x0000, 0x0000
 };
 
-
+/*
+    Facing car
+*/
 void __inline loadTrabantFacingGround(void)
-{
-    bitmap_facing_ground = load_zlib_file_as_bitmap("assets/trabant_facing_ground.dat", 5933, 12960, trabant_facing_ground.Width, trabant_facing_ground.Height, trabant_facing_ground.Depth);
-}
+{   bitmap_facing_ground = load_zlib_file_as_bitmap("assets/trabant_facing_ground.dat", 5933, 12960, trabant_facing_ground.Width, trabant_facing_ground.Height, trabant_facing_ground.Depth);  }
 
 void __inline drawTrabantFacingGround(struct BitMap *dest_bitmap)
-{
-    BLIT_BITMAP_S(bitmap_facing_ground, dest_bitmap, trabant_facing_ground.Width, trabant_facing_ground.Height, ((DISPL_WIDTH1 - trabant_facing_ground.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_ground.Height);
-}
+{   BLIT_BITMAP_S(bitmap_facing_ground, dest_bitmap, trabant_facing_ground.Width, trabant_facing_ground.Height, ((DISPL_WIDTH1 - trabant_facing_ground.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_ground.Height);   }
 
 void __inline freeTrabantFacingGround(void)
-{
-    free_allocated_bitmap(bitmap_facing_ground);
-}
+{   free_allocated_bitmap(bitmap_facing_ground);   }
 
 void __inline loadTrabantFacingCar(void)
-{
-    bitmap_facing_car = load_zlib_file_as_bitmap("assets/trabant_facing_car.dat", 2662, 6480, trabant_facing_car.Width, trabant_facing_car.Height, trabant_facing_car.Depth);
-}
+{   bitmap_facing_car = load_zlib_file_as_bitmap("assets/trabant_facing_car.dat", 2662, 6480, trabant_facing_car.Width, trabant_facing_car.Height, trabant_facing_car.Depth);  }
 
 void __inline drawTrabantFacingCar(struct BitMap *dest_bitmap)
-{
-    BLIT_BITMAP_S(bitmap_facing_car, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, ((DISPL_WIDTH1 - trabant_facing_car.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32);
-}
+{   BLIT_BITMAP_S(bitmap_facing_car, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, ((DISPL_WIDTH1 - trabant_facing_car.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32); }
 
 void __inline freeTrabantFacingCar(void)
-{    
-    free_allocated_bitmap(bitmap_facing_car);
-}
+{   free_allocated_bitmap(bitmap_facing_car);  }
 
 void __inline loadTrabantLight(void)
 {
@@ -106,6 +100,21 @@ void freeTrabantLight(void)
     free_allocated_bitmap(bitmap_carlight_1);
 }
 
+/*
+    Side car
+*/
+void __inline loadTrabantSideGround(void)
+{   bitmap_side_ground = load_zlib_file_as_bitmap("assets/trabant_side_ground.dat", 776, 6480, trabant_side_ground.Width, trabant_side_ground.Height, trabant_side_ground.Depth);  }
+
+void __inline drawTrabantSideGround(struct BitMap *dest_bitmap)
+{   BLIT_BITMAP_S(bitmap_side_ground, dest_bitmap, trabant_side_ground.Width, trabant_side_ground.Height, ((DISPL_WIDTH1 - trabant_side_ground.Width) >> 1) + dbuffer_offset_2, (HEIGHT1 + trabant_side_ground.Height) >> 1);   }
+
+void __inline freeTrabantSideGround(void)
+{   free_allocated_bitmap(bitmap_side_ground);   }
+
+/*
+    City scape
+*/
 void drawElementCity(struct BitMap *dest_bitmap)
 {
     bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 12065, 75264, element_city.Width, element_city.Height, element_city.Depth);

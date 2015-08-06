@@ -155,10 +155,18 @@ void close_demo(STRPTR message)
 	freeTrabantFacingCar();
 	freeTrabantLight();
 
+
 	if (pal_facing_car_fadein != NULL)
 		FreeMem(pal_facing_car_fadein, sizeof(UWORD) * 16 * 16);
 	if (pal_facing_car_fadeout != NULL)
 		FreeMem(pal_facing_car_fadeout, sizeof(UWORD) * 16 * 16);
+
+	freeTrabantSideGround();
+
+	if (pal_side_car_fadein != NULL)
+		FreeMem(pal_side_car_fadein, sizeof(UWORD) * 16 * 16);
+	if (pal_side_car_fadeout != NULL)
+		FreeMem(pal_side_car_fadeout, sizeof(UWORD) * 16 * 16);	
 
 	/*	Free the voxel structures */
 	deleteMatrix();
@@ -379,6 +387,7 @@ void main()
 	loadTrabantLight();
 
 	precalculateSideCarFades();
+	loadTrabantSideGround();
 
 	tin_fl_enable_waittof = 1;
 
@@ -408,11 +417,14 @@ void main()
 
 		switch(demo_phase)
 		{
-			/*	Facing car */
+			/*	Screen/FX :
+				Facing car 
+			*/
 			case DMPHASE_FACING_CAR:
 				if (PTSongPos(theMod) == 1 && PTPatternPos(theMod) > 4)
 					demo_phase++;
-				break;			
+				break;
+
 			case DMPHASE_FACING_CAR | 1:
 				palette_fade = 0;
 				drawTrabantFacingGround(&bit_map1);
@@ -467,9 +479,33 @@ void main()
 				}
 				break;
 
-			/*	Side car */
+			/*	Next fx!!! */
+			case DMPHASE_FACING_CAR | 5:
+				SetRast(&rast_port1, 0);
+				SetRast(&rast_port2, 0);
+				demo_phase = DMPHASE_SIDE_CAR;
+				break;			
+
+			/*	Screen/FX :
+			Side car */
 			case DMPHASE_SIDE_CAR:
+				setPaletteToBlack();
+				drawTrabantSideGround(&bit_map1);
+				palette_fade = 0;
+				demo_phase++;
 				break;
+
+			case DMPHASE_SIDE_CAR | 1:
+				/* Fade in */
+				LoadRGB4(&view_port1, pal_side_car_fadein + (palette_fade << 4), 16);
+				palette_fade++;
+				if (palette_fade >= 16)
+				{
+					palette_fade = 0;
+					demo_phase++;
+				}
+				break;
+
 
 		}
 
