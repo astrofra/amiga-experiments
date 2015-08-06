@@ -28,6 +28,7 @@ extern struct Image trabant_facing_car_l0;
 extern struct Image trabant_facing_car_l1;
 
 extern struct Image trabant_side_ground;
+extern struct Image trabant_side_car;
 
 struct BitMap *bitmap_facing_ground = NULL;
 struct BitMap *bitmap_facing_car = NULL;
@@ -35,6 +36,7 @@ struct BitMap *bitmap_carlight_0 = NULL;
 struct BitMap *bitmap_carlight_1 = NULL;
 
 struct BitMap *bitmap_side_ground = NULL;
+struct BitMap *bitmap_side_car = NULL;
 
 struct UCopList *copper;
 
@@ -111,6 +113,17 @@ void __inline drawTrabantSideGround(struct BitMap *dest_bitmap)
 
 void __inline freeTrabantSideGround(void)
 {   free_allocated_bitmap(bitmap_side_ground);   }
+
+void __inline loadTrabantSideCar(void)
+{   bitmap_side_car = load_zlib_file_as_bitmap("assets/trabant_side_car.dat", 6237, 16362, trabant_side_car.Width, trabant_side_car.Height, trabant_side_car.Depth);  }
+
+void __inline drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step)
+{   
+    BLIT_BITMAP_S(bitmap_side_car, dest_bitmap, trabant_side_car.Width, trabant_side_car.Height, ((DISPL_WIDTH1 - trabant_side_car.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_side_car.Height - 32); 
+}
+
+void __inline freeTrabantSideCar(void)
+{   free_allocated_bitmap(bitmap_side_car);  }
 
 /*
     City scape
