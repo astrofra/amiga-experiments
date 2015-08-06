@@ -115,11 +115,19 @@ void __inline freeTrabantSideGround(void)
 {   free_allocated_bitmap(bitmap_side_ground);   }
 
 void __inline loadTrabantSideCar(void)
-{   bitmap_side_car = load_zlib_file_as_bitmap("assets/trabant_side_car.dat", 6237, 16362, trabant_side_car.Width, trabant_side_car.Height, trabant_side_car.Depth);  }
-
-void __inline drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step)
 {   
-    BLIT_BITMAP_S(bitmap_side_car, dest_bitmap, trabant_side_car.Width, trabant_side_car.Height, ((DISPL_WIDTH1 - trabant_side_car.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_side_car.Height - 32); 
+   bitmap_side_car = load_zlib_file_as_bitmap("assets/trabant_side_car.dat", 6241, 16524, trabant_side_car.Width, trabant_side_car.Height, trabant_side_car.Depth);  
+    // bitmap_side_car = load_file_as_bitmap("assets/trabant_side_car.bin", 16524, trabant_side_car.Width, trabant_side_car.Height, trabant_side_car.Depth);  
+}
+
+void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step)
+{   
+    switch (door_step)
+    {
+        case 0:
+            BLIT_BITMAP_S(bitmap_side_car, dest_bitmap, 246, trabant_side_car.Height, ((DISPL_WIDTH1 - 246) >> 1) + dbuffer_offset_2 - 8, 80);
+        break; 
+    }
 }
 
 void __inline freeTrabantSideCar(void)

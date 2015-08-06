@@ -112,7 +112,10 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
   InitBitMap(new_bitmap, depth, width, height);
 
   for (i = 0; i < depth; i++)
+  {
     (*new_bitmap).Planes[i] = (PLANEPTR)AllocMem(RASSIZE(width, height), MEMF_CHIP);
+    printf("Planes[%d] = %x\n", i, (*new_bitmap).Planes[i]);
+  }
 
   // for (i = 0; i < depth; i++)
   //   Read(fileHandle, (*new_bitmap).Planes[i], output_size / depth);

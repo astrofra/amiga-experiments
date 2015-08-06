@@ -24,4 +24,8 @@ void loadTrabantSideGround(void);
 void drawTrabantSideGround(struct BitMap *dest_bitmap);
 void freeTrabantSideGround(void);
 
+void loadTrabantSideCar(void);
+void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step);
+void freeTrabantSideCar(void);
+
 #endif // #ifndef FX_ROUTINES

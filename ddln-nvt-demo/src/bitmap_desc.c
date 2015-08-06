@@ -101,7 +101,7 @@ UWORD trabant_side_PaletteRGB4[8] =
 struct Image trabant_side_car =
 {
 	0, 0,		/* LeftEdge, TopEdge */
-	426, 101, 3,	/* Width, Height, Depth */
+	432, 102, 3,	/* Width, Height, Depth */
 	NULL,	/* ImageData */
 	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
 	NULL		/* NextImage */

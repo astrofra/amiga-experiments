@@ -155,13 +155,13 @@ void close_demo(STRPTR message)
 	freeTrabantFacingCar();
 	freeTrabantLight();
 
-
 	if (pal_facing_car_fadein != NULL)
 		FreeMem(pal_facing_car_fadein, sizeof(UWORD) * 16 * 16);
 	if (pal_facing_car_fadeout != NULL)
 		FreeMem(pal_facing_car_fadeout, sizeof(UWORD) * 16 * 16);
 
 	freeTrabantSideGround();
+	freeTrabantSideCar();
 
 	if (pal_side_car_fadein != NULL)
 		FreeMem(pal_side_car_fadein, sizeof(UWORD) * 16 * 16);
@@ -388,6 +388,7 @@ void main()
 
 	precalculateSideCarFades();
 	loadTrabantSideGround();
+	loadTrabantSideCar();
 
 	tin_fl_enable_waittof = 1;
 
@@ -491,6 +492,7 @@ void main()
 			case DMPHASE_SIDE_CAR:
 				setPaletteToBlack();
 				drawTrabantSideGround(&bit_map1);
+				drawTrabantSideCar(&bit_map2, 0);
 				palette_fade = 0;
 				demo_phase++;
 				break;
