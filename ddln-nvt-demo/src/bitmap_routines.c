@@ -112,10 +112,7 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
   InitBitMap(new_bitmap, depth, width, height);
 
   for (i = 0; i < depth; i++)
-  {
     (*new_bitmap).Planes[i] = (PLANEPTR)AllocMem(RASSIZE(width, height), MEMF_CHIP);
-    printf("Planes[%d] = %x\n", i, (*new_bitmap).Planes[i]);
-  }
 
   // for (i = 0; i < depth; i++)
   //   Read(fileHandle, (*new_bitmap).Planes[i], output_size / depth);
@@ -125,10 +122,15 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
     return (NULL);
 
   Read(fileHandle, temp_mem, input_size);
+  Close(fileHandle);
 
   tinfl_decompress_mem_to_mem((*new_bitmap).Planes[0], output_size, temp_mem, input_size, 1);
   FreeMem(temp_mem, input_size);
   temp_mem = NULL;
+
+  // fileHandle = Open("assets/dump.dat", MODE_NEWFILE);
+  // printf("Dumping %d, %d bytes.\n", output_size, Write(fileHandle, (*new_bitmap).Planes[0], output_size));
+  // Close(fileHandle);
 
   return new_bitmap;
 }
