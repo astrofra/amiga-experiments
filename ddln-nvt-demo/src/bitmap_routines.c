@@ -93,6 +93,8 @@ struct BitMap *load_file_as_bitmap(UBYTE *name, ULONG byte_size, UWORD width, UW
 
   for (i = 0; i < depth; i++)
     Read(fileHandle, (*new_bitmap).Planes[i], byte_size / depth);
+  // Read(fileHandle, (*new_bitmap).Planes[0], byte_size);
+
   Close(fileHandle);
 
   return new_bitmap;
@@ -103,7 +105,7 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
   BPTR fileHandle;
   struct BitMap *new_bitmap;
   UWORD i;
-  PLANEPTR temp_mem;
+  PLANEPTR temp_mem, output_temp_mem;
 
   if (!(fileHandle = Open(name, MODE_OLDFILE)))
     return (NULL);
@@ -124,7 +126,15 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
   Read(fileHandle, temp_mem, input_size);
   Close(fileHandle);
 
-  tinfl_decompress_mem_to_mem((*new_bitmap).Planes[0], output_size, temp_mem, input_size, 1);
+  output_temp_mem = (PLANEPTR)AllocMem(output_size, MEMF_CLEAR);
+  tinfl_decompress_mem_to_mem(output_temp_mem, output_size, temp_mem, input_size, 1);
+  for (i = 0; i < depth; i++)
+    memcpy((*new_bitmap).Planes[i], output_temp_mem + RASSIZE(width, height) * i, RASSIZE(width, height));
+
+  FreeMem(output_temp_mem, output_size);
+
+  printf("output_size = %d, RASSIZE() = %d\n", output_size, RASSIZE(width, height) * depth);
+
   FreeMem(temp_mem, input_size);
   temp_mem = NULL;
 
