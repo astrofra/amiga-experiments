@@ -108,8 +108,9 @@ void freeTrabantLight(void)
 void __inline loadTrabantSideGround(void)
 {   bitmap_side_ground = load_zlib_file_as_bitmap("assets/trabant_side_ground.dat", 776, 6480, trabant_side_ground.Width, trabant_side_ground.Height, trabant_side_ground.Depth);  }
 
+
 void __inline drawTrabantSideGround(struct BitMap *dest_bitmap)
-{   BLIT_BITMAP_S(bitmap_side_ground, dest_bitmap, trabant_side_ground.Width, trabant_side_ground.Height, ((DISPL_WIDTH1 - trabant_side_ground.Width) >> 1) + dbuffer_offset_2, (HEIGHT1 + trabant_side_ground.Height) >> 1);   }
+{   BLIT_BITMAP_S(bitmap_side_ground, dest_bitmap, trabant_side_ground.Width, trabant_side_ground.Height, ((DISPL_WIDTH1 - trabant_side_ground.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_side_ground.Height - 8);   }
 
 void __inline freeTrabantSideGround(void)
 {   free_allocated_bitmap(bitmap_side_ground);   }
@@ -120,13 +121,38 @@ void __inline loadTrabantSideCar(void)
     // bitmap_side_car = load_file_as_bitmap("assets/trabant_side_car.bin", 16524, trabant_side_car.Width, trabant_side_car.Height, trabant_side_car.Depth);  
 }
 
+#define FX_SIDE_TRABANT_X ((DISPL_WIDTH1 - 246) >> 1) + dbuffer_offset_2 - 8
+#define FX_SIDE_TRABANT_Y (HEIGHT1 - trabant_side_car.Height - 40)
 void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step)
 {   
     switch (door_step)
     {
         case 0:
-            BLIT_BITMAP_S(bitmap_side_car, dest_bitmap, 246, trabant_side_car.Height, ((DISPL_WIDTH1 - 246) >> 1) + dbuffer_offset_2 - 8, 80);
-        break; 
+            if (bitmap_side_car)
+                BLIT_BITMAP_S(bitmap_side_car, dest_bitmap, 246, trabant_side_car.Height, FX_SIDE_TRABANT_X, FX_SIDE_TRABANT_Y);
+            break;
+
+        case 1:
+            if (bitmap_side_car)
+            {
+                BLIT_BITMAP_S(bitmap_side_car, dest_bitmap, 246, trabant_side_car.Height, FX_SIDE_TRABANT_X, FX_SIDE_TRABANT_Y);
+                BltBitMap(bitmap_side_car, 246, 0,
+                            dest_bitmap, FX_SIDE_TRABANT_X + 95, FX_SIDE_TRABANT_Y,
+                            88, trabant_side_car.Height,
+                            0xC0, 0xFF, NULL);
+            }
+            break;
+
+        case 2:
+            if (bitmap_side_car)
+            {
+                BLIT_BITMAP_S(bitmap_side_car, dest_bitmap, 246, trabant_side_car.Height, FX_SIDE_TRABANT_X, FX_SIDE_TRABANT_Y);
+                BltBitMap(bitmap_side_car, 246 + 90, 0,
+                            dest_bitmap, FX_SIDE_TRABANT_X + 95, FX_SIDE_TRABANT_Y,
+                            88, trabant_side_car.Height,
+                            0xC0, 0xFF, NULL);
+            }            
+            break;         
     }
 }
 

@@ -104,7 +104,7 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
 {
   BPTR fileHandle;
   struct BitMap *new_bitmap;
-  UWORD i;
+  UWORD i, j;
   PLANEPTR temp_mem, output_temp_mem;
 
   if (!(fileHandle = Open(name, MODE_OLDFILE)))
@@ -116,31 +116,29 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
   for (i = 0; i < depth; i++)
     (*new_bitmap).Planes[i] = (PLANEPTR)AllocMem(RASSIZE(width, height), MEMF_CHIP);
 
-  // for (i = 0; i < depth; i++)
-  //   Read(fileHandle, (*new_bitmap).Planes[i], output_size / depth);
-  // Close(fileHandle);
-
   if (!(temp_mem = AllocMem(input_size, MEMF_PUBLIC)))
     return (NULL);
 
   Read(fileHandle, temp_mem, input_size);
   Close(fileHandle);
 
-  output_temp_mem = (PLANEPTR)AllocMem(output_size, MEMF_CLEAR);
-  tinfl_decompress_mem_to_mem(output_temp_mem, output_size, temp_mem, input_size, 1);
-  for (i = 0; i < depth; i++)
-    memcpy((*new_bitmap).Planes[i], output_temp_mem + RASSIZE(width, height) * i, RASSIZE(width, height));
-
-  FreeMem(output_temp_mem, output_size);
-
-  printf("output_size = %d, RASSIZE() = %d\n", output_size, RASSIZE(width, height) * depth);
-
+  tinfl_decompress_mem_to_mem((*new_bitmap).Planes[0], output_size, temp_mem, input_size, 1);
   FreeMem(temp_mem, input_size);
   temp_mem = NULL;
 
-  // fileHandle = Open("assets/dump.dat", MODE_NEWFILE);
-  // printf("Dumping %d, %d bytes.\n", output_size, Write(fileHandle, (*new_bitmap).Planes[0], output_size));
-  // Close(fileHandle);
+  /*
+    Realign the bitplanes
+    in case there is a padding needed.
+    /!\ This should not work!
+  */
+  output_temp_mem = (*new_bitmap).Planes[0] + output_size;
+
+  if (output_temp_mem != (*new_bitmap).Planes[depth - 1] + RASSIZE(width, height))
+    for (i = 0; i < depth; i++)
+      for(j = 0; j < RASSIZE(width, height); j++)
+        *((*new_bitmap).Planes[depth - i - 1] + RASSIZE(width, height) - j) = *(output_temp_mem--);
+
+  // printf("output_size = %d, RASSIZE() = %d, tinfl = %d\n", output_size, RASSIZE(width, height) * depth, ret_val);
 
   return new_bitmap;
 }
