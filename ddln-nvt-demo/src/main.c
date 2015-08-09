@@ -454,6 +454,11 @@ void main()
 				/* Fade in */
 				LoadRGB4(&view_port1, pal_facing_car_fadein + (palette_fade << 4), 16);
 				palette_fade++;
+
+				/*	Parallax fx */
+				scr2_x_offset = (16 - palette_fade) >> 1;
+				scr1_x_offset = scr2_x_offset >> 1;				
+
 				if (palette_fade >= 16)
 				{
 					palette_fade = 0;
@@ -521,6 +526,11 @@ void main()
 				/* Fade in */
 				LoadRGB4(&view_port1, pal_side_car_fadein + (palette_fade << 4), 16);
 				palette_fade++;
+
+				/*	Parallax fx */
+				scr2_x_offset = palette_fade >> 1;
+				scr1_x_offset = scr2_x_offset >> 1;	
+
 				if (palette_fade >= 16)
 				{
 					palette_fade = 0;
@@ -554,7 +564,7 @@ void main()
 			swapDoubleBuffer2();
 
 		(&view_port1)->RasInfo->RxOffset = scr1_x_offset + dbuffer_offset_1;
-		(&view_port1)->RasInfo->RxOffset = scr1_y_offset;
+		(&view_port1)->RasInfo->RyOffset = scr1_y_offset;
 
 		(&view_port1)->RasInfo->Next->RxOffset = scr2_x_offset + dbuffer_offset_2;
 		(&view_port1)->RasInfo->Next->RyOffset = scr2_y_offset;
@@ -760,7 +770,7 @@ BOOL fxFacingCar(unsigned int fx_clock)
 	Screen with trabant seen from side
 	Draws the car & shutting door
 */
-#define FX_TRAB_SIDE_DELAY	15
+#define FX_TRAB_SIDE_DELAY	25
 BOOL fxSideCar(unsigned int fx_clock)
 {
 	scr2_y_offset = 0;
