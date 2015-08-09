@@ -5,8 +5,10 @@
 #include <intuition/intuition.h>
 #include <graphics/gfxbase.h>
 
-void drawElementCity(struct BitMap *dest_bitmap);
 void setCityCopperList(struct ViewPort *vp);
+void loadElementCity(void);
+void drawElementCity(struct BitMap *dest_bitmap);
+void freeElementCity(void);
 
 void loadTrabantFacingGround(void);
 void drawTrabantFacingGround(struct BitMap *dest_bitmap);
@@ -27,5 +29,7 @@ void freeTrabantSideGround(void);
 void loadTrabantSideCar(void);
 void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step);
 void freeTrabantSideCar(void);
+
+void loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_number);
 
 #endif // #ifndef FX_ROUTINES

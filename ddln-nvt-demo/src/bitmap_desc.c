@@ -106,3 +106,47 @@ struct Image trabant_side_car =
 	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
 	NULL		/* NextImage */
 };
+
+UWORD mistral_title_PaletteRGB4[8] =
+{
+	0x0000,0x0205,0x0409,0x0706,0x0905,0x0C08,0x0F0B,0x0000
+};
+
+struct Image mistral_title_0 =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	65, 38, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+struct Image mistral_title_1 =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	320, 40, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+struct Image mistral_title_2 =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	320, 36, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+struct Image mistral_title_3 =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	253, 37, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+
+

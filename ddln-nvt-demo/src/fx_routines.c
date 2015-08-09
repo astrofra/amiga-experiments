@@ -30,6 +30,11 @@ extern struct Image trabant_facing_car_l1;
 extern struct Image trabant_side_ground;
 extern struct Image trabant_side_car;
 
+extern struct Image mistral_title_0;
+extern struct Image mistral_title_1;
+extern struct Image mistral_title_2;
+extern struct Image mistral_title_3;
+
 struct BitMap *bitmap_facing_ground = NULL;
 struct BitMap *bitmap_facing_car = NULL;
 struct BitMap *bitmap_carlight_0 = NULL;
@@ -47,8 +52,41 @@ UWORD chip blank_pointer[4]=
 };
 
 /*
+    Various titles
+*****************************/
+
+void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_number)
+{   
+    struct BitMap *bitmap_title;
+
+    switch(title_number)
+    {
+        case 0:
+            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_0.dat", 839, 1140, mistral_title_0.Width, mistral_title_0.Height, mistral_title_0.Depth);
+            BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_0.Width, mistral_title_0.Height, ((DISPL_WIDTH1 - mistral_title_0.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_0.Height) >> 1));
+            break;
+
+        case 1:
+            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_1.dat", 2508, 4800, mistral_title_1.Width, mistral_title_1.Height, mistral_title_1.Depth);
+            BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_1.Width, mistral_title_1.Height, ((DISPL_WIDTH1 - mistral_title_1.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_1.Height) >> 1));
+            break;
+        case 2:
+            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_2.dat", 2109, 4320, mistral_title_2.Width, mistral_title_2.Height, mistral_title_2.Depth);
+            BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_2.Width, mistral_title_2.Height, ((DISPL_WIDTH1 - mistral_title_2.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_2.Height) >> 1));
+            break; 
+        case 3:
+            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_3.dat", 1681, 3552, mistral_title_3.Width, mistral_title_3.Height, mistral_title_3.Depth);
+            BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_3.Width, mistral_title_3.Height, ((DISPL_WIDTH1 - mistral_title_3.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_3.Height) >> 1));
+            break;                   
+    }
+
+    WaitBlit();
+    free_allocated_bitmap(bitmap_title);
+}
+
+/*
     Facing car
-*/
+*****************************/
 void __inline loadTrabantFacingGround(void)
 {   bitmap_facing_ground = load_zlib_file_as_bitmap("assets/trabant_facing_ground.dat", 5933, 12960, trabant_facing_ground.Width, trabant_facing_ground.Height, trabant_facing_ground.Depth);  }
 
@@ -104,7 +142,7 @@ void freeTrabantLight(void)
 
 /*
     Side car
-*/
+*****************************/
 void __inline loadTrabantSideGround(void)
 {   bitmap_side_ground = load_zlib_file_as_bitmap("assets/trabant_side_ground.dat", 776, 6480, trabant_side_ground.Width, trabant_side_ground.Height, trabant_side_ground.Depth);  }
 
@@ -161,17 +199,22 @@ void __inline freeTrabantSideCar(void)
 
 /*
     City scape
-*/
+*****************************/
+void loadElementCity(void)
+{    bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 12065, 75264, element_city.Width, element_city.Height, element_city.Depth);  }
+
 void drawElementCity(struct BitMap *dest_bitmap)
 {
-    bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 12065, 75264, element_city.Width, element_city.Height, element_city.Depth);
     BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 0, 0);
-
     WaitBlit();
+}
 
+void freeElementCity(void)
+{
     free_allocated_bitmap(bitmap_element_city);
     bitmap_element_city = NULL;
 }
+
 
 void setCityCopperList(struct ViewPort *vp)
 {
