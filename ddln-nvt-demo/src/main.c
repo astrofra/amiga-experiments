@@ -53,8 +53,15 @@ extern struct Custom far custom;
 struct View my_view;
 struct View *my_old_view;
 
+/*
+	Double buffer and scrolling
+*/
 short scr1_x_offset = 0, scr1_y_offset = 0;
 short scr2_x_offset = 0, scr2_y_offset = 0;
+int dbuffer_offset_1 = 0;
+int dbuffer_offset_2 = 0;
+BOOL enable_dbuffer_1 = FALSE;
+BOOL enable_dbuffer_2 = FALSE;
 
 /* ViewPort 1 */
 struct ViewPort view_port1;
@@ -65,11 +72,6 @@ struct RasInfo ras_info2;
 struct BitMap bit_map2;
 struct RastPort rast_port2;
 
-int dbuffer_offset_1 = 0;
-int dbuffer_offset_2 = 0;
-
-BOOL enable_dbuffer_1 = FALSE;
-BOOL enable_dbuffer_2 = FALSE;
 
 /* Data */
 struct BitMap *bitmap_element_city = NULL;
@@ -222,22 +224,25 @@ void close_demo(STRPTR message)
 
 void __inline swapDoubleBuffer1(void)
 {
-	if (dbuffer_offset_1 <= 0)
+	if (dbuffer_offset_1 == 0)
 		dbuffer_offset_1 = DISPL_WIDTH1;
 	else
-		dbuffer_offset_1 = -DISPL_WIDTH1;
+		dbuffer_offset_1 = 0;
 }
 
 void __inline swapDoubleBuffer2(void)
 {		
-	if (dbuffer_offset_2 <= 0)
+	if (dbuffer_offset_2 == 0)
 		dbuffer_offset_2 = DISPL_WIDTH1;
 	else
-		dbuffer_offset_2 = -DISPL_WIDTH1;
+		dbuffer_offset_2 = 0;
 }
 
 void __inline resetViewportOffset(void)
 {
+	dbuffer_offset_1 = 0;
+	dbuffer_offset_2 = 0;
+
 	(&view_port1)->RasInfo->RxOffset = 0;
 	(&view_port1)->RasInfo->RyOffset = 0;
 	(&view_port1)->RasInfo->Next->RxOffset = 0;
@@ -526,9 +531,7 @@ void main()
 					palette_fade = 0;
 					demo_phase++;
 				}
-				break;				
-
-
+				break;
 		}
 
 		if (enable_dbuffer_1)
@@ -536,29 +539,20 @@ void main()
 		if (enable_dbuffer_2)
 			swapDoubleBuffer2();
 
-		if (scr2_x_offset)
-			(&view_port1)->RasInfo->Next->RxOffset += scr2_x_offset;
-		if (scr2_y_offset)
-			(&view_port1)->RasInfo->Next->RyOffset += scr2_y_offset;
+		(&view_port1)->RasInfo->RxOffset = scr1_x_offset + dbuffer_offset_1;
+		(&view_port1)->RasInfo->RxOffset = scr1_y_offset;
 
-		if (dbuffer_offset_1 != 0)
-			(&view_port1)->RasInfo->RxOffset += dbuffer_offset_1;
-		if (dbuffer_offset_2 != 0)
-			(&view_port1)->RasInfo->Next->RxOffset += dbuffer_offset_2;
+		(&view_port1)->RasInfo->Next->RxOffset = scr2_x_offset + dbuffer_offset_2;
+		(&view_port1)->RasInfo->Next->RyOffset = scr2_y_offset;
 
-		ScrollVPort(&view_port1);
-
-		dbuffer_offset_1 = 0;
-		dbuffer_offset_2 = 0;
-		scr2_x_offset = 0;
-		scr2_y_offset = 0;		
+		ScrollVPort(&view_port1);	
 
 		WaitTOF();
 	}
 
 	// ON_VBLANK;
 
-	WaitTOF();
+	WaitTOF();	
 
 	/*	Wait for mouse up
 		to prevent the mouse up event
@@ -740,7 +734,7 @@ BOOL fxFacingCar(unsigned int fx_clock)
 			// freeTrabantFacingGround();
 			// freeTrabantFacingCar();
 			// freeTrabantLight();
-			dbuffer_offset_2 = 0;
+			// dbuffer_offset_2 = 0;
 			return FALSE;
 			break;
 	}
@@ -790,7 +784,7 @@ BOOL fxSideCar(unsigned int fx_clock)
 		break;
 
 		case FX_TRAB_SIDE_DELAY + 100:
-			dbuffer_offset_2 = 0;
+			// dbuffer_offset_2 = 0;
 			return FALSE;
 		break;		
 	}

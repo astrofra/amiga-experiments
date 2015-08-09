@@ -122,7 +122,7 @@ void __inline loadTrabantSideCar(void)
 }
 
 #define FX_SIDE_TRABANT_X ((DISPL_WIDTH1 - 246) >> 1) + dbuffer_offset_2 - 8
-#define FX_SIDE_TRABANT_Y (HEIGHT1 - trabant_side_car.Height - 40)
+#define FX_SIDE_TRABANT_Y (HEIGHT1 - trabant_side_car.Height - 45)
 void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step)
 {   
     switch (door_step)
