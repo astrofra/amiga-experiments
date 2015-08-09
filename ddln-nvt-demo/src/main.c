@@ -362,6 +362,7 @@ void main()
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
 
+	printf("Tinfl decrunches while waiting...\n");
 	initMusic();
 
 	WaitTOF();
@@ -478,10 +479,19 @@ void main()
 				}
 				break;
 
-			/*	Next fx!!! */
+			/*	Clear the screen */
 			case DMPHASE_FACING_CAR | 5:
 				SetRast(&rast_port1, 0);
+				demo_phase++;
+				break;
+
+			case DMPHASE_FACING_CAR | 6:
 				SetRast(&rast_port2, 0);
+				demo_phase++;
+				break;						
+
+			/*	Next fx!!! */
+			case DMPHASE_FACING_CAR | 7:
 				resetViewportOffset();
 				demo_phase = DMPHASE_SIDE_CAR;
 				break;			
@@ -498,12 +508,16 @@ void main()
 			case DMPHASE_SIDE_CAR | 1:
 				setPaletteToBlack();
 				drawTrabantSideGround(&bit_map1);
-				drawTrabantSideCar(&bit_map2, 0);
-				palette_fade = 0;
 				demo_phase++;
 				break;
 
 			case DMPHASE_SIDE_CAR | 2:
+				drawTrabantSideCar(&bit_map2, 0);
+				palette_fade = 0;
+				demo_phase++;
+				break;				
+
+			case DMPHASE_SIDE_CAR | 3:
 				/* Fade in */
 				LoadRGB4(&view_port1, pal_side_car_fadein + (palette_fade << 4), 16);
 				palette_fade++;
@@ -515,14 +529,14 @@ void main()
 				}
 				break;
 
-			case DMPHASE_SIDE_CAR | 3:
+			case DMPHASE_SIDE_CAR | 4:
 				if (fxSideCar(fx_clock))
 					fx_clock++;
 				else
 					demo_phase++;
 				break;
 
-			case DMPHASE_SIDE_CAR | 4:
+			case DMPHASE_SIDE_CAR | 5:
 				/* Fade out */
 				LoadRGB4(&view_port1, pal_side_car_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
@@ -531,7 +545,7 @@ void main()
 					palette_fade = 0;
 					demo_phase++;
 				}
-				break;
+				break;		
 		}
 
 		if (enable_dbuffer_1)

@@ -59,7 +59,7 @@ extern void WaitTOF( void );
 extern UBYTE tin_fl_enable_waittof;
 UBYTE wait_counter = 0;
 
-#define WaitTOF_LF ; // if (tin_fl_enable_waittof && wait_counter++ > 12) { wait_counter = 0; WaitTOF(); }
+#define WaitTOF_LF if (tin_fl_enable_waittof && wait_counter++ > 8) { wait_counter = 0; WaitTOF(); }
 // High level decompression functions:
 // tinfl_decompress_mem_to_heap() decompresses a block in memory to a heap block allocated via malloc().
 // On entry:
