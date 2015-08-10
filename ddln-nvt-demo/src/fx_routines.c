@@ -201,11 +201,12 @@ void __inline freeTrabantSideCar(void)
     City scape
 *****************************/
 void loadElementCity(void)
-{    bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 12065, 75264, element_city.Width, element_city.Height, element_city.Depth);  }
+{    bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 4697, 15048, element_city.Width, element_city.Height, element_city.Depth);  }
 
 void drawElementCity(struct BitMap *dest_bitmap)
 {
-    BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 0, 0);
+    BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 0, 71);
+    BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 320, 71);
     WaitBlit();
 }
 

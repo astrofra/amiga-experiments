@@ -881,6 +881,8 @@ void main()
 
 			case DMPHASE_BERLIN_0 | 5:
 				scr1_x_offset++;
+				if (scr1_x_offset > 320)
+					scr1_x_offset = 0;
 				break;							
 
 		}
