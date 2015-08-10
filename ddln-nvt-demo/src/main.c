@@ -578,6 +578,9 @@ void main()
 			/*	Next fx!!! */
 			case DMPHASE_FACING_CAR | 7:
 				resetViewportOffset();
+				freeTrabantFacingGround();
+				freeTrabantFacingCar();
+				freeTrabantLight();
 				demo_phase = DMPHASE_TITLE_1;
 				break;
 
@@ -714,6 +717,8 @@ void main()
 			/*	Next fx!!! */
 			case DMPHASE_SIDE_CAR | 8:
 				resetViewportOffset();
+				loadTrabantSideGround();
+				freeTrabantSideCar();
 				demo_phase = DMPHASE_TITLE_2;
 				break;				
 
