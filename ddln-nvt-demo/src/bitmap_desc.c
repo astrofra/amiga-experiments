@@ -20,6 +20,14 @@ struct Image element_city =
 	NULL		/* NextImage */
 };
 
+struct Image element_tree =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	117, 256, 1,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0001, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
 
 /* Trabant Screen #0 */
 

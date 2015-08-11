@@ -854,6 +854,8 @@ void main()
 			***********************/
 
 			case DMPHASE_BERLIN_0:
+				loadElementTree();
+				drawElementTree(&bit_map2);
 				setCityCopperList(&view_port1);
 				demo_phase++;
 				break;
@@ -881,8 +883,11 @@ void main()
 
 			case DMPHASE_BERLIN_0 | 5:
 				scr1_x_offset++;
-				if (scr1_x_offset > 320)
+				if (scr1_x_offset > DEFAULT_WIDTH)
 					scr1_x_offset = 0;
+				scr2_x_offset+=2;
+				if (scr2_x_offset > DEFAULT_WIDTH)
+					scr2_x_offset = 0;				
 				break;							
 
 		}

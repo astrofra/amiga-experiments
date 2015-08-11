@@ -9,6 +9,9 @@ void setCityCopperList(struct ViewPort *vp);
 void loadElementCity(void);
 void drawElementCity(struct BitMap *dest_bitmap);
 void freeElementCity(void);
+void loadElementTree(void);
+void drawElementTree(struct BitMap *dest_bitmap);
+void freeElementTree(void);
 
 void loadTrabantFacingGround(void);
 void drawTrabantFacingGround(struct BitMap *dest_bitmap);

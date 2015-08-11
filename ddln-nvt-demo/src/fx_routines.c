@@ -21,6 +21,7 @@ extern int dbuffer_offset_2;
 
 extern struct Image element_city;
 extern struct BitMap *bitmap_element_city;
+struct BitMap *bitmap_element_tree = NULL;
 
 extern struct Image trabant_facing_ground;
 extern struct Image trabant_facing_car;
@@ -34,6 +35,8 @@ extern struct Image mistral_title_0;
 extern struct Image mistral_title_1;
 extern struct Image mistral_title_2;
 extern struct Image mistral_title_3;
+
+extern struct Image element_tree;
 
 struct BitMap *bitmap_facing_ground = NULL;
 struct BitMap *bitmap_facing_car = NULL;
@@ -206,7 +209,7 @@ void loadElementCity(void)
 void drawElementCity(struct BitMap *dest_bitmap)
 {
     BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 0, 71);
-    BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 320, 71);
+    BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, DEFAULT_WIDTH, 71);
     WaitBlit();
 }
 
@@ -216,6 +219,20 @@ void freeElementCity(void)
     bitmap_element_city = NULL;
 }
 
+void loadElementTree(void)
+{    bitmap_element_tree = load_zlib_file_as_bitmap("assets/element_tree.dat", 799, 4096, element_tree.Width, element_tree.Height, element_tree.Depth);  }
+
+void drawElementTree(struct BitMap *dest_bitmap)
+{
+    BLIT_BITMAP_S(bitmap_element_tree, dest_bitmap, element_tree.Width, element_tree.Height, 0, 0);
+    WaitBlit();
+}
+
+void freeElementTree(void)
+{
+    free_allocated_bitmap(bitmap_element_tree);
+    bitmap_element_tree = NULL;
+}
 
 void setCityCopperList(struct ViewPort *vp)
 {

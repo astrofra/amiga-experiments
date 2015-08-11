@@ -186,8 +186,6 @@ void free_allocated_bitmap(struct BitMap *allocated_bitmap)
     block_len = (LONG)sizeof(struct BitMap);
     // printf("FreeMem() struct BitMap, block_len = %i\n", block_len);
     FreeMem(allocated_bitmap, block_len);
-
-    allocated_bitmap = NULL;
   }
 }
 
