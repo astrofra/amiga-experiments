@@ -75,6 +75,15 @@ struct RastPort rast_port2;
 
 /* Data */
 struct BitMap *bitmap_element_city = NULL;
+struct BitMap *bitmap_element_tree = NULL;
+
+struct BitMap *bitmap_facing_ground = NULL;
+struct BitMap *bitmap_facing_car = NULL;
+struct BitMap *bitmap_carlight_0 = NULL;
+struct BitMap *bitmap_carlight_1 = NULL;
+
+struct BitMap *bitmap_side_ground = NULL;
+struct BitMap *bitmap_side_car = NULL;
 
 extern UWORD trabant_facing_groundPaletteRGB4[8];
 extern UWORD trabant_facing_carPaletteRGB4[8];
@@ -303,7 +312,7 @@ void main()
 	InitVPort( &view_port1 );
 	view_port1.DWidth = DISPL_WIDTH1;      /* Set the width.                */
 	view_port1.DHeight = DISPL_HEIGHT1;    /* Set the height.               */
-	view_port1.DxOffset = 0;         /* X position.                   */
+	view_port1.DxOffset = 6;         /* X position.                   */
 	view_port1.DyOffset = 0;         /* Y position.                   */
 	view_port1.RasInfo = &ras_info1; /* Give it a pointer to RasInfo. */
 	view_port1.Modes = DUALPF|PFBA;         /* Low resolution.               */
@@ -430,7 +439,7 @@ void main()
 	#define DMPHASE_TITLE_3		(5 << 4)
 	#define DMPHASE_BERLIN_0	(6 << 4)
 
-	demo_phase = 0;
+	demo_phase = DMPHASE_BERLIN_0;
 	fx_clock = 0;
 
 	while((*(UBYTE *)0xBFE001) & 0x40)

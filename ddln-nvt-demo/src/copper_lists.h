@@ -3,5 +3,5 @@
 #include <exec/types.h>
 #include <intuition/intuition.h>
 
-#define CL_CITY_LEN 1082
-extern UWORD cl_city[1082];
+#define CL_CITY_LEN 1500
+extern UWORD cl_city[1500];

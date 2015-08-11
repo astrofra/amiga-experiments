@@ -21,7 +21,7 @@ extern int dbuffer_offset_2;
 
 extern struct Image element_city;
 extern struct BitMap *bitmap_element_city;
-struct BitMap *bitmap_element_tree = NULL;
+extern struct BitMap *bitmap_element_tree;
 
 extern struct Image trabant_facing_ground;
 extern struct Image trabant_facing_car;
@@ -38,13 +38,13 @@ extern struct Image mistral_title_3;
 
 extern struct Image element_tree;
 
-struct BitMap *bitmap_facing_ground = NULL;
-struct BitMap *bitmap_facing_car = NULL;
-struct BitMap *bitmap_carlight_0 = NULL;
-struct BitMap *bitmap_carlight_1 = NULL;
+extern struct BitMap *bitmap_facing_ground;
+extern struct BitMap *bitmap_facing_car;
+extern struct BitMap *bitmap_carlight_0;
+extern struct BitMap *bitmap_carlight_1;
 
-struct BitMap *bitmap_side_ground = NULL;
-struct BitMap *bitmap_side_car = NULL;
+extern struct BitMap *bitmap_side_ground;
+extern struct BitMap *bitmap_side_car;
 
 struct UCopList *copper;
 
@@ -97,7 +97,10 @@ void __inline drawTrabantFacingGround(struct BitMap *dest_bitmap)
 {   BLIT_BITMAP_S(bitmap_facing_ground, dest_bitmap, trabant_facing_ground.Width, trabant_facing_ground.Height, ((DISPL_WIDTH1 - trabant_facing_ground.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_ground.Height);   }
 
 void __inline freeTrabantFacingGround(void)
-{   free_allocated_bitmap(bitmap_facing_ground);   }
+{   
+    free_allocated_bitmap(bitmap_facing_ground);
+    bitmap_facing_ground = NULL;
+    }
 
 void __inline loadTrabantFacingCar(void)
 {   bitmap_facing_car = load_zlib_file_as_bitmap("assets/trabant_facing_car.dat", 2662, 6480, trabant_facing_car.Width, trabant_facing_car.Height, trabant_facing_car.Depth);  }
@@ -106,7 +109,10 @@ void __inline drawTrabantFacingCar(struct BitMap *dest_bitmap)
 {   BLIT_BITMAP_S(bitmap_facing_car, dest_bitmap, trabant_facing_car.Width, trabant_facing_car.Height, ((DISPL_WIDTH1 - trabant_facing_car.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_facing_car.Height - 32); }
 
 void __inline freeTrabantFacingCar(void)
-{   free_allocated_bitmap(bitmap_facing_car);  }
+{   
+    free_allocated_bitmap(bitmap_facing_car);
+    bitmap_facing_car = NULL; 
+}
 
 void __inline loadTrabantLight(void)
 {
@@ -141,6 +147,8 @@ void freeTrabantLight(void)
 {
     free_allocated_bitmap(bitmap_carlight_0);
     free_allocated_bitmap(bitmap_carlight_1);
+    bitmap_carlight_0 = NULL;
+    bitmap_carlight_1 = NULL;
 }
 
 /*
@@ -154,7 +162,10 @@ void __inline drawTrabantSideGround(struct BitMap *dest_bitmap)
 {   BLIT_BITMAP_S(bitmap_side_ground, dest_bitmap, trabant_side_ground.Width, trabant_side_ground.Height, ((DISPL_WIDTH1 - trabant_side_ground.Width) >> 1) + dbuffer_offset_2, HEIGHT1 - trabant_side_ground.Height - 8);   }
 
 void __inline freeTrabantSideGround(void)
-{   free_allocated_bitmap(bitmap_side_ground);   }
+{   
+    free_allocated_bitmap(bitmap_side_ground);
+    bitmap_side_ground = NULL;
+}
 
 void __inline loadTrabantSideCar(void)
 {   
@@ -198,7 +209,10 @@ void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step)
 }
 
 void __inline freeTrabantSideCar(void)
-{   free_allocated_bitmap(bitmap_side_car);  }
+{   
+    free_allocated_bitmap(bitmap_side_car);
+    bitmap_side_car = NULL;
+}
 
 /*
     City scape
@@ -241,7 +255,7 @@ void setCityCopperList(struct ViewPort *vp)
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
 
-    CINIT(copper, CL_CITY_LEN);
+    CINIT(copper, CL_CITY_LEN * 4);
     CWAIT(copper, 0, 0);
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
@@ -253,12 +267,20 @@ void setCityCopperList(struct ViewPort *vp)
     while(loop < CL_CITY_LEN)
     {
     	/*	Scanline position */
-    	CWAIT(copper, cl_city[loop++], 0);
+        short tmp_line = loop;
+        loop++;
+
+        // CWAIT(copper, cl_city[tmp_line], 0);
+        // CMOVE(copper, custom.color[0], 0x000);
+    	CWAIT(copper, cl_city[tmp_line], 64);
 
     	/*	How many color registers ? */
         max_color = cl_city[loop++];
     	for (c_loop = 0; c_loop < max_color; c_loop++)
     		CMOVE(copper, custom.color[cl_city[loop++]], cl_city[loop++]);
+
+        CWAIT(copper, cl_city[tmp_line], 220);        
+        CMOVE(copper, custom.color[0], 0x000);
     }
     // CWAIT(copper, 63, 0);
     // CMOVE(copper, custom.color[0], 0xF0F);
