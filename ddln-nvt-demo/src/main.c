@@ -167,6 +167,8 @@ void close_demo(STRPTR message)
 
 	WaitBlit();
 	free_allocated_bitmap(bitmap_element_city);
+	free_allocated_bitmap(bitmap_element_tree);
+
 	freeTrabantFacingGround();
 	freeTrabantFacingCar();
 	freeTrabantLight();
@@ -439,7 +441,7 @@ void main()
 	#define DMPHASE_TITLE_3		(5 << 4)
 	#define DMPHASE_BERLIN_0	(6 << 4)
 
-	demo_phase = DMPHASE_BERLIN_0;
+	demo_phase = 0;
 	fx_clock = 0;
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
@@ -470,7 +472,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_0 | 1:
-				if ((PTSongPos(theMod) == 0 && PTPatternPos(theMod) > 24) || (PTSongPos(theMod) > 0))
+				if (1) // ((PTSongPos(theMod) == 0 && PTPatternPos(theMod) > 24) || (PTSongPos(theMod) > 0))
 					demo_phase++;
 				break;
 
@@ -506,12 +508,12 @@ void main()
 			/*	Clear the screen */
 			case DMPHASE_TITLE_0 | 5:
 				setPaletteToBlack();
-				SetRast(&rast_port1, 0);
+				//SetRast(&rast_port1, 0);
 				demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_0 | 6:
-				SetRast(&rast_port2, 0);
+				//SetRast(&rast_port2, 0);
 				demo_phase++;
 				break;						
 
@@ -526,7 +528,7 @@ void main()
 				Facing car 
 			***********************/
 			case DMPHASE_FACING_CAR:
-				if ((PTSongPos(theMod) == 1 && PTPatternPos(theMod) > 4) || (PTSongPos(theMod) > 1))
+				if (1) // ((PTSongPos(theMod) == 1 && PTPatternPos(theMod) > 4) || (PTSongPos(theMod) > 1))
 					demo_phase++;
 				break;
 
@@ -575,12 +577,12 @@ void main()
 			/*	Clear the screen */
 			case DMPHASE_FACING_CAR | 5:
 				setPaletteToBlack();
-				SetRast(&rast_port1, 0);
+				//SetRast(&rast_port1, 0);
 				demo_phase++;
 				break;
 
 			case DMPHASE_FACING_CAR | 6:
-				SetRast(&rast_port2, 0);
+				//SetRast(&rast_port2, 0);
 				demo_phase++;
 				break;						
 
@@ -605,7 +607,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_1 | 1:
-				if ((PTSongPos(theMod) == 2 && PTPatternPos(theMod) > 32) || (PTSongPos(theMod) > 2))
+				if (1) // ((PTSongPos(theMod) == 2 && PTPatternPos(theMod) > 32) || (PTSongPos(theMod) > 2))
 					demo_phase++;
 				break;
 
@@ -622,7 +624,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_1 | 3:
-				if ((PTSongPos(theMod) == 3 && PTPatternPos(theMod) > 4) || (PTSongPos(theMod) > 3))
+				if (1) // ((PTSongPos(theMod) == 3 && PTPatternPos(theMod) > 4) || (PTSongPos(theMod) > 3))
 					demo_phase++;
 				break;
 
@@ -640,12 +642,12 @@ void main()
 			/*	Clear the screen */
 			case DMPHASE_TITLE_1 | 5:
 				setPaletteToBlack();
-				SetRast(&rast_port1, 0);
+				//SetRast(&rast_port1, 0);
 				demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_1 | 6:
-				SetRast(&rast_port2, 0);
+				//SetRast(&rast_port2, 0);
 				demo_phase++;
 				break;						
 
@@ -660,7 +662,7 @@ void main()
 				Side car 
 			***********************/
 			case DMPHASE_SIDE_CAR:
-				if ((PTSongPos(theMod) == 3 && PTPatternPos(theMod) > 32) || (PTSongPos(theMod) > 4))
+				if (1) // ((PTSongPos(theMod) == 3 && PTPatternPos(theMod) > 32) || (PTSongPos(theMod) > 4))
 				demo_phase++;
 				break;
 
@@ -714,19 +716,19 @@ void main()
 			/*	Clear the screen */
 			case DMPHASE_SIDE_CAR | 6:
 				setPaletteToBlack();
-				SetRast(&rast_port1, 0);
+				//SetRast(&rast_port1, 0);
 				demo_phase++;
 				break;
 
 			case DMPHASE_SIDE_CAR | 7:
-				SetRast(&rast_port2, 0);
+				//SetRast(&rast_port2, 0);
 				demo_phase++;
 				break;						
 
 			/*	Next fx!!! */
 			case DMPHASE_SIDE_CAR | 8:
 				resetViewportOffset();
-				loadTrabantSideGround();
+				freeTrabantSideGround();
 				freeTrabantSideCar();
 				demo_phase = DMPHASE_TITLE_2;
 				break;				
@@ -779,12 +781,12 @@ void main()
 			/*	Clear the screen */
 			case DMPHASE_TITLE_2 | 5:
 				setPaletteToBlack();
-				SetRast(&rast_port1, 0);
+				//SetRast(&rast_port1, 0);
 				demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_2 | 6:
-				SetRast(&rast_port2, 0);
+				//SetRast(&rast_port2, 0);
 				demo_phase++;
 				break;						
 
@@ -842,12 +844,12 @@ void main()
 			/*	Clear the screen */
 			case DMPHASE_TITLE_3 | 5:
 				setPaletteToBlack();
-				SetRast(&rast_port1, 0);
+				//SetRast(&rast_port1, 0);
 				demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_3 | 6:
-				SetRast(&rast_port2, 0);
+				//SetRast(&rast_port2, 0);
 				demo_phase++;
 				break;						
 
@@ -859,38 +861,59 @@ void main()
 
 			/*	
 				Screen/FX :
-				Mistral Title : is about to happen
+				Berlin scrolling
 			***********************/
 
 			case DMPHASE_BERLIN_0:
 				loadElementTree();
-				drawElementTree(&bit_map2);
-				setCityCopperList(&view_port1);
 				demo_phase++;
 				break;
 
 			case DMPHASE_BERLIN_0 | 1:
-				MrgCop(&my_view);
+				drawElementTree(&bit_map2);
 				demo_phase++;
 				break;
 
 			case DMPHASE_BERLIN_0 | 2:
+				setCityCopperList(&view_port1);
+				demo_phase++;
+				break;								
+
+			case DMPHASE_BERLIN_0 | 3:
+				MrgCop(&my_view);
+				demo_phase++;
+				break;
+
+			case DMPHASE_BERLIN_0 | 4:
 				LoadView( &my_view );
 				demo_phase++;
 				break;
 							
-			case DMPHASE_BERLIN_0 | 3:
+			case DMPHASE_BERLIN_0 | 5:
 				drawElementCity(&bit_map1);
-				demo_phase++;
-				break;
-							
-			case DMPHASE_BERLIN_0 | 4:
-				freeElementCity();
+				fx_clock = 0;
 				scr1_x_offset = 0;
 				demo_phase++;
 				break;
 
-			case DMPHASE_BERLIN_0 | 5:
+			case DMPHASE_BERLIN_0 | 6:
+				if (!drawElementCityRefl(&bit_map1, fx_clock))
+				{
+					freeElementCity();
+					demo_phase++;
+				}
+
+				fx_clock += 2;
+
+				scr1_x_offset++;
+				if (scr1_x_offset > DEFAULT_WIDTH)
+					scr1_x_offset = 0;
+				scr2_x_offset+=2;
+				if (scr2_x_offset > DEFAULT_WIDTH)
+					scr2_x_offset = 0;					
+				break;
+
+			case DMPHASE_BERLIN_0 | 7:
 				scr1_x_offset++;
 				if (scr1_x_offset > DEFAULT_WIDTH)
 					scr1_x_offset = 0;

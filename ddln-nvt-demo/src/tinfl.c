@@ -59,7 +59,7 @@ extern void WaitTOF( void );
 extern UBYTE tin_fl_enable_waittof;
 UBYTE wait_counter = 0;
 
-#define WaitTOF_LF if (tin_fl_enable_waittof && wait_counter++ > 8) { wait_counter = 0; WaitTOF(); }
+#define WaitTOF_LF if (tin_fl_enable_waittof && wait_counter++ > 4) { wait_counter = 0; WaitTOF(); }
 // High level decompression functions:
 // tinfl_decompress_mem_to_heap() decompresses a block in memory to a heap block allocated via malloc().
 // On entry:
@@ -182,6 +182,7 @@ struct tinfl_decompressor_tag
 #define TINFL_GET_BYTE(state_index, c) do { \
   if (pIn_buf_cur >= pIn_buf_end) { \
     for ( ; ; ) { \
+      WaitTOF_LF; \
       if (decomp_flags & TINFL_FLAG_HAS_MORE_INPUT) { \
         TINFL_CR_RETURN(state_index, TINFL_STATUS_NEEDS_MORE_INPUT); \
         if (pIn_buf_cur < pIn_buf_end) { \
@@ -195,9 +196,9 @@ struct tinfl_decompressor_tag
     } \
   } else c = *pIn_buf_cur++; } MZ_MACRO_END
 
-#define TINFL_NEED_BITS(state_index, n) do { mz_uint c; TINFL_GET_BYTE(state_index, c); bit_buf |= (((tinfl_bit_buf_t)c) << num_bits); num_bits += 8; } while (num_bits < (mz_uint)(n))
-#define TINFL_SKIP_BITS(state_index, n) do { if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
-#define TINFL_GET_BITS(state_index, b, n) do { if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } b = bit_buf & ((1 << (n)) - 1); bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
+#define TINFL_NEED_BITS(state_index, n) do { mz_uint c; WaitTOF_LF; TINFL_GET_BYTE(state_index, c); bit_buf |= (((tinfl_bit_buf_t)c) << num_bits); num_bits += 8; } while (num_bits < (mz_uint)(n))
+#define TINFL_SKIP_BITS(state_index, n) do { WaitTOF_LF; if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
+#define TINFL_GET_BITS(state_index, b, n) do { WaitTOF_LF; if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } b = bit_buf & ((1 << (n)) - 1); bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
 
 // TINFL_HUFF_BITBUF_FILL() is only used rarely, when the number of bytes remaining in the input buffer falls below 2.
 // It reads just enough bytes from the input stream that are needed to decode the next Huffman code (and absolutely no more). It works by trying to fully decode a
@@ -456,7 +457,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
           const mz_uint8 *pSrc_end = pSrc + (counter & ~7);
           do
           {
-            // WaitTOF_LF
+            WaitTOF_LF
             ((mz_uint32 *)pOut_buf_cur)[0] = ((const mz_uint32 *)pSrc)[0];
             ((mz_uint32 *)pOut_buf_cur)[1] = ((const mz_uint32 *)pSrc)[1];
             pOut_buf_cur += 8;
@@ -476,7 +477,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
 #endif
         do
         {
-          // WaitTOF_LF
+          WaitTOF_LF
           pOut_buf_cur[0] = pSrc[0];
           pOut_buf_cur[1] = pSrc[1];
           pOut_buf_cur[2] = pSrc[2];

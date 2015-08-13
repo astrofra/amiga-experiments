@@ -54,6 +54,12 @@ UWORD chip blank_pointer[4]=
     0x0000, 0x0000
 };
 
+#define RASTER_CLEAR_HSTEP 32
+BOOL progressiveClearRaster(struct RastPort *, unsigned int fx_clock)
+{
+
+}
+
 /*
     Various titles
 *****************************/
@@ -66,19 +72,23 @@ void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_nu
     {
         case 0:
             bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_0.dat", 839, 1140, mistral_title_0.Width, mistral_title_0.Height, mistral_title_0.Depth);
+            WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_0.Width, mistral_title_0.Height, ((DISPL_WIDTH1 - mistral_title_0.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_0.Height) >> 1));
             break;
 
         case 1:
             bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_1.dat", 2508, 4800, mistral_title_1.Width, mistral_title_1.Height, mistral_title_1.Depth);
+            WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_1.Width, mistral_title_1.Height, ((DISPL_WIDTH1 - mistral_title_1.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_1.Height) >> 1));
             break;
         case 2:
             bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_2.dat", 2109, 4320, mistral_title_2.Width, mistral_title_2.Height, mistral_title_2.Depth);
+            WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_2.Width, mistral_title_2.Height, ((DISPL_WIDTH1 - mistral_title_2.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_2.Height) >> 1));
             break; 
         case 3:
             bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_3.dat", 1681, 3552, mistral_title_3.Width, mistral_title_3.Height, mistral_title_3.Depth);
+            WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_3.Width, mistral_title_3.Height, ((DISPL_WIDTH1 - mistral_title_3.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_3.Height) >> 1));
             break;                   
     }
@@ -227,6 +237,27 @@ void drawElementCity(struct BitMap *dest_bitmap)
     WaitBlit();
 }
 
+BOOL drawElementCityRefl(struct BitMap *dest_bitmap, unsigned int fx_clock)
+{
+    if (fx_clock < element_city.Height)
+    {
+        BltBitMap(bitmap_element_city, 0, element_city.Height - fx_clock - 1,
+                    dest_bitmap, 0, 70 + element_city.Height + (fx_clock >> 1),
+                    element_city.Width, 1,
+                    0xC0, 0xFF, NULL);
+
+        BltBitMap(bitmap_element_city, 0, element_city.Height - fx_clock - 1,
+                    dest_bitmap, DEFAULT_WIDTH, 70 + element_city.Height + (fx_clock >> 1),
+                    element_city.Width, 1,
+                    0xC0, 0xFF, NULL);
+
+        return TRUE;
+    }
+    else
+        return FALSE;
+}
+
+
 void freeElementCity(void)
 {
     free_allocated_bitmap(bitmap_element_city);
@@ -251,11 +282,12 @@ void freeElementTree(void)
 void setCityCopperList(struct ViewPort *vp)
 {
 	UWORD loop, zloop, c_loop, max_color, line_index;
+    UWORD tmp_line;
 
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
 
-    CINIT(copper, CL_CITY_LEN * 4);
+    CINIT(copper, CL_CITY_LEN * 5);
     CWAIT(copper, 0, 0);
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
@@ -267,11 +299,9 @@ void setCityCopperList(struct ViewPort *vp)
     while(loop < CL_CITY_LEN)
     {
     	/*	Scanline position */
-        short tmp_line = loop;
+        tmp_line = loop;
         loop++;
 
-        // CWAIT(copper, cl_city[tmp_line], 0);
-        // CMOVE(copper, custom.color[0], 0x000);
     	CWAIT(copper, cl_city[tmp_line], 64);
 
     	/*	How many color registers ? */
@@ -282,11 +312,6 @@ void setCityCopperList(struct ViewPort *vp)
         CWAIT(copper, cl_city[tmp_line], 220);        
         CMOVE(copper, custom.color[0], 0x000);
     }
-    // CWAIT(copper, 63, 0);
-    // CMOVE(copper, custom.color[0], 0xF0F);
-
-    // CWAIT(copper, 96, 0);
-    // CMOVE(copper, custom.color[0], 0xFF0);
 
     CEND(copper);
 

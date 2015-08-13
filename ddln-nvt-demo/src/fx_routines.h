@@ -12,6 +12,7 @@ void freeElementCity(void);
 void loadElementTree(void);
 void drawElementTree(struct BitMap *dest_bitmap);
 void freeElementTree(void);
+BOOL drawElementCityRefl(struct BitMap *dest_bitmap, unsigned int fx_clock);
 
 void loadTrabantFacingGround(void);
 void drawTrabantFacingGround(struct BitMap *dest_bitmap);
