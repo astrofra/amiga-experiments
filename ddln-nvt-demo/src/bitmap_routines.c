@@ -3,6 +3,7 @@
 */
 
 #include "includes.prl"
+#include "tinfl.c"
 
 extern struct DosLibrary *DOSBase;
 extern struct GfxBase *GfxBase;

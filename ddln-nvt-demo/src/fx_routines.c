@@ -54,10 +54,22 @@ UWORD chip blank_pointer[4]=
     0x0000, 0x0000
 };
 
-#define RASTER_CLEAR_HSTEP 32
-BOOL progressiveClearRaster(struct RastPort *, unsigned int fx_clock)
+#define RASTER_CLEAR_HSTEP 64
+BOOL progressiveClearRaster(struct RastPort *rp, unsigned int fx_clock, const int max_width, const int max_height)
 {
+    short x, max_x;
+    x = fx_clock * RASTER_CLEAR_HSTEP;
 
+    if (x >= max_width)
+        return FALSE;
+
+    max_x = x + RASTER_CLEAR_HSTEP;
+    if (max_x >= max_width)
+        max_x = max_width - 1;
+    SetAPen(rp, 0);
+    RectFill(rp, x, 0, x + RASTER_CLEAR_HSTEP, max_height - 1);
+
+    return TRUE;
 }
 
 /*
@@ -71,23 +83,23 @@ void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_nu
     switch(title_number)
     {
         case 0:
-            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_0.dat", 839, 1140, mistral_title_0.Width, mistral_title_0.Height, mistral_title_0.Depth);
+            bitmap_title = load_file_as_bitmap("assets/mistral_title_0.dat", 1140, mistral_title_0.Width, mistral_title_0.Height, mistral_title_0.Depth);
             WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_0.Width, mistral_title_0.Height, ((DISPL_WIDTH1 - mistral_title_0.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_0.Height) >> 1));
             break;
 
         case 1:
-            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_1.dat", 2508, 4800, mistral_title_1.Width, mistral_title_1.Height, mistral_title_1.Depth);
+            bitmap_title = load_file_as_bitmap("assets/mistral_title_1.dat", 4800, mistral_title_1.Width, mistral_title_1.Height, mistral_title_1.Depth);
             WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_1.Width, mistral_title_1.Height, ((DISPL_WIDTH1 - mistral_title_1.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_1.Height) >> 1));
             break;
         case 2:
-            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_2.dat", 2109, 4320, mistral_title_2.Width, mistral_title_2.Height, mistral_title_2.Depth);
+            bitmap_title = load_file_as_bitmap("assets/mistral_title_2.dat", 4320, mistral_title_2.Width, mistral_title_2.Height, mistral_title_2.Depth);
             WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_2.Width, mistral_title_2.Height, ((DISPL_WIDTH1 - mistral_title_2.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_2.Height) >> 1));
             break; 
         case 3:
-            bitmap_title = load_zlib_file_as_bitmap("assets/mistral_title_3.dat", 1681, 3552, mistral_title_3.Width, mistral_title_3.Height, mistral_title_3.Depth);
+            bitmap_title = load_file_as_bitmap("assets/mistral_title_3.dat", 3552, mistral_title_3.Width, mistral_title_3.Height, mistral_title_3.Depth);
             WaitTOF();
             BLIT_BITMAP_S(bitmap_title, dest_bitmap, mistral_title_3.Width, mistral_title_3.Height, ((DISPL_WIDTH1 - mistral_title_3.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - mistral_title_3.Height) >> 1));
             break;                   

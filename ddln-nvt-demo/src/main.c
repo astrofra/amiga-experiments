@@ -4,6 +4,7 @@
 */
 
 #include "includes.prl"
+#include "time.h"
 #include <intuition/intuition.h>
 #include <graphics/gfxbase.h>
 #include <hardware/dmabits.h>
@@ -29,7 +30,6 @@ Routines
 #include "color_routines.h"
 #include "voxel_routines.h"
 #include "fx_routines.h"
-#include "tinfl.c"
 
 /*
 Graphic assets
@@ -41,8 +41,6 @@ Graphic assets
 struct Library *PTReplayBase;
 struct Module *theMod;
 UBYTE *mod = NULL;
-
-UBYTE tin_fl_enable_waittof = 0;
 
 struct IntuitionBase *IntuitionBase;
 struct GfxBase *GfxBase;
@@ -279,6 +277,7 @@ void main()
 	unsigned int fx_clock = 0;
 	unsigned short demo_phase = 0;
 	unsigned int palette_fade;
+	unsigned int prev_clock;
 
 	UWORD angle;
 
@@ -293,8 +292,6 @@ void main()
 	OpenLibrary( "graphics.library", 0 );
 	if( !GfxBase )
 		close_demo( "Could NOT open the Graphics library!" );
-
-	tinflDiag();
 
 	printf("DEMO IS LOADING!\n");
 
@@ -426,8 +423,6 @@ void main()
 
 	precalculateMistralTitleFades();
 
-	tin_fl_enable_waittof = 1;
-
 	playMusic();
 	// drawElementCity(&bit_map1);
 	// drawElementCity(&bit_map2);
@@ -472,7 +467,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_0 | 1:
-				if (1) // ((PTSongPos(theMod) == 0 && PTPatternPos(theMod) > 24) || (PTSongPos(theMod) > 0))
+				if ((PTSongPos(theMod) == 0 && PTPatternPos(theMod) > 0x10) || (PTSongPos(theMod) > 0))
 					demo_phase++;
 				break;
 
@@ -490,7 +485,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_0 | 3:
-				if (fx_clock++ > 50)
+				if (fx_clock++ > 180)
 					demo_phase++;
 				break;
 
@@ -501,19 +496,31 @@ void main()
 				if (palette_fade >= 16)
 				{
 					palette_fade = 0;
+					fx_clock = 0;
+					setPaletteToBlack();
 					demo_phase++;
 				}
 				break;
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_0 | 5:
-				setPaletteToBlack();
-				//SetRast(&rast_port1, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;
 
 			case DMPHASE_TITLE_0 | 6:
-				//SetRast(&rast_port2, 0);
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				demo_phase++;
 				break;						
 
@@ -528,7 +535,7 @@ void main()
 				Facing car 
 			***********************/
 			case DMPHASE_FACING_CAR:
-				if (1) // ((PTSongPos(theMod) == 1 && PTPatternPos(theMod) > 4) || (PTSongPos(theMod) > 1))
+				if ((PTSongPos(theMod) == 0 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 0))
 					demo_phase++;
 				break;
 
@@ -557,37 +564,53 @@ void main()
 				break;
 
 			case DMPHASE_FACING_CAR | 3:
+				if ((PTSongPos(theMod) == 1 && PTPatternPos(theMod) > 0x22) || (PTSongPos(theMod) > 1))
+					demo_phase++;
+					break;
+
+			case DMPHASE_FACING_CAR | 4:
 				if (fxFacingCar(fx_clock))
 					fx_clock++;
 				else
 					demo_phase++;
 				break;
 
-			case DMPHASE_FACING_CAR | 4:
+			case DMPHASE_FACING_CAR | 5:
 				/* Fade out */
 				LoadRGB4(&view_port1, pal_facing_car_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
 				if (palette_fade >= 16)
 				{
 					palette_fade = 0;
+					fx_clock = 0;
+					setPaletteToBlack();
 					demo_phase++;
 				}
 				break;
 
 			/*	Clear the screen */
-			case DMPHASE_FACING_CAR | 5:
-				setPaletteToBlack();
-				//SetRast(&rast_port1, 0);
-				demo_phase++;
+			case DMPHASE_FACING_CAR | 6:
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;
 
-			case DMPHASE_FACING_CAR | 6:
-				//SetRast(&rast_port2, 0);
-				demo_phase++;
+			case DMPHASE_FACING_CAR | 7:
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;						
 
 			/*	Next fx!!! */
-			case DMPHASE_FACING_CAR | 7:
+			case DMPHASE_FACING_CAR | 8:
 				resetViewportOffset();
 				freeTrabantFacingGround();
 				freeTrabantFacingCar();
@@ -607,7 +630,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_1 | 1:
-				if (1) // ((PTSongPos(theMod) == 2 && PTPatternPos(theMod) > 32) || (PTSongPos(theMod) > 2))
+				if ((PTSongPos(theMod) == 2 && PTPatternPos(theMod) > 0x20) || (PTSongPos(theMod) > 2))
 					demo_phase++;
 				break;
 
@@ -624,7 +647,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_1 | 3:
-				if (1) // ((PTSongPos(theMod) == 3 && PTPatternPos(theMod) > 4) || (PTSongPos(theMod) > 3))
+				if ((PTSongPos(theMod) == 2 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 2))
 					demo_phase++;
 				break;
 
@@ -635,20 +658,31 @@ void main()
 				if (palette_fade >= 16)
 				{
 					palette_fade = 0;
+					fx_clock = 0;
+					setPaletteToBlack();
 					demo_phase++;
 				}
 				break;
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_1 | 5:
-				setPaletteToBlack();
-				//SetRast(&rast_port1, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;
 
 			case DMPHASE_TITLE_1 | 6:
-				//SetRast(&rast_port2, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;						
 
 			/*	Next fx!!! */
@@ -709,20 +743,31 @@ void main()
 				if (palette_fade >= 16)
 				{
 					palette_fade = 0;
+					fx_clock = 0;
+					setPaletteToBlack();
 					demo_phase++;
 				}
 				break;
 
 			/*	Clear the screen */
 			case DMPHASE_SIDE_CAR | 6:
-				setPaletteToBlack();
-				//SetRast(&rast_port1, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;
 
 			case DMPHASE_SIDE_CAR | 7:
-				//SetRast(&rast_port2, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;						
 
 			/*	Next fx!!! */
@@ -774,20 +819,31 @@ void main()
 				if (palette_fade >= 16)
 				{
 					palette_fade = 0;
+					fx_clock = 0;
+					setPaletteToBlack();
 					demo_phase++;
 				}
 				break;
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_2 | 5:
-				setPaletteToBlack();
-				//SetRast(&rast_port1, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;
 
 			case DMPHASE_TITLE_2 | 6:
-				//SetRast(&rast_port2, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;						
 
 			/*	Next fx!!! */
@@ -836,6 +892,8 @@ void main()
 				palette_fade++;
 				if (palette_fade >= 16)
 				{
+					setPaletteToBlack();
+					fx_clock = 0;
 					palette_fade = 0;
 					demo_phase++;
 				}
@@ -843,14 +901,23 @@ void main()
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_3 | 5:
-				setPaletteToBlack();
-				//SetRast(&rast_port1, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;
 
 			case DMPHASE_TITLE_3 | 6:
-				//SetRast(&rast_port2, 0);
-				demo_phase++;
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
 				break;						
 
 			/*	Next fx!!! */
@@ -1062,7 +1129,7 @@ void precalculateSideCarFades(void)
 	Screen with a facing trabant
 	Draws the car & carlights
 */
-#define FX_TRAB_CARLIGHT_DELAY	150
+#define FX_TRAB_CARLIGHT_DELAY	25
 #define FX_TRAB_CARLIGHT_INTERVAL	4
 BOOL fxFacingCar(unsigned int fx_clock)
 {
@@ -1120,7 +1187,7 @@ BOOL fxFacingCar(unsigned int fx_clock)
 			scr2_y_offset = -1;
 			break;
 
-		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 50:
+		case FX_TRAB_CARLIGHT_DELAY + (FX_TRAB_CARLIGHT_INTERVAL * 2) + 100:
 			// freeTrabantFacingGround();
 			// freeTrabantFacingCar();
 			// freeTrabantLight();

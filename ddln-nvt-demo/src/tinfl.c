@@ -56,10 +56,7 @@ enum
 void tinflDiag(void);
 
 extern void WaitTOF( void );
-extern UBYTE tin_fl_enable_waittof;
-UBYTE wait_counter = 0;
 
-#define WaitTOF_LF if (tin_fl_enable_waittof && wait_counter++ > 4) { wait_counter = 0; WaitTOF(); }
 // High level decompression functions:
 // tinfl_decompress_mem_to_heap() decompresses a block in memory to a heap block allocated via malloc().
 // On entry:
@@ -182,7 +179,6 @@ struct tinfl_decompressor_tag
 #define TINFL_GET_BYTE(state_index, c) do { \
   if (pIn_buf_cur >= pIn_buf_end) { \
     for ( ; ; ) { \
-      WaitTOF_LF; \
       if (decomp_flags & TINFL_FLAG_HAS_MORE_INPUT) { \
         TINFL_CR_RETURN(state_index, TINFL_STATUS_NEEDS_MORE_INPUT); \
         if (pIn_buf_cur < pIn_buf_end) { \
@@ -196,9 +192,9 @@ struct tinfl_decompressor_tag
     } \
   } else c = *pIn_buf_cur++; } MZ_MACRO_END
 
-#define TINFL_NEED_BITS(state_index, n) do { mz_uint c; WaitTOF_LF; TINFL_GET_BYTE(state_index, c); bit_buf |= (((tinfl_bit_buf_t)c) << num_bits); num_bits += 8; } while (num_bits < (mz_uint)(n))
-#define TINFL_SKIP_BITS(state_index, n) do { WaitTOF_LF; if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
-#define TINFL_GET_BITS(state_index, b, n) do { WaitTOF_LF; if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } b = bit_buf & ((1 << (n)) - 1); bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
+#define TINFL_NEED_BITS(state_index, n) do { mz_uint c; TINFL_GET_BYTE(state_index, c); bit_buf |= (((tinfl_bit_buf_t)c) << num_bits); num_bits += 8; } while (num_bits < (mz_uint)(n))
+#define TINFL_SKIP_BITS(state_index, n) do { if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
+#define TINFL_GET_BITS(state_index, b, n) do {  if (num_bits < (mz_uint)(n)) { TINFL_NEED_BITS(state_index, n); } b = bit_buf & ((1 << (n)) - 1); bit_buf >>= (n); num_bits -= (n); } MZ_MACRO_END
 
 // TINFL_HUFF_BITBUF_FILL() is only used rarely, when the number of bytes remaining in the input buffer falls below 2.
 // It reads just enough bytes from the input stream that are needed to decode the next Huffman code (and absolutely no more). It works by trying to fully decode a
@@ -272,7 +268,6 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
   do
   {
     TINFL_GET_BITS(3, r->m_final, 3); r->m_type = r->m_final >> 1;
-    WaitTOF_LF
     if (r->m_type == 0)
     {
       TINFL_SKIP_BITS(5, num_bits & 7);
@@ -288,10 +283,9 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
       while (counter)
       {
         size_t n; while (pOut_buf_cur >= pOut_buf_end) { TINFL_CR_RETURN(9, TINFL_STATUS_HAS_MORE_OUTPUT); }
-        WaitTOF_LF
+        
         while (pIn_buf_cur >= pIn_buf_end)
         {
-          WaitTOF_LF
           if (decomp_flags & TINFL_FLAG_HAS_MORE_INPUT)
           {
             TINFL_CR_RETURN(38, TINFL_STATUS_NEEDS_MORE_INPUT);
@@ -327,7 +321,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
       {
         int tree_next, tree_cur; tinfl_huff_table *pTable;
         mz_uint i, j, used_syms, total, sym_index, next_code[17], total_syms[16]; pTable = &r->m_tables[r->m_type]; MZ_CLEAR_OBJ(total_syms); MZ_CLEAR_OBJ(pTable->m_look_up); MZ_CLEAR_OBJ(pTable->m_tree);
-        WaitTOF_LF
+        
         for (i = 0; i < r->m_table_sizes[r->m_type]; ++i) total_syms[pTable->m_code_size[i]]++;
         used_syms = 0, total = 0; next_code[0] = next_code[1] = 0;
         for (i = 1; i <= 15; ++i) { used_syms += total_syms[i]; next_code[i + 1] = (total = ((total + total_syms[i]) << 1)); }
@@ -339,7 +333,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         {
           mz_uint rev_code = 0, l, cur_code, code_size = pTable->m_code_size[sym_index]; if (!code_size) continue;
           cur_code = next_code[code_size]++; for (l = code_size; l > 0; l--, cur_code >>= 1) rev_code = (rev_code << 1) | (cur_code & 1);
-          WaitTOF_LF
+          
           if (code_size <= TINFL_FAST_LOOKUP_BITS) { mz_int16 k = (mz_int16)((code_size << 9) | sym_index); while (rev_code < TINFL_FAST_LOOKUP_SIZE) { pTable->m_look_up[rev_code] = k; rev_code += (1 << code_size); } continue; }
           if (0 == (tree_cur = pTable->m_look_up[rev_code & (TINFL_FAST_LOOKUP_SIZE - 1)])) { pTable->m_look_up[rev_code & (TINFL_FAST_LOOKUP_SIZE - 1)] = (mz_int16)tree_next; tree_cur = tree_next; tree_next -= 2; }
           rev_code >>= (TINFL_FAST_LOOKUP_BITS - 1);
@@ -372,7 +366,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
       for ( ; ; )
       {
         mz_uint8 *pSrc;
-        WaitTOF_LF
+        
 
         for ( ; ; )
         {
@@ -445,7 +439,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         {
           while (counter--)
           {
-            WaitTOF_LF
+            
             while (pOut_buf_cur >= pOut_buf_end) { TINFL_CR_RETURN(53, TINFL_STATUS_HAS_MORE_OUTPUT); }
             *pOut_buf_cur++ = pOut_buf_start[(dist_from_out_buf_start++ - dist) & out_buf_size_mask];
           }
@@ -457,7 +451,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
           const mz_uint8 *pSrc_end = pSrc + (counter & ~7);
           do
           {
-            WaitTOF_LF
+            
             ((mz_uint32 *)pOut_buf_cur)[0] = ((const mz_uint32 *)pSrc)[0];
             ((mz_uint32 *)pOut_buf_cur)[1] = ((const mz_uint32 *)pSrc)[1];
             pOut_buf_cur += 8;
@@ -477,7 +471,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
 #endif
         do
         {
-          WaitTOF_LF
+          
           pOut_buf_cur[0] = pSrc[0];
           pOut_buf_cur[1] = pSrc[1];
           pOut_buf_cur[2] = pSrc[2];
@@ -511,7 +505,7 @@ common_exit:
     mz_uint32 i, s1 = r->m_check_adler32 & 0xffff, s2 = r->m_check_adler32 >> 16; size_t block_len = buf_len % 5552;
     while (buf_len)
     {
-      WaitTOF_LF
+      
       for (i = 0; i + 7 < block_len; i += 8, ptr += 8)
       {
         s1 += ptr[0], s2 += s1; s1 += ptr[1], s2 += s1; s1 += ptr[2], s2 += s1; s1 += ptr[3], s2 += s1;
