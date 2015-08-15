@@ -9,7 +9,7 @@ BOOL progressiveClearRaster(struct RastPort *rp, unsigned int fx_clock, const in
 
 void setCityCopperList(struct ViewPort *vp);
 void loadElementCity(void);
-void drawElementCity(struct BitMap *dest_bitmap);
+void drawElementCity(struct RastPort *rp, struct BitMap *dest_bitmap);
 void freeElementCity(void);
 void loadElementTree(void);
 void drawElementTree(struct BitMap *dest_bitmap);

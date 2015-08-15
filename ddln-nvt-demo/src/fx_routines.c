@@ -240,10 +240,13 @@ void __inline freeTrabantSideCar(void)
     City scape
 *****************************/
 void loadElementCity(void)
-{    bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 4697, 15048, element_city.Width, element_city.Height, element_city.Depth);  }
+{    bitmap_element_city = load_zlib_file_as_bitmap("assets/element_city.dat", 4671, 15048, element_city.Width, element_city.Height, element_city.Depth);  }
 
-void drawElementCity(struct BitMap *dest_bitmap)
+void drawElementCity(struct RastPort *rp, struct BitMap *dest_bitmap)
 {
+    SetAPen(rp, 7);
+    RectFill(rp, 0, 0, (WIDTH1 << 1) - 1, 70);
+
     BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 0, 71);
     BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, DEFAULT_WIDTH, 71);
     WaitBlit();
@@ -299,7 +302,7 @@ void setCityCopperList(struct ViewPort *vp)
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
 
-    CINIT(copper, CL_CITY_LEN * 5);
+    CINIT(copper, CL_CITY_LEN * 2 + 16);
     CWAIT(copper, 0, 0);
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
@@ -314,15 +317,12 @@ void setCityCopperList(struct ViewPort *vp)
         tmp_line = loop;
         loop++;
 
-    	CWAIT(copper, cl_city[tmp_line], 64);
+    	CWAIT(copper, cl_city[tmp_line], 0);
 
     	/*	How many color registers ? */
         max_color = cl_city[loop++];
     	for (c_loop = 0; c_loop < max_color; c_loop++)
     		CMOVE(copper, custom.color[cl_city[loop++]], cl_city[loop++]);
-
-        CWAIT(copper, cl_city[tmp_line], 220);        
-        CMOVE(copper, custom.color[0], 0x000);
     }
 
     CEND(copper);

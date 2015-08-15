@@ -311,7 +311,7 @@ void main()
 	InitVPort( &view_port1 );
 	view_port1.DWidth = DISPL_WIDTH1;      /* Set the width.                */
 	view_port1.DHeight = DISPL_HEIGHT1;    /* Set the height.               */
-	view_port1.DxOffset = 6;         /* X position.                   */
+	view_port1.DxOffset = 0;         /* X position.                   */
 	view_port1.DyOffset = 0;         /* Y position.                   */
 	view_port1.RasInfo = &ras_info1; /* Give it a pointer to RasInfo. */
 	view_port1.Modes = DUALPF|PFBA;         /* Low resolution.               */
@@ -957,7 +957,7 @@ void main()
 				break;
 							
 			case DMPHASE_BERLIN_0 | 5:
-				drawElementCity(&bit_map1);
+				drawElementCity(&rast_port1, &bit_map1);
 				fx_clock = 0;
 				scr1_x_offset = 0;
 				demo_phase++;
