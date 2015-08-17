@@ -56,6 +56,7 @@ struct View *my_old_view;
 */
 short scr1_x_offset = 0, scr1_y_offset = 0;
 short scr2_x_offset = 0, scr2_y_offset = 0;
+int scr2_x_offset_half_precision = 0;
 int dbuffer_offset_1 = 0;
 int dbuffer_offset_2 = 0;
 BOOL enable_dbuffer_1 = FALSE;
@@ -273,6 +274,7 @@ BOOL fxFacingCar(unsigned int);
 void precalculateSideCarFades(void);
 BOOL fxSideCar(unsigned int);
 void precalculateMistralTitleFades(void);
+BOOL fxCityScrolling(void);
 
 void main()
 {
@@ -942,56 +944,68 @@ void main()
 
 			case DMPHASE_BERLIN_0 | 1:
 				drawElementTree(&bit_map2);
-				drawElementBridge(&bit_map2);
+				freeElementTree();
 				demo_phase++;
 				break;
 
 			case DMPHASE_BERLIN_0 | 2:
+				drawElementCity(&rast_port1, &bit_map1);
+				demo_phase++;
+				break;
+
+			case DMPHASE_BERLIN_0 | 3:
+				if (!drawElementCityRefl(&bit_map1, fx_clock))
+				{
+					WaitBlit();
+					freeElementCity();
+					fx_clock = 0;
+					demo_phase++;
+				}
+				else
+					fx_clock += 2;
+				break;
+
+			case DMPHASE_BERLIN_0 | 4:
+				drawElementBridge(&bit_map2);
+				demo_phase++;
+				fx_clock = 0;
+				break;
+
+			case DMPHASE_BERLIN_0 | 5:
+				if (!drawElementBridgeRefl(&bit_map2, fx_clock))
+				{
+					WaitBlit();
+					freeElementBridge();
+					demo_phase++;
+				}
+				else
+					fx_clock += 2;
+				break;							
+
+			case DMPHASE_BERLIN_0 | 6:
 				setCityCopperList(&view_port1);
 				demo_phase++;
 				break;								
 
-			case DMPHASE_BERLIN_0 | 3:
+			case DMPHASE_BERLIN_0 | 7:
 				MrgCop(&my_view);
 				demo_phase++;
 				break;
 
-			case DMPHASE_BERLIN_0 | 4:
+			case DMPHASE_BERLIN_0 | 8:
 				LoadView( &my_view );
+				fx_clock = 0;
+				scr1_x_offset = 0;
+				scr2_x_offset_half_precision = 0;
 				demo_phase++;
 				break;
 							
-			case DMPHASE_BERLIN_0 | 5:
-				drawElementCity(&rast_port1, &bit_map1);
-				fx_clock = 0;
-				scr1_x_offset = 0;
-				demo_phase++;
-				break;
 
-			case DMPHASE_BERLIN_0 | 6:
-				if (!drawElementCityRefl(&bit_map1, fx_clock))
-				{
-					freeElementCity();
+			case DMPHASE_BERLIN_0 | 9:
+				if (!fxCityScrolling())
 					demo_phase++;
-				}
 
-				fx_clock += 2;
-
-				scr1_x_offset++;
-				if (scr1_x_offset > DEFAULT_WIDTH)
-					scr1_x_offset = 0;
-				scr2_x_offset+=2;
-				if (scr2_x_offset > DEFAULT_WIDTH)
-					scr2_x_offset = 0;					
-				break;
-
-			case DMPHASE_BERLIN_0 | 7:
-				scr1_x_offset++;
-				if (scr1_x_offset > DEFAULT_WIDTH)
-					scr1_x_offset = 0;
-				scr2_x_offset+=2;
-				if (scr2_x_offset > DEFAULT_WIDTH)
-					scr2_x_offset = 0;				
+				scr1_x_offset = scr2_x_offset >> 1;				
 				break;							
 
 		}
@@ -1295,4 +1309,43 @@ void precalculateMistralTitleFades(void)
 
 			pal_mistral_title_fadeout[palette_idx + (palette_fade << 4)] = mixRGB4Colors(tmp_col, 0x000, palette_fade);
 		}
+}
+
+/*
+	Scrolling of the city scape
+	with an acceleration and deceleration
+*/
+BOOL fxCityScrolling(void)
+{
+	UBYTE scroll_speed = 0;
+
+	if (scr2_x_offset < 16)
+		scroll_speed = 1;
+	else
+	if (scr2_x_offset < 32)
+		scroll_speed = 2;
+	else
+	if (scr2_x_offset < 64)
+		scroll_speed = 3;
+	else
+	if (scr2_x_offset < 128)
+		scroll_speed = 4;
+	else
+	if (scr2_x_offset < DEFAULT_WIDTH - 32)
+		scroll_speed = 3;
+	else			
+	if (scr2_x_offset < DEFAULT_WIDTH - 16)
+		scroll_speed = 2;
+	else
+	if (scr2_x_offset < DEFAULT_WIDTH - 1)
+		scroll_speed = 1;
+	else
+	{
+		scroll_speed = 0;
+		return FALSE;
+	}
+
+	scr2_x_offset_half_precision += scroll_speed;
+	scr2_x_offset = scr2_x_offset_half_precision >> 1;
+	return TRUE;
 }

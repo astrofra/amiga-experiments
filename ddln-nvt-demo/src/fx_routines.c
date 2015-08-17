@@ -48,6 +48,8 @@ extern struct BitMap *bitmap_carlight_1;
 extern struct BitMap *bitmap_side_ground;
 extern struct BitMap *bitmap_side_car;
 
+extern UWORD element_bridgePaletteRGB4[8];
+
 struct UCopList *copper;
 
 UWORD chip blank_pointer[4]=
@@ -254,7 +256,7 @@ void drawElementCity(struct RastPort *rp, struct BitMap *dest_bitmap)
     WaitBlit();
 }
 
-BOOL drawElementCityRefl(struct BitMap *dest_bitmap, unsigned int fx_clock)
+BOOL __inline drawElementCityRefl(struct BitMap *dest_bitmap, unsigned int fx_clock)
 {
     if (fx_clock < element_city.Height)
     {
@@ -299,10 +301,26 @@ void freeElementTree(void)
 void loadElementBridge(void)
 {    bitmap_element_bridge = load_zlib_file_as_bitmap("assets/element_bridge.dat", 2739, 11280, element_bridge.Width, element_bridge.Height, element_bridge.Depth);  }
 
+#define BRIDGE_OFFSET_Y 100
 void drawElementBridge(struct BitMap *dest_bitmap)
 {
-    BLIT_BITMAP_S(bitmap_element_bridge, dest_bitmap, element_bridge.Width, element_bridge.Height, DISPL_WIDTH1, 102);
+    BLIT_BITMAP_S(bitmap_element_bridge, dest_bitmap, element_bridge.Width, element_bridge.Height, DISPL_WIDTH1, BRIDGE_OFFSET_Y);
     WaitBlit();
+}
+
+BOOL __inline drawElementBridgeRefl(struct BitMap *dest_bitmap, unsigned int fx_clock)
+{
+    if (fx_clock < element_bridge.Height)
+    {
+        BltBitMap(bitmap_element_bridge, 0, element_bridge.Height - fx_clock - 1,
+                    dest_bitmap, DISPL_WIDTH1, BRIDGE_OFFSET_Y + element_bridge.Height + (fx_clock >> 1),
+                    element_bridge.Width, 1,
+                    0xC0, 0xFF, NULL);
+
+        return TRUE;
+    }
+    else
+        return FALSE;
 }
 
 void freeElementBridge(void)
@@ -315,6 +333,7 @@ void setCityCopperList(struct ViewPort *vp)
 {
 	UWORD loop, zloop, c_loop, max_color, line_index;
     UWORD tmp_line;
+    UBYTE pal_phase = 0;
 
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
@@ -340,6 +359,31 @@ void setCityCopperList(struct ViewPort *vp)
         max_color = cl_city[loop++];
     	for (c_loop = 0; c_loop < max_color; c_loop++)
     		CMOVE(copper, custom.color[cl_city[loop++]], cl_city[loop++]);
+
+        if (cl_city[tmp_line] > 0 && pal_phase == 0)
+        {
+            CMOVE(copper, custom.color[8], 0x000);
+            CMOVE(copper, custom.color[9], element_bridgePaletteRGB4[1]);
+            CMOVE(copper, custom.color[10], element_bridgePaletteRGB4[2]);
+            CMOVE(copper, custom.color[11], element_bridgePaletteRGB4[3]);
+            CMOVE(copper, custom.color[12], element_bridgePaletteRGB4[4]);
+            CMOVE(copper, custom.color[13], element_bridgePaletteRGB4[5]);
+            CMOVE(copper, custom.color[14], element_bridgePaletteRGB4[6]);
+            CMOVE(copper, custom.color[15], element_bridgePaletteRGB4[7]);
+            pal_phase++;
+        }
+        else
+        if (cl_city[tmp_line] >= (BRIDGE_OFFSET_Y + element_bridge.Height) && pal_phase == 1)
+        {
+            CMOVE(copper, custom.color[9], element_bridgePaletteRGB4[1]);
+            CMOVE(copper, custom.color[10], mixRGB4Colors(0x04A, element_bridgePaletteRGB4[2], 8));
+            CMOVE(copper, custom.color[11], mixRGB4Colors(0x04A, element_bridgePaletteRGB4[3], 8));
+            CMOVE(copper, custom.color[12], mixRGB4Colors(0x04A, element_bridgePaletteRGB4[4], 8));
+            CMOVE(copper, custom.color[13], mixRGB4Colors(0x04A, element_bridgePaletteRGB4[5], 8));
+            CMOVE(copper, custom.color[14], mixRGB4Colors(0x04A, element_bridgePaletteRGB4[6], 8));
+            CMOVE(copper, custom.color[15], mixRGB4Colors(0x04A, element_bridgePaletteRGB4[7], 8));
+            pal_phase++;
+        }
     }
 
     CEND(copper);

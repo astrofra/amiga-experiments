@@ -18,6 +18,7 @@ BOOL drawElementCityRefl(struct BitMap *dest_bitmap, unsigned int fx_clock);
 void loadElementBridge(void);
 void drawElementBridge(struct BitMap *dest_bitmap);
 void freeElementBridge(void);
+BOOL drawElementBridgeRefl(struct BitMap *dest_bitmap, unsigned int fx_clock);
 
 void loadTrabantFacingGround(void);
 void drawTrabantFacingGround(struct BitMap *dest_bitmap);
