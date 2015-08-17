@@ -29,6 +29,20 @@ struct Image element_tree =
 	NULL		/* NextImage */
 };
 
+UWORD element_bridgePaletteRGB4[8] =
+{
+	0x0F0F,0x0000,0x0312,0x0523,0x0734,0x0835,0x0B47,0x0FC1
+};
+
+struct Image element_bridge =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	320, 94, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
 /* Trabant Screen #0 */
 
 UWORD trabant_facing_groundPaletteRGB4[8] =

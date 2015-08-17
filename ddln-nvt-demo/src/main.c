@@ -74,6 +74,7 @@ struct RastPort rast_port2;
 /* Data */
 struct BitMap *bitmap_element_city = NULL;
 struct BitMap *bitmap_element_tree = NULL;
+struct BitMap *bitmap_element_bridge = NULL;
 
 struct BitMap *bitmap_facing_ground = NULL;
 struct BitMap *bitmap_facing_car = NULL;
@@ -164,8 +165,10 @@ void close_demo(STRPTR message)
 	int loop;
 
 	WaitBlit();
-	free_allocated_bitmap(bitmap_element_city);
-	free_allocated_bitmap(bitmap_element_tree);
+
+	freeElementCity();
+	freeElementTree();
+	freeElementBridge();
 
 	freeTrabantFacingGround();
 	freeTrabantFacingCar();
@@ -411,6 +414,7 @@ void main()
 	setPaletteToBlack();
 
 	loadElementCity();
+	loadElementBridge();
 
 	precalculateFacingCarFades();
 	loadTrabantFacingGround();
@@ -938,6 +942,7 @@ void main()
 
 			case DMPHASE_BERLIN_0 | 1:
 				drawElementTree(&bit_map2);
+				drawElementBridge(&bit_map2);
 				demo_phase++;
 				break;
 
