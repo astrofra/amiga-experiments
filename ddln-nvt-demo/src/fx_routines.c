@@ -338,7 +338,7 @@ void setCityCopperList(struct ViewPort *vp)
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
 
-    CINIT(copper, CL_CITY_LEN * 2 + 16);
+    CINIT(copper, CL_CITY_LEN * 3);
     CWAIT(copper, 0, 0);
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
