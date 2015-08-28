@@ -48,6 +48,9 @@ extern struct ExecBase *SysBase;
 extern struct DosLibrary *DOSBase;
 extern struct Custom far custom;
 
+struct Task *myTask = NULL;
+BYTE oldPri;
+
 struct View my_view;
 struct View *my_old_view;
 
@@ -180,8 +183,8 @@ void close_demo(STRPTR message)
 	if (pal_facing_car_fadeout != NULL)
 		FreeMem(pal_facing_car_fadeout, sizeof(UWORD) * 16 * 16);
 
-	freeTrabantSideGround();
-	freeTrabantSideCar();
+	// freeTrabantSideGround();
+	// freeTrabantSideCar();
 
 	if (pal_side_car_fadein != NULL)
 		FreeMem(pal_side_car_fadein, sizeof(UWORD) * 16 * 16);
@@ -236,6 +239,9 @@ void close_demo(STRPTR message)
 
 	/* Print the message and leave: */
 	printf( "%s\n", message );
+
+	if (myTask != NULL)
+		SetTaskPri(myTask, oldPri);
 
 	exit(0);
 }
@@ -400,6 +406,9 @@ void main()
 	WaitTOF();
 	WaitTOF();
 
+	myTask = FindTask(NULL);
+	oldPri = SetTaskPri(myTask, 127);	
+
 	Forbid();
 	Disable();
 	WaitBlit();
@@ -510,7 +519,7 @@ void main()
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_0 | 5:
-				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -520,7 +529,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_0 | 6:
-				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -596,7 +605,7 @@ void main()
 
 			/*	Clear the screen */
 			case DMPHASE_FACING_CAR | 6:
-				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -606,7 +615,7 @@ void main()
 				break;
 
 			case DMPHASE_FACING_CAR | 7:
-				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -672,7 +681,7 @@ void main()
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_1 | 5:
-				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -682,7 +691,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_1 | 6:
-				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -694,7 +703,7 @@ void main()
 			/*	Next fx!!! */
 			case DMPHASE_TITLE_1 | 7:
 				resetViewportOffset();
-				demo_phase = DMPHASE_SIDE_CAR;
+				demo_phase = DMPHASE_TITLE_2; // DMPHASE_SIDE_CAR;
 				break;									
 
 			/*	
@@ -757,7 +766,7 @@ void main()
 
 			/*	Clear the screen */
 			case DMPHASE_SIDE_CAR | 6:
-				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -767,7 +776,7 @@ void main()
 				break;
 
 			case DMPHASE_SIDE_CAR | 7:
-				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -833,7 +842,7 @@ void main()
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_2 | 5:
-				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -843,7 +852,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_2 | 6:
-				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -887,7 +896,7 @@ void main()
 				}
 				break;
 
-			case DMPHASE_TITLE_3 | 3:
+			case DMPHASE_TITLE_3 | 3:		
 				if (fx_clock++ > 50)
 					demo_phase++;
 				break;
@@ -907,7 +916,7 @@ void main()
 
 			/*	Clear the screen */
 			case DMPHASE_TITLE_3 | 5:
-				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 7))
 					fx_clock++;
 				else
 				{
@@ -917,7 +926,7 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_3 | 6:
-				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1))
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
 				{
@@ -965,7 +974,7 @@ void main()
 					fx_clock += 2;
 				break;
 
-			case DMPHASE_BERLIN_0 | 4:
+			case DMPHASE_BERLIN_0 | 4:		
 				drawElementBridge(&bit_map2);
 				demo_phase++;
 				fx_clock = 0;

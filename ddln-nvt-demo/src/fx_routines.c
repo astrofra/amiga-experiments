@@ -59,7 +59,7 @@ UWORD chip blank_pointer[4]=
 };
 
 #define RASTER_CLEAR_HSTEP 64
-BOOL progressiveClearRaster(struct RastPort *rp, unsigned int fx_clock, const int max_width, const int max_height)
+BOOL progressiveClearRaster(struct RastPort *rp, unsigned int fx_clock, const int max_width, const int max_height, UBYTE color_index)
 {
     short x, max_x;
     x = fx_clock * RASTER_CLEAR_HSTEP;
@@ -70,7 +70,7 @@ BOOL progressiveClearRaster(struct RastPort *rp, unsigned int fx_clock, const in
     max_x = x + RASTER_CLEAR_HSTEP;
     if (max_x >= max_width)
         max_x = max_width - 1;
-    SetAPen(rp, 0);
+    SetAPen(rp, color_index);
     RectFill(rp, x, 0, x + RASTER_CLEAR_HSTEP, max_height - 1);
 
     return TRUE;
@@ -248,8 +248,8 @@ void loadElementCity(void)
 
 void drawElementCity(struct RastPort *rp, struct BitMap *dest_bitmap)
 {
-    SetAPen(rp, 7);
-    RectFill(rp, 0, 0, (WIDTH1 << 1) - 1, 70);
+    // SetAPen(rp, 7);
+    // RectFill(rp, 0, 0, (DEFAULT_WIDTH << 1) - 1, 70);
 
     BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, 0, 71);
     BLIT_BITMAP_S(bitmap_element_city, dest_bitmap, element_city.Width, element_city.Height, DEFAULT_WIDTH, 71);
@@ -338,7 +338,7 @@ void setCityCopperList(struct ViewPort *vp)
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
 
-    CINIT(copper, CL_CITY_LEN * 3);
+    CINIT(copper, CL_CITY_LEN * 4);
     CWAIT(copper, 0, 0);
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
@@ -349,6 +349,9 @@ void setCityCopperList(struct ViewPort *vp)
 
     while(loop < CL_CITY_LEN)
     {
+        if (loop & 0x4 == 0x4)
+            WaitTOF();
+
     	/*	Scanline position */
         tmp_line = loop;
         loop++;
