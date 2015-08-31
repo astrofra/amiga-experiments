@@ -1255,9 +1255,9 @@ void __inline fxVoxelRotation(UWORD *angle)
 		swapDoubleBuffer1();
 
 		SetAPen(&rast_port1_1b, 0);
-		RectFill(&rast_port1_1b, (DISPL_WIDTH1 >> 1) - 64 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) - 64, (DISPL_WIDTH1 >> 1) + 64 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) + 64);
+		RectFill(&rast_port1_1b, (DISPL_WIDTH1 >> 1) - 48 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) - 48, (DISPL_WIDTH1 >> 1) + 48 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) + 48);
 		drawLinesListToViewport(&rast_port1_1b, dbuffer_offset_1);
-		(*angle)++;
+		(*angle) += 2;
 		(*angle) &= 0x1FF;
 	}
 	else

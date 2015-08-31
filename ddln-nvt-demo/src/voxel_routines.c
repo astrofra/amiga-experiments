@@ -147,17 +147,18 @@ void buildPointListFromMatrix(void)
 void buildLinesListAsCube(void)
 {
 	short list_idx = 0;
-	point_list_size = 8;
+	point_list_size = 9;
 
 	point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
 	VOXEL_ADD_POINT(0,0,0,1);
-	VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+	VOXEL_ADD_POINT(0,0,VOXEL_SIZE,1);
 	VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE,1);
+	VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+	VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,0,1);
+	VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,VOXEL_SIZE,1);
 	VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
 	VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
-	VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,0,1);
-	VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
-	VOXEL_ADD_POINT(0,0,0,1);
+	VOXEL_ADD_POINT(0,0,0,1);	
 
 	t_point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
 }
@@ -226,7 +227,7 @@ void __inline drawLinesListToViewport(struct RastPort *rp, UWORD x_offset)
 
 	SetAPen(rp, 1);
 	Move(rp, t_point_list[loop] + (DEFAULT_WIDTH >> 1) + x_offset, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1));
-	for(loop = 1; loop < point_list_size << 2; loop += 4)
+	for(loop = 4; loop < point_list_size << 2; loop += 4)
 	{
 		Draw(rp, t_point_list[loop] + (DEFAULT_WIDTH >> 1) + x_offset, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1));
 
