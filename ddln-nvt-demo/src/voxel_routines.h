@@ -6,7 +6,7 @@
 #include <graphics/gfxbase.h>
 
 
-#define VOXEL_SIZE_EXP	4
+#define VOXEL_SIZE_EXP	3
 #define VOXEL_SIZE (1 << VOXEL_SIZE_EXP)
 #define VOXEL_PX_SIZE 4
 
@@ -18,6 +18,9 @@ void buildPointListFromMatrix(void);
 void deleteMatrix(void);
 void deletePointList(void);
 void rotatePointsOnAxisY(UWORD angle);
-void drawPointListToViewport(struct RastPort *rp);
+void drawPointListToViewport(struct RastPort *rp, UWORD x_offset);
+
+void buildLinesListAsCube(void);
+void drawLinesListToViewport(struct RastPort *rp, UWORD x_offset);
 
 #endif // #ifndef VOXEL_ROUTINES

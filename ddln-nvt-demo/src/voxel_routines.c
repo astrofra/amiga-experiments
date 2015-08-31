@@ -55,7 +55,7 @@ void fillMatrixWithRandomData(void)
 			for(x = 0; x < VOXEL_SIZE; x++)
 			{
 				value = squareDistBetweenPoints(x, y, z, VOXEL_SIZE >> 1, VOXEL_SIZE >> 1, VOXEL_SIZE >> 1);
-				if (value > (VOXEL_SIZE * 3) - 5 && value < VOXEL_SIZE * 3)
+				if (value > (VOXEL_SIZE * 3) - 3 && value < VOXEL_SIZE * 3)
 					writeVoxelToMatrix(x,y,z,1);
 			}
 		}
@@ -136,7 +136,30 @@ void buildPointListFromMatrix(void)
 	*/
 	t_point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
 
-	printf("buildPointListFromMatrix() found %d points\n", list_idx);
+	printf("buildPointListFromMatrix() found %d points\n", (list_idx >> 2));
+}
+
+#define VOXEL_ADD_POINT(x,y,z,v_col)	point_list[list_idx++] = x - (VOXEL_SIZE >> 1); \
+										point_list[list_idx++] = y - (VOXEL_SIZE >> 1); \
+										point_list[list_idx++] = z - (VOXEL_SIZE >> 1); \
+										point_list[list_idx++] = v_col;
+
+void buildLinesListAsCube(void)
+{
+	short list_idx = 0;
+	point_list_size = 8;
+
+	point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
+	VOXEL_ADD_POINT(0,0,0,1);
+	VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+	VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE,1);
+	VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
+	VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
+	VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,0,1);
+	VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+	VOXEL_ADD_POINT(0,0,0,1);
+
+	t_point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
 }
 
 void deleteMatrix(void)
@@ -162,7 +185,7 @@ void deletePointList(void)
 	Rotate the point list
 	on its Z axis.
 */
-void rotatePointsOnAxisY(UWORD angle)
+void __inline rotatePointsOnAxisY(UWORD angle)
 {
 	short loop;
 
@@ -178,20 +201,40 @@ void rotatePointsOnAxisY(UWORD angle)
 	}
 }
 
-void drawPointListToViewport(struct RastPort *rp)
+void __inline drawPointListToViewport(struct RastPort *rp, UWORD x_offset)
 {
 	short loop;
 
 	SetAPen(rp, 1);
 	for(loop = 0; loop < point_list_size << 2; loop += 4)
 	{
-		// WritePixel(rp, t_point_list[loop] + (DEFAULT_WIDTH >> 1), t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1));
+		WritePixel(rp, t_point_list[loop] + (DEFAULT_WIDTH >> 1) + x_offset, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1));
 
 		// RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset_2,
 		// 			t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE + dbuffer_offset_2);
 
-		RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE,
-					t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE);		
+		// RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE,
+		// 			t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE);		
+
+		// printf("(%d,%d), ", t_point_list[loop], t_point_list[loop + 1]);
+	}
+}
+
+void __inline drawLinesListToViewport(struct RastPort *rp, UWORD x_offset)
+{
+	short loop = 0;
+
+	SetAPen(rp, 1);
+	Move(rp, t_point_list[loop] + (DEFAULT_WIDTH >> 1) + x_offset, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1));
+	for(loop = 1; loop < point_list_size << 2; loop += 4)
+	{
+		Draw(rp, t_point_list[loop] + (DEFAULT_WIDTH >> 1) + x_offset, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1));
+
+		// RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset_2,
+		// 			t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE, t_point_list[loop + 1] + (t_point_list[loop + 2] >> 2) + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE + dbuffer_offset_2);
+
+		// RectFill(rp, t_point_list[loop] + (DISPL_WIDTH1 >> 1) - VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) - VOXEL_PX_SIZE,
+		// 			t_point_list[loop] + (DEFAULT_WIDTH >> 1) + VOXEL_PX_SIZE + dbuffer_offset_2, t_point_list[loop + 1] + (DISPL_HEIGHT1 >> 1) + VOXEL_PX_SIZE);		
 
 		// printf("(%d,%d), ", t_point_list[loop], t_point_list[loop + 1]);
 	}

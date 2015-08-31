@@ -68,8 +68,11 @@ BOOL enable_dbuffer_2 = FALSE;
 /* ViewPort 1 */
 struct ViewPort view_port1;
 struct RasInfo ras_info1;
+struct RasInfo ras_info1_1b;
 struct BitMap bit_map1;
+struct BitMap bit_map1_1b;
 struct RastPort rast_port1;
+struct RastPort rast_port1_1b;
 struct RasInfo ras_info2;
 struct BitMap bit_map2;
 struct RastPort rast_port2;
@@ -103,6 +106,8 @@ extern UWORD mistral_title_PaletteRGB4[8];
 
 UWORD *pal_mistral_title_fadein = NULL;
 UWORD *pal_mistral_title_fadeout = NULL;
+
+BOOL voxel_switch = FALSE;
 
 #define PTREPLAY_MUSIC
 struct SoundInfo *background = NULL;
@@ -281,6 +286,7 @@ void precalculateSideCarFades(void);
 BOOL fxSideCar(unsigned int);
 void precalculateMistralTitleFades(void);
 BOOL fxCityScrolling(void);
+void fxVoxelRotation(UWORD *angle);
 
 void main()
 {
@@ -338,6 +344,8 @@ void main()
 	/* Prepare the BitMaps */
 	/* ViewPort 1, Bitmap 1 */
 	InitBitMap( &bit_map1, DEPTH1, WIDTH1, HEIGHT1 + 8);
+	InitBitMap( &bit_map1_1b, 1, WIDTH1, HEIGHT1 + 8);
+	
 	/* Allocate memory for the Raster: */ 
 	for( loop = 0; loop < DEPTH1; loop++ )
 	{
@@ -347,6 +355,8 @@ void main()
 	/* Clear the display memory with help of the Blitter: */
 		BltClear( bit_map1.Planes[ loop ], RASSIZE( WIDTH1, HEIGHT1 + 8), 0 );
 	}
+
+	bit_map1_1b.Planes[0] = bit_map1.Planes[0];
 
 	/* ViewPort 1, Bitmap 2 */
 	InitBitMap( &bit_map2, DEPTH1, WIDTH1, HEIGHT1 + 8);
@@ -377,12 +387,17 @@ void main()
 	ras_info2.Next = NULL;        /* Single playfield - only one       */
 	              				/* RasInfo structure is necessary.   */
 
+	ras_info1_1b.BitMap = &bit_map1_1b;
+
 	/* Prepare the RastPort, and give it a pointer to the BitMap. */
 	/* ViewPort 1 */
 	InitRastPort( &rast_port1 );
 	rast_port1.BitMap = &bit_map1;
 	InitRastPort( &rast_port2 );
 	rast_port2.BitMap = &bit_map2;
+
+	InitRastPort( &rast_port1_1b );
+	rast_port1_1b.BitMap = &bit_map1_1b;	
 
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
@@ -416,10 +431,10 @@ void main()
 	OFF_SPRITE;
 	// OFF_VBLANK;
 
-	// setupMatrix();
+	setupMatrix();
 	// fillMatrixWithRandomData();
-	// buildPointListFromMatrix();
-	// angle = 0;
+	buildLinesListAsCube();
+	angle = 0;
 
 	// setPaletteFacingCar();
 	setPaletteToBlack();
@@ -456,19 +471,13 @@ void main()
 
 	while((*(UBYTE *)0xBFE001) & 0x40)
 	{
-		// SetAPen(&rast_port1, 0);
-		// // RectFill(&rast_port1, (DISPL_WIDTH1 >> 1) - 64, (DISPL_HEIGHT1 >> 1) - 64 + dbuffer_offset, (DISPL_WIDTH1 >> 1) + 64, (DISPL_HEIGHT1 >> 1) + 64 + dbuffer_offset);
-		// drawPointListToViewport(&rast_port1);
+		// fxVoxelRotation(&angle);
 		// angle++;
-		// angle &= 0x1FF;
-
-		// rotatePointsOnAxisY(angle);
-		// angle++;
-
 		// printf("demo_phase = %d\n", demo_phase);
 		// printf("Songpos = %d, Patpos = %d\n", PTSongPos(theMod), PTPatternPos(theMod));
 
-		switch(demo_phase)
+		// if(0)
+			switch(demo_phase)
 		{
 			/*	
 				Screen/FX :
@@ -488,6 +497,7 @@ void main()
 
 			case DMPHASE_TITLE_0 | 2:
 				/* Fade in */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadein + (palette_fade << 4), 16);
 				palette_fade++;		
 
@@ -500,12 +510,14 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_0 | 3:
+				fxVoxelRotation(&angle);
 				if (fx_clock++ > 180)
 					demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_0 | 4:
 				/* Fade out */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
 				if (palette_fade >= 16)
@@ -651,6 +663,7 @@ void main()
 
 			case DMPHASE_TITLE_1 | 2:
 				/* Fade in */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadein + (palette_fade << 4), 16);
 				palette_fade++;		
 
@@ -662,12 +675,14 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_1 | 3:
+				fxVoxelRotation(&angle);
 				if ((PTSongPos(theMod) == 2 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 2))
 					demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_1 | 4:
 				/* Fade out */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
 				if (palette_fade >= 16)
@@ -811,6 +826,7 @@ void main()
 
 			case DMPHASE_TITLE_2 | 2:
 				/* Fade in */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadein + (palette_fade << 4), 16);
 				palette_fade++;		
 
@@ -823,12 +839,14 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_2 | 3:
+				fxVoxelRotation(&angle);
 				if (fx_clock++ > 50)
 					demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_2 | 4:
 				/* Fade out */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
 				if (palette_fade >= 16)
@@ -885,6 +903,7 @@ void main()
 
 			case DMPHASE_TITLE_3 | 2:
 				/* Fade in */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadein + (palette_fade << 4), 16);
 				palette_fade++;		
 
@@ -896,13 +915,15 @@ void main()
 				}
 				break;
 
-			case DMPHASE_TITLE_3 | 3:		
+			case DMPHASE_TITLE_3 | 3:
+				fxVoxelRotation(&angle);	
 				if (fx_clock++ > 50)
 					demo_phase++;
 				break;
 
 			case DMPHASE_TITLE_3 | 4:
 				/* Fade out */
+				fxVoxelRotation(&angle);
 				LoadRGB4(&view_port1, pal_mistral_title_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
 				if (palette_fade >= 16)
@@ -1227,6 +1248,25 @@ BOOL fxFacingCar(unsigned int fx_clock)
 	return TRUE;
 }
 
+void __inline fxVoxelRotation(UWORD *angle)
+{
+	if (voxel_switch)
+	{
+		swapDoubleBuffer1();
+
+		SetAPen(&rast_port1_1b, 0);
+		RectFill(&rast_port1_1b, (DISPL_WIDTH1 >> 1) - 64 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) - 64, (DISPL_WIDTH1 >> 1) + 64 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) + 64);
+		drawLinesListToViewport(&rast_port1_1b, dbuffer_offset_1);
+		(*angle)++;
+		(*angle) &= 0x1FF;
+	}
+	else
+		rotatePointsOnAxisY(*angle);
+
+	voxel_switch = !voxel_switch;
+	// angle++;
+}
+
 /*
 	Screen with trabant seen from side
 	Draws the car & shutting door
@@ -1291,7 +1331,12 @@ void precalculateMistralTitleFades(void)
 		for(palette_idx = 0; palette_idx < 16; palette_idx++)
 		{
 			if (palette_idx < 8)
-				tmp_col = 0x000; // trabant_facing_groundPaletteRGB4[palette_idx];
+			{
+				if (palette_idx == 1)
+					tmp_col = 0x00F;
+				else 
+					tmp_col = 0x000;// trabant_facing_groundPaletteRGB4[palette_idx];
+			}
 			else
 				tmp_col = mistral_title_PaletteRGB4[palette_idx - 8];
 

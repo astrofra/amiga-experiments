@@ -265,6 +265,8 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
     if (counter) { TINFL_CR_RETURN_FOREVER(36, TINFL_STATUS_FAILED); }
   }
 
+  WaitTOF();
+
   do
   {
     TINFL_GET_BITS(3, r->m_final, 3); r->m_type = r->m_final >> 1;
@@ -280,6 +282,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         *pOut_buf_cur++ = (mz_uint8)dist;
         counter--;
       }
+      WaitTOF();
       while (counter)
       {
         size_t n; while (pOut_buf_cur >= pOut_buf_end) { TINFL_CR_RETURN(9, TINFL_STATUS_HAS_MORE_OUTPUT); }
@@ -298,6 +301,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         n = MZ_MIN(MZ_MIN((size_t)(pOut_buf_end - pOut_buf_cur), (size_t)(pIn_buf_end - pIn_buf_cur)), counter);
         TINFL_MEMCPY(pOut_buf_cur, pIn_buf_cur, n); pIn_buf_cur += n; pOut_buf_cur += n; counter -= (mz_uint)n;
       }
+      WaitTOF();
     }
     else if (r->m_type == 3)
     {
@@ -310,12 +314,14 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         mz_uint8 *p = r->m_tables[0].m_code_size; mz_uint i;
         r->m_table_sizes[0] = 288; r->m_table_sizes[1] = 32; TINFL_MEMSET(r->m_tables[1].m_code_size, 5, 32);
         for ( i = 0; i <= 143; ++i) *p++ = 8; for ( ; i <= 255; ++i) *p++ = 9; for ( ; i <= 279; ++i) *p++ = 7; for ( ; i <= 287; ++i) *p++ = 8;
+        WaitTOF();
       }
       else
       {
         for (counter = 0; counter < 3; counter++) { TINFL_GET_BITS(11, r->m_table_sizes[counter], "\05\05\04"[counter]); r->m_table_sizes[counter] += s_min_table_sizes[counter]; }
         MZ_CLEAR_OBJ(r->m_tables[2].m_code_size); for (counter = 0; counter < r->m_table_sizes[2]; counter++) { mz_uint s; TINFL_GET_BITS(14, s, 3); r->m_tables[2].m_code_size[s_length_dezigzag[counter]] = (mz_uint8)s; }
         r->m_table_sizes[2] = 19;
+        WaitTOF();
       }
       for ( ; (int)r->m_type >= 0; r->m_type--)
       {
@@ -328,7 +334,9 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         if ((65536 != total) && (used_syms > 1))
         {
           TINFL_CR_RETURN_FOREVER(35, TINFL_STATUS_FAILED);
+          WaitTOF();
         }
+        WaitTOF();
         for (tree_next = -1, sym_index = 0; sym_index < r->m_table_sizes[r->m_type]; ++sym_index)
         {
           mz_uint rev_code = 0, l, cur_code, code_size = pTable->m_code_size[sym_index]; if (!code_size) continue;
@@ -346,6 +354,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         }
         if (r->m_type == 2)
         {
+          WaitTOF();
           for (counter = 0; counter < (r->m_table_sizes[0] + r->m_table_sizes[1]); )
           {
             mz_uint s; TINFL_HUFF_DECODE(16, dist, &r->m_tables[2]); if (dist < 16) { r->m_len_codes[counter++] = (mz_uint8)dist; continue; }
@@ -377,6 +386,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
               break;
             while (pOut_buf_cur >= pOut_buf_end) { TINFL_CR_RETURN(24, TINFL_STATUS_HAS_MORE_OUTPUT); }
             *pOut_buf_cur++ = (mz_uint8)counter;
+            WaitTOF();
           }
           else
           {
@@ -416,6 +426,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
             }
             pOut_buf_cur[1] = (mz_uint8)sym2;
             pOut_buf_cur += 2;
+            WaitTOF();
           }
         }
         if ((counter &= 511) == 256) break;
@@ -437,6 +448,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
 
         if ((MZ_MAX(pOut_buf_cur, pSrc) + counter) > pOut_buf_end)
         {
+          WaitTOF();
           while (counter--)
           {
             
@@ -449,6 +461,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
         else if ((counter >= 9) && (counter <= dist))
         {
           const mz_uint8 *pSrc_end = pSrc + (counter & ~7);
+          WaitTOF();
           do
           {
             
@@ -458,6 +471,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
           } while ((pSrc += 8) < pSrc_end);
           if ((counter &= 7) < 3)
           {
+            WaitTOF();
             if (counter)
             {
               pOut_buf_cur[0] = pSrc[0];
@@ -490,6 +504,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
   if (decomp_flags & TINFL_FLAG_PARSE_ZLIB_HEADER)
   {
     TINFL_SKIP_BITS(32, num_bits & 7); for (counter = 0; counter < 4; ++counter) { mz_uint s; if (num_bits) TINFL_GET_BITS(41, s, 8); else TINFL_GET_BYTE(42, s); r->m_z_adler32 = (r->m_z_adler32 << 8) | s; }
+    WaitTOF();
   }
   TINFL_CR_RETURN_FOREVER(34, TINFL_STATUS_DONE);
   TINFL_CR_FINISH
@@ -503,6 +518,7 @@ common_exit:
   {
     const mz_uint8 *ptr = pOut_buf_next; size_t buf_len = *pOut_buf_size;
     mz_uint32 i, s1 = r->m_check_adler32 & 0xffff, s2 = r->m_check_adler32 >> 16; size_t block_len = buf_len % 5552;
+    WaitTOF();
     while (buf_len)
     {
       
