@@ -433,7 +433,7 @@ void main()
 
 	setupMatrix();
 	// fillMatrixWithRandomData();
-	buildLinesListAsCube();
+	buildLinesListAsCube(1);
 	angle = 0;
 
 	// setPaletteFacingCar();
@@ -553,6 +553,8 @@ void main()
 
 			/*	Next fx!!! */
 			case DMPHASE_TITLE_0 | 7:
+				// deletePointList();
+				buildLinesListAsCube(1);
 				resetViewportOffset();
 				demo_phase = DMPHASE_FACING_CAR;
 				break;													
@@ -642,6 +644,8 @@ void main()
 				freeTrabantFacingGround();
 				freeTrabantFacingCar();
 				freeTrabantLight();
+				// deletePointList();
+				buildLinesListAsCube(0);
 				demo_phase = DMPHASE_TITLE_1;
 				break;
 
@@ -718,7 +722,8 @@ void main()
 			/*	Next fx!!! */
 			case DMPHASE_TITLE_1 | 7:
 				resetViewportOffset();
-				demo_phase = DMPHASE_TITLE_2; // DMPHASE_SIDE_CAR;
+				// deletePointList();
+				demo_phase = DMPHASE_SIDE_CAR;
 				break;									
 
 			/*	
@@ -805,6 +810,7 @@ void main()
 				resetViewportOffset();
 				freeTrabantSideGround();
 				freeTrabantSideCar();
+				buildLinesListAsCube(2);				
 				demo_phase = DMPHASE_TITLE_2;
 				break;				
 
@@ -882,6 +888,8 @@ void main()
 			/*	Next fx!!! */
 			case DMPHASE_TITLE_2 | 7:
 				resetViewportOffset();
+				// deletePointList();
+				// buildLinesListAsCube(1);				
 				demo_phase = DMPHASE_TITLE_3;
 				break;
 

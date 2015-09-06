@@ -20,7 +20,7 @@ void deletePointList(void);
 void rotatePointsOnAxisY(UWORD angle);
 void drawPointListToViewport(struct RastPort *rp, UWORD x_offset);
 
-void buildLinesListAsCube(void);
+void buildLinesListAsCube(UBYTE figure_index);
 void drawLinesListToViewport(struct RastPort *rp, UWORD x_offset);
 
 #endif // #ifndef VOXEL_ROUTINES
