@@ -144,9 +144,14 @@ void buildPointListFromMatrix(void)
 										point_list[list_idx++] = z - (VOXEL_SIZE >> 1); \
 										point_list[list_idx++] = v_col;
 
+#define FP_0_25(a)	(a >> 2)		/* (a * 0.25) */
+#define FP_0_75(a)	((a * 6) >> 3)	/* (a * 0.75) */
+
 void buildLinesListAsCube(UBYTE figure_index)
 {
 	short list_idx = 0;
+
+	deletePointList();
 
 	switch(figure_index)
 	{
@@ -170,18 +175,35 @@ void buildLinesListAsCube(UBYTE figure_index)
 
 		case 1:
 			/*	Triangle shapped pyramid */
-			point_list_size = 9;
+			point_list_size = 17;
 
 			point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
-			VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
-			VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
+			// VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
+			// VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
+			// VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+			// VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE,1);
+			// VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
+			// VOXEL_ADD_POINT(0,0,VOXEL_SIZE,1);
+			// VOXEL_ADD_POINT(0,0,0,1);
+			// VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
+			// VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(0,0,0,1);
 			VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,FP_0_25(VOXEL_SIZE),1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,FP_0_25(VOXEL_SIZE),1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,FP_0_75(VOXEL_SIZE),1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,FP_0_75(VOXEL_SIZE),1);
 			VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,VOXEL_SIZE,1);
 			VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
 			VOXEL_ADD_POINT(0,0,VOXEL_SIZE,1);
-			VOXEL_ADD_POINT(0,0,0,1);
+			VOXEL_ADD_POINT(0,0,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE >> 1,1);
 			VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
-			VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(0,0,0,1);
 
 			t_point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
 			break;
@@ -202,7 +224,56 @@ void buildLinesListAsCube(UBYTE figure_index)
 			VOXEL_ADD_POINT(0,0,0,1);
 
 			t_point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
-			break;				
+			break;
+
+		case 3:
+			/*	Triangle shapped pyramid */
+			point_list_size = 13;
+
+			point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
+			VOXEL_ADD_POINT(0,0,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(0,0,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(0,0,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,VOXEL_SIZE,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,VOXEL_SIZE,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,VOXEL_SIZE,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(0,0,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,VOXEL_SIZE,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(0,0,0,1);
+
+			t_point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
+			break;
+
+		case 4:
+			/*	Chair */
+			point_list_size = 17;
+
+			point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
+			VOXEL_ADD_POINT(0,0,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
+			VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,0,1);
+			VOXEL_ADD_POINT(0,VOXEL_SIZE,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,0,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,VOXEL_SIZE,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,0,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(0,VOXEL_SIZE,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(0,0,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,0,0,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE,0,VOXEL_SIZE >> 1,1);
+			VOXEL_ADD_POINT(VOXEL_SIZE >> 1,0,VOXEL_SIZE,1);
+			VOXEL_ADD_POINT(0,0,VOXEL_SIZE >> 1,1);
+
+
+			t_point_list = (short *)AllocMem(sizeof(short) * point_list_size * 4, MEMF_CLEAR);
+			break;										
 	}
 }
 

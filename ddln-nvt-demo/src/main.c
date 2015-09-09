@@ -554,7 +554,7 @@ void main()
 			/*	Next fx!!! */
 			case DMPHASE_TITLE_0 | 7:
 				// deletePointList();
-				buildLinesListAsCube(1);
+				// buildLinesListAsCube(1);
 				resetViewportOffset();
 				demo_phase = DMPHASE_FACING_CAR;
 				break;													
@@ -644,7 +644,6 @@ void main()
 				freeTrabantFacingGround();
 				freeTrabantFacingCar();
 				freeTrabantLight();
-				// deletePointList();
 				buildLinesListAsCube(0);
 				demo_phase = DMPHASE_TITLE_1;
 				break;
@@ -810,7 +809,7 @@ void main()
 				resetViewportOffset();
 				freeTrabantSideGround();
 				freeTrabantSideCar();
-				buildLinesListAsCube(2);				
+				buildLinesListAsCube(3);				
 				demo_phase = DMPHASE_TITLE_2;
 				break;				
 
@@ -888,8 +887,7 @@ void main()
 			/*	Next fx!!! */
 			case DMPHASE_TITLE_2 | 7:
 				resetViewportOffset();
-				// deletePointList();
-				// buildLinesListAsCube(1);				
+				buildLinesListAsCube(4);				
 				demo_phase = DMPHASE_TITLE_3;
 				break;
 
