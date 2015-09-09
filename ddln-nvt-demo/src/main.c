@@ -437,7 +437,7 @@ void main()
 	angle = 0;
 
 	// setPaletteFacingCar();
-	setPaletteToBlack();
+	// setPaletteToBlack();
 
 	loadElementCity();
 	loadElementBridge();
@@ -465,6 +465,7 @@ void main()
 	#define DMPHASE_TITLE_2		(4 << 4)
 	#define DMPHASE_TITLE_3		(5 << 4)
 	#define DMPHASE_BERLIN_0	(6 << 4)
+	#define DMPHASE_INFOLINER	(7 << 4)
 
 	demo_phase = 0;
 	fx_clock = 0;
@@ -1042,8 +1043,82 @@ void main()
 					demo_phase++;
 
 				scr1_x_offset = scr2_x_offset >> 1;				
-				break;							
+				break;
 
+			case DMPHASE_BERLIN_0 | 10:
+				// printf("PTSongPos = %d, PTPatternPos = %d\n", PTSongPos(theMod), PTPatternPos(theMod));
+				if ((PTSongPos(theMod) == 5 && PTPatternPos(theMod) > 55) || (PTSongPos(theMod) > 6))
+					demo_phase++;
+				break;
+
+			/*	Next fx!!! */
+			case DMPHASE_BERLIN_0 | 11:
+				resetViewportOffset();
+				demo_phase = DMPHASE_INFOLINER;
+				break;
+
+			/*	Infoliner!
+				At last!!!	
+			*/
+			case DMPHASE_INFOLINER:
+				// setEmptyCopperList(&view_port1);
+				demo_phase++;
+				break;
+
+			case DMPHASE_INFOLINER | 1:
+				// LoadView( &my_view );
+				// MrgCop(&my_view);
+				fx_clock = 0;
+				demo_phase++;
+				break;
+
+			/*	Clear the screen */
+			case DMPHASE_INFOLINER | 2:
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;
+
+			case DMPHASE_INFOLINER | 3:
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;																		
+
+			case DMPHASE_INFOLINER | 4:
+				SetAPen(&rast_port1_1b, 1);
+				fx_clock = 0;
+				demo_phase++;
+				break;														
+
+			case DMPHASE_INFOLINER | 5:
+				fx_clock += 13;
+				fx_clock << 2;
+				fx_clock += 5;
+				fx_clock >> 1;
+				if (fx_clock < fx_clock & 0x11)
+					fx_clock += 3;
+				if (fx_clock > 300)
+					fx_clock -= 300;
+
+				WritePixel(&rast_port1_1b, fx_clock, 200);
+
+		        BltBitMap(&bit_map1_1b, 32, 1,
+		                    &bit_map1_1b, 32, 0,
+		                    320 - 32, 200,
+		                    0xC0, 0xFF, NULL);
+
+				// printf("%d, \n", fx_clock);
+				// demo_phase++;
+				break;														
 		}
 
 		if (enable_dbuffer_1)

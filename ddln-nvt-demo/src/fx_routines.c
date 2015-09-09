@@ -329,6 +329,22 @@ void freeElementBridge(void)
     bitmap_element_bridge = NULL;
 }
 
+void setEmptyCopperList(struct ViewPort *vp)
+{
+    copper = (struct UCopList *)
+    AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
+
+    CINIT(copper, 16);
+    CWAIT(copper, 0, 0);
+
+    CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
+    CMOVE(copper, *((UWORD *)SPR0PTL_ADDR), (LONG)&blank_pointer);
+
+    CEND(copper);
+
+    vp->UCopIns = copper;    
+}
+
 void setCityCopperList(struct ViewPort *vp)
 {
 	UWORD loop, zloop, c_loop, max_color, line_index;
