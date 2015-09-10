@@ -50,6 +50,7 @@ __inline UBYTE font_blit_string(struct BitMap *font_BitMap, struct BitMap *font_
 			glyph_h = font_BitMap->Rows;
 			default_font = font_BitMap;
 			font_blit_state = 1;
+			// printf("%s\n", text_string);
 			break;
 
 		case 1:
@@ -95,6 +96,7 @@ __inline UBYTE font_blit_string(struct BitMap *font_BitMap, struct BitMap *font_
 						if (glyph_index >= 0 && glyph_index < 512)
 						{
 							glyph_w = x_pos_array[glyph_index + 1] - x_pos_array[glyph_index] - 1;
+							// printf("%d, ", glyph_index);
 							BltBitMap(default_font, x_pos_array[glyph_index], 0,
 							            dest_BitMap, cur_x, y,
 							            glyph_w, glyph_h,

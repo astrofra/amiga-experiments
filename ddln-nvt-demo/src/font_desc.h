@@ -1,4 +1,8 @@
+#ifndef FONT_DESC
+#define FONT_DESC
 /* Font descriptor headers */
 
-extern const char mario_ft_glyph_array[40];
-extern const int mario_ft_x_pos_array[41];
+extern const char tiny_font_glyph[45];
+extern const short tiny_font_x_pos[47];
+
+#endif

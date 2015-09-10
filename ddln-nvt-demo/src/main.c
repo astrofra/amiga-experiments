@@ -25,11 +25,14 @@ Routines
 */
 #include "bitmap_routines.h"
 #include "font_routines.h"
-#include "sound_routines.h"	
+#include "sound_routines.h"
+#include "font_desc.h"
+#include "font_bitmap.h"
 #include "font_routines.h"
 #include "color_routines.h"
 #include "voxel_routines.h"
 #include "fx_routines.h"
+#include "demo_strings.h"
 
 /*
 Graphic assets
@@ -79,6 +82,9 @@ struct RastPort rast_port2;
 
 
 /* Data */
+UBYTE demo_string_index = 0;
+struct BitMap *bitmap_font = NULL;
+
 struct BitMap *bitmap_element_city = NULL;
 struct BitMap *bitmap_element_tree = NULL;
 struct BitMap *bitmap_element_bridge = NULL;
@@ -174,6 +180,8 @@ void close_demo(STRPTR message)
 	int loop;
 
 	WaitBlit();
+
+	free_allocated_bitmap(bitmap_font);
 
 	freeElementCity();
 	freeElementTree();
@@ -287,6 +295,8 @@ BOOL fxSideCar(unsigned int);
 void precalculateMistralTitleFades(void);
 BOOL fxCityScrolling(void);
 void fxVoxelRotation(UWORD *angle);
+void loadTextWriterFont(void);
+BOOL fxInfolineScrolling(unsigned int fx_clock);
 
 void main()
 {
@@ -450,6 +460,8 @@ void main()
 	precalculateSideCarFades();
 	loadTrabantSideGround();
 	loadTrabantSideCar();
+
+	loadTextWriterFont();
 
 	precalculateMistralTitleFades();
 
@@ -1061,13 +1073,14 @@ void main()
 				At last!!!	
 			*/
 			case DMPHASE_INFOLINER:
-				// setEmptyCopperList(&view_port1);
+				setEmptyCopperList(&view_port1);
 				demo_phase++;
 				break;
 
 			case DMPHASE_INFOLINER | 1:
-				// LoadView( &my_view );
-				// MrgCop(&my_view);
+				LoadView( &my_view );
+				MrgCop(&my_view);
+				setPaletteFacingCar();
 				fx_clock = 0;
 				demo_phase++;
 				break;
@@ -1100,23 +1113,8 @@ void main()
 				break;														
 
 			case DMPHASE_INFOLINER | 5:
-				fx_clock += 13;
-				fx_clock << 2;
-				fx_clock += 5;
-				fx_clock >> 1;
-				if (fx_clock < fx_clock & 0x11)
-					fx_clock += 3;
-				if (fx_clock > 300)
-					fx_clock -= 300;
-
-				WritePixel(&rast_port1_1b, fx_clock, 200);
-
-		        BltBitMap(&bit_map1_1b, 32, 1,
-		                    &bit_map1_1b, 32, 0,
-		                    320 - 32, 200,
-		                    0xC0, 0xFF, NULL);
-
-				// printf("%d, \n", fx_clock);
+				fx_clock++;
+				fxInfolineScrolling(fx_clock);
 				// demo_phase++;
 				break;														
 		}
@@ -1161,6 +1159,40 @@ void setPaletteToBlack(void)
 	short loop;
 	for(loop = 1; loop < 16; loop++)
 		SetRGB4(&view_port1, loop, 0x0, 0x0, 0x0);
+}
+
+void loadTextWriterFont(void)
+{
+    bitmap_font = load_array_as_bitmap(font_data, 288 << 1, font_image.Width, font_image.Height, font_image.Depth);
+}
+
+BOOL fxInfolineScrolling(unsigned int fx_clock)
+{
+	// {		
+	// 	WritePixel(&rast_port1_1b, (fx_clock * 5) & 0xFF + 16, 200);
+	// 	printf("WritePixel(), fx_clock = %d\n", fx_clock);
+	// }
+	// else
+	if((fx_clock & 1) == 0)
+	{
+		BltBitMap(&bit_map1_1b, 0, 1,
+		        &bit_map1_1b, 0, 0,
+		        320, 200,
+		        0xC0, 0xFF, NULL);
+		// printf("BltBitMap(), fx_clock = %d\n", fx_clock);
+	}
+
+	// printf("%s\n", demo_string[demo_string_index]);
+	// demo_string_index++;
+	// if (demo_string_index > DEMO_STRINGS_MAX_INDEX)
+	// 	demo_string_index = 0;	
+
+	if (font_blit_string(bitmap_font, bitmap_font, &bit_map1_1b, (const char *)&tiny_font_glyph, (const short *)&tiny_font_x_pos, 0, 180, (UBYTE *)demo_string[demo_string_index]) == 0)
+	{
+		demo_string_index++;
+		if (demo_string_index > DEMO_STRINGS_MAX_INDEX)
+			demo_string_index = 0;
+	}
 }
 
 /*

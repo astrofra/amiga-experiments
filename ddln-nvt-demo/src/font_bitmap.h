@@ -1,21 +1,10 @@
-/*
-	Data for "mario_font" Image
-*/
+#ifndef FONT_BITMAP
+#define FONT_BITMAP
 
-#include <exec/types.h>
 #include <intuition/intuition.h>
 
+extern UWORD font_palRGB4[4];
+extern UWORD font_data[288];
+extern struct Image font_image;
 
-UWORD mario_fontPaletteRGB4[8] =
-{
-	0x0F0F,0x0000,0x0888,0x0BBB,0x0FFF,0x0000,0x0000,0x0000
-};
-
-struct Image mario_font =
-{
-	0, 0,		/* LeftEdge, TopEdge */
-	512, 16, 3,	/* Width, Height, Depth */
-	NULL,	/* ImageData */
-	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
-	NULL		/* NextImage */
-};
+#endif
