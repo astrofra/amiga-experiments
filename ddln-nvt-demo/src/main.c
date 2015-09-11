@@ -447,7 +447,7 @@ void main()
 	angle = 0;
 
 	// setPaletteFacingCar();
-	// setPaletteToBlack();
+	setPaletteToBlack();
 
 	loadElementCity();
 	loadElementBridge();
@@ -1073,6 +1073,9 @@ void main()
 				At last!!!	
 			*/
 			case DMPHASE_INFOLINER:
+				scr1_x_offset = 0;
+				scr2_x_offset = 0;
+				scr2_x_offset_half_precision = 0;
 				setEmptyCopperList(&view_port1);
 				demo_phase++;
 				break;
@@ -1173,7 +1176,7 @@ BOOL fxInfolineScrolling(unsigned int fx_clock)
 	// 	printf("WritePixel(), fx_clock = %d\n", fx_clock);
 	// }
 	// else
-	if((fx_clock & 1) == 0)
+	if(((fx_clock >> 1) & 1) == 0)
 	{
 		BltBitMap(&bit_map1_1b, 0, 1,
 		        &bit_map1_1b, 0, 0,
