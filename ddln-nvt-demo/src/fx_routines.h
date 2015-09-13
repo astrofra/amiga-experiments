@@ -42,5 +42,8 @@ void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step);
 void freeTrabantSideCar(void);
 
 void loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_number);
+void loadAndDrawDemoTitle(struct BitMap *dest_bitmap);
+void loadAndDrawDemoPlace(struct BitMap *dest_bitmap);
+void setLogoCopperList(struct ViewPort *vp);
 
 #endif // #ifndef FX_ROUTINES

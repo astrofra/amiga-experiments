@@ -33,6 +33,7 @@ Routines
 #include "voxel_routines.h"
 #include "fx_routines.h"
 #include "demo_strings.h"
+#include "cosine_table.h"
 
 /*
 Graphic assets
@@ -80,10 +81,12 @@ struct RasInfo ras_info2;
 struct BitMap bit_map2;
 struct RastPort rast_port2;
 
-
 /* Data */
 UBYTE demo_string_index = 0;
 struct BitMap *bitmap_font = NULL;
+
+struct BitMap *bitmap_title_logo = NULL;
+struct BitMap *bitmap_title_place = NULL;
 
 struct BitMap *bitmap_element_city = NULL;
 struct BitMap *bitmap_element_tree = NULL;
@@ -109,9 +112,14 @@ UWORD *pal_side_car_fadein = NULL;
 UWORD *pal_side_car_fadeout = NULL;
 
 extern UWORD mistral_title_PaletteRGB4[8];
+extern UWORD title_logoPaletteRGB4[8];
+extern UWORD title_placePaletteRGB4[8];
 
 UWORD *pal_mistral_title_fadein = NULL;
 UWORD *pal_mistral_title_fadeout = NULL;
+
+UWORD *pal_demo_title_fadein = NULL;
+UWORD *pal_demo_title_fadeout = NULL;
 
 BOOL voxel_switch = FALSE;
 
@@ -144,7 +152,7 @@ void initMusic(void)
 		exit(0); //FIXME
 	}
 
-	mod = load_zlib_getchipmem((UBYTE *)"assets/jhericurl-med-mandarine.dat", 120930, 232562);
+	mod = load_zlib_getchipmem((UBYTE *)"assets/jhericurl-med-mandarine.dat", 116841, 221128);
 	// mod = NULL;
 	// mod = load_getchipmem((UBYTE *)"assets/miami_vice.mod", 7394);
 #else
@@ -227,7 +235,7 @@ void close_demo(STRPTR message)
 	{
 		PTStop(theMod);
 		PTFreeMod(theMod);
-		FreeMem(mod, 232562);
+		FreeMem(mod, 221128);
 	}
 
 	if (PTReplayBase) CloseLibrary(PTReplayBase);
@@ -293,6 +301,7 @@ BOOL fxFacingCar(unsigned int);
 void precalculateSideCarFades(void);
 BOOL fxSideCar(unsigned int);
 void precalculateMistralTitleFades(void);
+void precalculateDemoTitleFades(void);
 BOOL fxCityScrolling(void);
 void fxVoxelRotation(UWORD *angle);
 void loadTextWriterFont(void);
@@ -464,6 +473,7 @@ void main()
 	loadTextWriterFont();
 
 	precalculateMistralTitleFades();
+	precalculateDemoTitleFades();
 
 	playMusic();
 	// drawElementCity(&bit_map1);
@@ -477,7 +487,8 @@ void main()
 	#define DMPHASE_TITLE_2		(4 << 4)
 	#define DMPHASE_TITLE_3		(5 << 4)
 	#define DMPHASE_BERLIN_0	(6 << 4)
-	#define DMPHASE_INFOLINER	(7 << 4)
+	#define DMPHASE_TITLE_4		(7 << 4)
+	#define DMPHASE_INFOLINER	(8 << 4)
 
 	demo_phase = 0;
 	fx_clock = 0;
@@ -1063,27 +1074,165 @@ void main()
 					demo_phase++;
 				break;
 
-			/*	Next fx!!! */
+			/*	Clear the screen */
 			case DMPHASE_BERLIN_0 | 11:
-				resetViewportOffset();
-				demo_phase = DMPHASE_INFOLINER;
+				setEmptyCopperList(&view_port1);
+				scr1_x_offset = 0;
+				scr2_x_offset = 0;
+				scr2_x_offset_half_precision = 0;
+				demo_phase++;
 				break;
+
+			case DMPHASE_BERLIN_0 | 12:
+				LoadView( &my_view );
+				demo_phase++;
+				break;
+
+			case DMPHASE_BERLIN_0 | 13:
+				MrgCop(&my_view);
+				resetViewportOffset();
+				demo_phase++;
+				break;
+
+			case DMPHASE_BERLIN_0 | 14:
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;
+
+			/*	Next fx!!! */
+			case DMPHASE_BERLIN_0 | 15:
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					scr1_x_offset = 0;
+					scr2_x_offset = 0;
+					scr2_x_offset_half_precision = 0;
+					demo_phase = DMPHASE_TITLE_4;
+				}
+				break;						
+
+			/*	
+				Screen/FX :
+				Demo title!
+			***********************/
+			case DMPHASE_TITLE_4:
+				scr1_x_offset = 320;
+				scr2_x_offset = 0;
+				setLogoCopperList(&view_port1);
+				demo_phase++;
+				break;								
+
+			case DMPHASE_TITLE_4 | 1:
+				MrgCop(&my_view);
+				demo_phase++;
+				break;
+
+			case DMPHASE_TITLE_4 | 2:
+				LoadView( &my_view );									
+				demo_phase++;
+				break;
+
+			case DMPHASE_TITLE_4 | 3:
+				loadAndDrawDemoTitle(&bit_map1);
+				demo_phase++;
+				break;
+
+			case DMPHASE_TITLE_4 | 4:
+				loadAndDrawDemoPlace(&bit_map2);
+				palette_fade = 0;
+				demo_phase++;
+				break;
+
+			case DMPHASE_TITLE_4 | 5:
+				/* Fade in */
+				LoadRGB4(&view_port1, pal_demo_title_fadein + ((palette_fade >> 1) << 4), 16);
+				palette_fade++;
+				scr2_x_offset = (easing[palette_fade] * 32) >> 9;
+				scr2_x_offset = (scr2_x_offset * 10);
+				scr1_x_offset = 320 - (palette_fade * 10);
+
+				if (palette_fade >= 32)
+				{
+					palette_fade = 0;
+					demo_phase++;
+				}
+				break;
+
+			case DMPHASE_TITLE_4 | 6:
+				printf("PTSongPos(theMod) = %d\n", PTSongPos(theMod));
+				if ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
+					demo_phase++;
+				break;
+
+			case DMPHASE_TITLE_4 | 7:
+				/* Fade out */
+				LoadRGB4(&view_port1, pal_demo_title_fadeout + (palette_fade << 4), 16);
+				palette_fade++;
+
+				scr2_x_offset = (easing[palette_fade << 1] * 32) >> 9;
+				scr2_x_offset = 320 - (scr2_x_offset * 10);
+				scr1_x_offset = (palette_fade * 10);
+
+				if (palette_fade >= 16)
+				{
+					palette_fade = 0;
+					fx_clock = 0;
+					setPaletteToBlack();
+					demo_phase++;
+				}
+				break;
+
+			/*	Clear the screen */
+			case DMPHASE_TITLE_4 | 8:
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;
+
+			case DMPHASE_TITLE_4 | 9:
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;
+
+
+			/*	Next fx!!! */
+			case DMPHASE_TITLE_4 | 10:
+				setEmptyCopperList(&view_port1);
+				MrgCop(&my_view);
+				LoadView( &my_view );
+				resetViewportOffset();
+				scr1_x_offset = 0;
+				scr2_x_offset = 0;
+				// deletePointList();
+				demo_phase = DMPHASE_INFOLINER;
+				break;									
+
 
 			/*	Infoliner!
 				At last!!!	
 			*/
-			case DMPHASE_INFOLINER:
-				scr1_x_offset = 0;
-				scr2_x_offset = 0;
-				scr2_x_offset_half_precision = 0;
-				setEmptyCopperList(&view_port1);
+			case DMPHASE_INFOLINER :
+				setPaletteFacingCar();
 				demo_phase++;
 				break;
 
 			case DMPHASE_INFOLINER | 1:
-				LoadView( &my_view );
-				MrgCop(&my_view);
-				setPaletteFacingCar();
 				fx_clock = 0;
 				demo_phase++;
 				break;
@@ -1478,6 +1627,55 @@ void precalculateMistralTitleFades(void)
 				tmp_col = mistral_title_PaletteRGB4[palette_idx - 8];
 
 			pal_mistral_title_fadeout[palette_idx + (palette_fade << 4)] = mixRGB4Colors(tmp_col, 0x000, palette_fade);
+		}
+}
+
+/*
+	Prepare the fade in/fade out palette
+	for the "Demo Titles" screens.
+*/
+void precalculateDemoTitleFades(void)
+{
+	short palette_fade, palette_idx;
+	UWORD tmp_col;
+
+	/* Precalc the fade in/out */
+	pal_demo_title_fadein = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+			{
+				// if (palette_idx == 1)
+				// 	tmp_col = 0x00F;
+				// else 
+				tmp_col = title_logoPaletteRGB4[palette_idx];
+			}
+			else
+				tmp_col = title_placePaletteRGB4[palette_idx - 8];
+
+			pal_demo_title_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0x000, tmp_col, palette_fade);
+
+			if (palette_idx > 0 && palette_fade == 11)
+				pal_demo_title_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0xFFF, pal_demo_title_fadein[palette_idx + (palette_fade << 4)], 4);
+			if (palette_idx > 0 && palette_fade == 12)
+				pal_demo_title_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0xFFF, pal_demo_title_fadein[palette_idx + (palette_fade << 4)], 8);
+			if (palette_idx > 0 && palette_fade == 13)
+				pal_demo_title_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0xFFF, pal_demo_title_fadein[palette_idx + (palette_fade << 4)], 14);
+			if (palette_idx > 0 && palette_fade == 14)
+				pal_demo_title_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0xFFF, pal_demo_title_fadein[palette_idx + (palette_fade << 4)], 5);
+		}
+
+	pal_demo_title_fadeout = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+				tmp_col = 0x000; // trabant_facing_groundPaletteRGB4[palette_idx];
+			else
+				tmp_col = mistral_title_PaletteRGB4[palette_idx - 8];
+
+			pal_demo_title_fadeout[palette_idx + (palette_fade << 4)] = mixRGB4Colors(tmp_col, 0x000, palette_fade);
 		}
 }
 

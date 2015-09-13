@@ -92,20 +92,6 @@ struct Image trabant_facing_car_l0 =
 	NULL		/* NextImage */
 };
 
-UWORD title_placePaletteRGB4[4] =
-{
-	0x00F0,0x0525,0x0A47,0x0F59
-};
-
-struct Image title_place =
-{
-	0, 0,		/* LeftEdge, TopEdge */
-	312, 68, 2,	/* Width, Height, Depth */
-	NULL,	/* ImageData */
-	0x0003, 0x0000,	/* PlanePick, PlaneOnOff */
-	NULL		/* NextImage */
-};
-
 struct Image trabant_side_ground =
 {
 	0, 0,		/* LeftEdge, TopEdge */
@@ -167,6 +153,34 @@ struct Image mistral_title_3 =
 	253, 37, 3,	/* Width, Height, Depth */
 	NULL,	/* ImageData */
 	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+UWORD title_logoPaletteRGB4[8] =
+{
+	0x0000,0x0526,0x005C,0x0748,0x0A6A,0x0D6B,0x0D9C,0x0FAE
+};
+
+struct Image title_logo =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	320, 122, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
+UWORD title_placePaletteRGB4[8] =
+{
+	0x0000,0x0525,0x0A47,0x0F59,0x0000,0x0000,0x0000,0x0000
+};
+
+struct Image title_place =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	320, 68, 2,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0003, 0x0000,	/* PlanePick, PlaneOnOff */
 	NULL		/* NextImage */
 };
 

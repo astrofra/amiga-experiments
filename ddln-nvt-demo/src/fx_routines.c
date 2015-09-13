@@ -37,6 +37,9 @@ extern struct Image mistral_title_1;
 extern struct Image mistral_title_2;
 extern struct Image mistral_title_3;
 
+extern struct Image title_place;
+extern struct Image title_logo;
+
 extern struct Image element_tree;
 extern struct Image element_bridge;
 
@@ -79,6 +82,30 @@ BOOL progressiveClearRaster(struct RastPort *rp, unsigned int fx_clock, const in
 /*
     Various titles
 *****************************/
+
+void __inline loadAndDrawDemoTitle(struct BitMap *dest_bitmap)
+{   
+    struct BitMap *bitmap_title;
+
+    bitmap_title = load_file_as_bitmap("assets/title_logo.dat", 14640, title_logo.Width, title_logo.Height, title_logo.Depth);
+    WaitTOF();
+    BLIT_BITMAP_S(bitmap_title, dest_bitmap, title_logo.Width, title_logo.Height, ((DISPL_WIDTH1 - title_logo.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - title_logo.Height) >> 1) - 32);
+
+    WaitBlit();
+    free_allocated_bitmap(bitmap_title);
+}
+
+void __inline loadAndDrawDemoPlace(struct BitMap *dest_bitmap)
+{   
+    struct BitMap *bitmap_title;
+
+    bitmap_title = load_file_as_bitmap("assets/title_place.dat", 5440, title_place.Width, title_place.Height, title_place.Depth);
+    WaitTOF();
+    BLIT_BITMAP_S(bitmap_title, dest_bitmap, title_place.Width, title_place.Height, 320 + ((DISPL_WIDTH1 - title_place.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - title_place.Height) >> 1) + 40);
+
+    WaitBlit();
+    free_allocated_bitmap(bitmap_title);
+}
 
 void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_number)
 {   
@@ -339,6 +366,40 @@ void setEmptyCopperList(struct ViewPort *vp)
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
     CMOVE(copper, *((UWORD *)SPR0PTL_ADDR), (LONG)&blank_pointer);
+
+    CEND(copper);
+
+    vp->UCopIns = copper;    
+}
+
+#define CL_C0_START 102
+#define CL_C1_START 30
+void setLogoCopperList(struct ViewPort *vp)
+{
+    UWORD c_loop;
+
+    copper = (struct UCopList *)
+    AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
+
+    CINIT(copper, 32);
+    CWAIT(copper, 0, 0);
+
+    CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);
+    CMOVE(copper, *((UWORD *)SPR0PTL_ADDR), (LONG)&blank_pointer);
+
+    for (c_loop = 0; c_loop < 255; c_loop++)
+    {    
+        if (c_loop > CL_C0_START && c_loop < 208)
+        {
+            CWAIT(copper, c_loop, 0);
+            if (c_loop < CL_C0_START + CL_LOGO_LEN)
+                CMOVE(copper, custom.color[2], cl_logo0[c_loop - CL_C0_START]);
+            if (c_loop > CL_C0_START + CL_C1_START && c_loop < CL_C0_START + CL_C1_START + CL_LOGO_LEN)
+                CMOVE(copper, custom.color[8 + 3], cl_logo1[c_loop - CL_C0_START - CL_C1_START]);
+
+        }
+        // CMOVE(copper, custom.color[8 + 3], 0x0F59);
+    }
 
     CEND(copper);
 
