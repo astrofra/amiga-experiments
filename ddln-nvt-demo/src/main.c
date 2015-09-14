@@ -193,7 +193,7 @@ void close_demo(STRPTR message)
 
 	WaitBlit();
 
-	free_allocated_bitmap(bitmap_font);
+	FREE_ALLOCATED_BITMAP(bitmap_font);
 
 	freeElementCity();
 	freeElementTree();
@@ -203,7 +203,7 @@ void close_demo(STRPTR message)
 	freeTrabantFacingCar();
 	freeTrabantLight();
 
-	free_allocated_bitmap(bitmap_tower);
+	FREE_ALLOCATED_BITMAP(bitmap_tower);
 
 	if (pal_facing_car_fadein != NULL)
 		FreeMem(pal_facing_car_fadein, sizeof(UWORD) * 16 * 16);
@@ -1164,12 +1164,13 @@ void main()
 				/* Fade in */
 				LoadRGB4(&view_port1, pal_demo_title_fadein + ((palette_fade >> 1) << 4), 16);
 				palette_fade++;
-				scr2_x_offset = (easing[palette_fade] * 30) >> 9;
+				scr2_x_offset = (easing[palette_fade] * 32) >> 9;
 				scr2_x_offset = (scr2_x_offset * 10);
-				scr1_x_offset = 300 - (palette_fade * 10);
+				scr1_x_offset = 320 - (palette_fade * 10);
 
 				if (palette_fade >= 32)
 				{
+					loadElementTower();
 					palette_fade = 0;
 					demo_phase++;
 				}
@@ -1177,7 +1178,6 @@ void main()
 
 			case DMPHASE_TITLE_4 | 6:
 				// printf("PTSongPos(theMod) = %d\n", PTSongPos(theMod));
-				loadElementTower();
 				if ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
 					demo_phase++;
 				break;
@@ -1187,8 +1187,8 @@ void main()
 				LoadRGB4(&view_port1, pal_demo_title_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
 
-				scr2_x_offset = (easing[palette_fade << 1] * 30) >> 9;
-				scr2_x_offset = 300 - (scr2_x_offset * 10);
+				scr2_x_offset = (easing[palette_fade << 1] * 32) >> 9;
+				scr2_x_offset = 320 - (scr2_x_offset * 10);
 				scr1_x_offset = (palette_fade * 10);
 
 				if (palette_fade >= 16)
@@ -1280,12 +1280,17 @@ void main()
 				break;
 
 			case DMPHASE_INFOLINER | 4:
+				freeElementTower();
+				demo_phase++;
+				break;				
+
+			case DMPHASE_INFOLINER | 5:
 				SetAPen(&rast_port1_1b, 1);
 				fx_clock = 0;
 				demo_phase++;
 				break;														
 
-			case DMPHASE_INFOLINER | 5:
+			case DMPHASE_INFOLINER | 6:
 				fx_clock++;
 				fxInfolineScrolling(fx_clock);
 				// demo_phase++;

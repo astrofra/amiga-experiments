@@ -95,7 +95,7 @@ void __inline loadAndDrawDemoTitle(struct BitMap *dest_bitmap)
     BLIT_BITMAP_S(bitmap_title, dest_bitmap, title_logo.Width, title_logo.Height, ((DISPL_WIDTH1 - title_logo.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - title_logo.Height) >> 1) - 32);
 
     WaitBlit();
-    free_allocated_bitmap(bitmap_title);
+    FREE_ALLOCATED_BITMAP(bitmap_title);
 }
 
 void __inline loadAndDrawDemoPlace(struct BitMap *dest_bitmap)
@@ -104,10 +104,10 @@ void __inline loadAndDrawDemoPlace(struct BitMap *dest_bitmap)
 
     bitmap_title = load_file_as_bitmap("assets/title_place.dat", 5440, title_place.Width, title_place.Height, title_place.Depth);
     WaitTOF();
-    BLIT_BITMAP_S(bitmap_title, dest_bitmap, title_place.Width, title_place.Height, 300 + ((DISPL_WIDTH1 - title_place.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - title_place.Height) >> 1) + 40);
+    BLIT_BITMAP_S(bitmap_title, dest_bitmap, title_place.Width - 2, title_place.Height, 320 + ((DISPL_WIDTH1 - title_place.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - title_place.Height) >> 1) + 40);
 
     WaitBlit();
-    free_allocated_bitmap(bitmap_title);
+    FREE_ALLOCATED_BITMAP(bitmap_title);
 }
 
 void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_number)
@@ -140,7 +140,7 @@ void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_nu
     }
 
     WaitBlit();
-    free_allocated_bitmap(bitmap_title);
+    FREE_ALLOCATED_BITMAP(bitmap_title);
 }
 
 /*
@@ -150,11 +150,14 @@ void __inline loadElementTower(void)
 {   bitmap_tower = load_zlib_file_as_bitmap("assets/element_tower.dat", 827, 3072, element_tower.Width, element_tower.Height, element_tower.Depth);  }
 
 void __inline drawElementTower(struct BitMap *dest_bitmap)
-{   BLIT_BITMAP_S(bitmap_tower, dest_bitmap, element_tower.Width, element_tower.Height, DISPL_WIDTH1 - (element_tower.Width << 1), 0); }
+{   
+    BLIT_BITMAP_S(bitmap_tower, dest_bitmap, element_tower.Width, element_tower.Height, DISPL_WIDTH1 - (element_tower.Width << 1), 0);
+    WaitBlit();
+}
 
 void __inline freeElementTower(void)
 {   
-    free_allocated_bitmap(bitmap_tower);
+    FREE_ALLOCATED_BITMAP(bitmap_tower);
     bitmap_tower = NULL; 
 }
 
@@ -169,7 +172,7 @@ void __inline drawTrabantFacingGround(struct BitMap *dest_bitmap)
 
 void __inline freeTrabantFacingGround(void)
 {   
-    free_allocated_bitmap(bitmap_facing_ground);
+    FREE_ALLOCATED_BITMAP(bitmap_facing_ground);
     bitmap_facing_ground = NULL;
 }
 
@@ -181,7 +184,7 @@ void __inline drawTrabantFacingCar(struct BitMap *dest_bitmap)
 
 void __inline freeTrabantFacingCar(void)
 {   
-    free_allocated_bitmap(bitmap_facing_car);
+    FREE_ALLOCATED_BITMAP(bitmap_facing_car);
     bitmap_facing_car = NULL; 
 }
 
@@ -216,8 +219,8 @@ void drawTrabantLight(struct BitMap *dest_bitmap, struct RastPort *rp, UBYTE lig
 
 void freeTrabantLight(void)
 {
-    free_allocated_bitmap(bitmap_carlight_0);
-    free_allocated_bitmap(bitmap_carlight_1);
+    FREE_ALLOCATED_BITMAP(bitmap_carlight_0);
+    FREE_ALLOCATED_BITMAP(bitmap_carlight_1);
     bitmap_carlight_0 = NULL;
     bitmap_carlight_1 = NULL;
 }
@@ -234,7 +237,7 @@ void __inline drawTrabantSideGround(struct BitMap *dest_bitmap)
 
 void __inline freeTrabantSideGround(void)
 {   
-    free_allocated_bitmap(bitmap_side_ground);
+    FREE_ALLOCATED_BITMAP(bitmap_side_ground);
     bitmap_side_ground = NULL;
 }
 
@@ -281,7 +284,7 @@ void drawTrabantSideCar(struct BitMap *dest_bitmap, UBYTE door_step)
 
 void __inline freeTrabantSideCar(void)
 {   
-    free_allocated_bitmap(bitmap_side_car);
+    FREE_ALLOCATED_BITMAP(bitmap_side_car);
     bitmap_side_car = NULL;
 }
 
@@ -324,7 +327,7 @@ BOOL __inline drawElementCityRefl(struct BitMap *dest_bitmap, unsigned int fx_cl
 
 void freeElementCity(void)
 {
-    free_allocated_bitmap(bitmap_element_city);
+    FREE_ALLOCATED_BITMAP(bitmap_element_city);
     bitmap_element_city = NULL;
 }
 
@@ -339,7 +342,7 @@ void drawElementTree(struct BitMap *dest_bitmap)
 
 void freeElementTree(void)
 {
-    free_allocated_bitmap(bitmap_element_tree);
+    FREE_ALLOCATED_BITMAP(bitmap_element_tree);
     bitmap_element_tree = NULL;
 }
 
@@ -370,7 +373,7 @@ BOOL __inline drawElementBridgeRefl(struct BitMap *dest_bitmap, unsigned int fx_
 
 void freeElementBridge(void)
 {
-    free_allocated_bitmap(bitmap_element_bridge);
+    FREE_ALLOCATED_BITMAP(bitmap_element_bridge);
     bitmap_element_bridge = NULL;
 }
 
