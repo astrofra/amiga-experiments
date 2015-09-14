@@ -75,6 +75,8 @@ struct RasInfo ras_info1;
 struct RasInfo ras_info1_1b;
 struct BitMap bit_map1;
 struct BitMap bit_map1_1b;
+struct BitMap bit_map1_1b2;
+struct BitMap bit_map1_1b3;
 struct RastPort rast_port1;
 struct RastPort rast_port1_1b;
 struct RasInfo ras_info2;
@@ -99,6 +101,8 @@ struct BitMap *bitmap_carlight_1 = NULL;
 
 struct BitMap *bitmap_side_ground = NULL;
 struct BitMap *bitmap_side_car = NULL;
+
+struct BitMap *bitmap_tower = NULL;
 
 extern UWORD trabant_facing_groundPaletteRGB4[8];
 extern UWORD trabant_facing_carPaletteRGB4[8];
@@ -198,6 +202,8 @@ void close_demo(STRPTR message)
 	freeTrabantFacingGround();
 	freeTrabantFacingCar();
 	freeTrabantLight();
+
+	free_allocated_bitmap(bitmap_tower);
 
 	if (pal_facing_car_fadein != NULL)
 		FreeMem(pal_facing_car_fadein, sizeof(UWORD) * 16 * 16);
@@ -364,6 +370,8 @@ void main()
 	/* ViewPort 1, Bitmap 1 */
 	InitBitMap( &bit_map1, DEPTH1, WIDTH1, HEIGHT1 + 8);
 	InitBitMap( &bit_map1_1b, 1, WIDTH1, HEIGHT1 + 8);
+	InitBitMap( &bit_map1_1b2, 1, WIDTH1, HEIGHT1 + 8);
+	InitBitMap( &bit_map1_1b3, 1, WIDTH1, HEIGHT1 + 8);		
 	
 	/* Allocate memory for the Raster: */ 
 	for( loop = 0; loop < DEPTH1; loop++ )
@@ -376,6 +384,8 @@ void main()
 	}
 
 	bit_map1_1b.Planes[0] = bit_map1.Planes[0];
+	bit_map1_1b2.Planes[0] = bit_map1.Planes[1];
+	bit_map1_1b3.Planes[0] = bit_map1.Planes[2];
 
 	/* ViewPort 1, Bitmap 2 */
 	InitBitMap( &bit_map2, DEPTH1, WIDTH1, HEIGHT1 + 8);
@@ -1154,9 +1164,9 @@ void main()
 				/* Fade in */
 				LoadRGB4(&view_port1, pal_demo_title_fadein + ((palette_fade >> 1) << 4), 16);
 				palette_fade++;
-				scr2_x_offset = (easing[palette_fade] * 32) >> 9;
+				scr2_x_offset = (easing[palette_fade] * 30) >> 9;
 				scr2_x_offset = (scr2_x_offset * 10);
-				scr1_x_offset = 320 - (palette_fade * 10);
+				scr1_x_offset = 300 - (palette_fade * 10);
 
 				if (palette_fade >= 32)
 				{
@@ -1166,7 +1176,8 @@ void main()
 				break;
 
 			case DMPHASE_TITLE_4 | 6:
-				printf("PTSongPos(theMod) = %d\n", PTSongPos(theMod));
+				// printf("PTSongPos(theMod) = %d\n", PTSongPos(theMod));
+				loadElementTower();
 				if ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
 					demo_phase++;
 				break;
@@ -1176,8 +1187,8 @@ void main()
 				LoadRGB4(&view_port1, pal_demo_title_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
 
-				scr2_x_offset = (easing[palette_fade << 1] * 32) >> 9;
-				scr2_x_offset = 320 - (scr2_x_offset * 10);
+				scr2_x_offset = (easing[palette_fade << 1] * 30) >> 9;
+				scr2_x_offset = 300 - (scr2_x_offset * 10);
 				scr1_x_offset = (palette_fade * 10);
 
 				if (palette_fade >= 16)
@@ -1211,34 +1222,39 @@ void main()
 				break;
 
 
-			/*	Next fx!!! */
+			/*	Clear copper list */
 			case DMPHASE_TITLE_4 | 10:
 				setEmptyCopperList(&view_port1);
+				demo_phase++;
+				break;
+
+			case DMPHASE_TITLE_4 | 11:
 				MrgCop(&my_view);
 				LoadView( &my_view );
+				demo_phase++;
+				break;
+
+			/*	Next fx!!! */
+			case DMPHASE_TITLE_4 | 12:
 				resetViewportOffset();
 				scr1_x_offset = 0;
 				scr2_x_offset = 0;
 				// deletePointList();
 				demo_phase = DMPHASE_INFOLINER;
-				break;									
-
+				break;
 
 			/*	Infoliner!
 				At last!!!	
 			*/
 			case DMPHASE_INFOLINER :
+				// loadElementTower();
 				setPaletteFacingCar();
-				demo_phase++;
-				break;
-
-			case DMPHASE_INFOLINER | 1:
 				fx_clock = 0;
 				demo_phase++;
 				break;
 
 			/*	Clear the screen */
-			case DMPHASE_INFOLINER | 2:
+			case DMPHASE_INFOLINER | 1:
 				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
@@ -1248,7 +1264,7 @@ void main()
 				}
 				break;
 
-			case DMPHASE_INFOLINER | 3:
+			case DMPHASE_INFOLINER | 2:
 				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
@@ -1257,6 +1273,11 @@ void main()
 					demo_phase++;
 				}
 				break;																		
+
+			case DMPHASE_INFOLINER | 3:
+				drawElementTower(&bit_map2);
+				demo_phase++;
+				break;
 
 			case DMPHASE_INFOLINER | 4:
 				SetAPen(&rast_port1_1b, 1);
@@ -1327,8 +1348,8 @@ BOOL fxInfolineScrolling(unsigned int fx_clock)
 	// else
 	if(((fx_clock >> 1) & 1) == 0)
 	{
-		BltBitMap(&bit_map1_1b, 0, 1,
-		        &bit_map1_1b, 0, 0,
+		BltBitMap(&bit_map1_1b3, 0, 1,
+		        &bit_map1_1b3, 0, 0,
 		        320, 200,
 		        0xC0, 0xFF, NULL);
 		// printf("BltBitMap(), fx_clock = %d\n", fx_clock);
@@ -1339,7 +1360,7 @@ BOOL fxInfolineScrolling(unsigned int fx_clock)
 	// if (demo_string_index > DEMO_STRINGS_MAX_INDEX)
 	// 	demo_string_index = 0;	
 
-	if (font_blit_string(bitmap_font, bitmap_font, &bit_map1_1b, (const char *)&tiny_font_glyph, (const short *)&tiny_font_x_pos, 0, 180, (UBYTE *)demo_string[demo_string_index]) == 0)
+	if (font_blit_string(bitmap_font, bitmap_font, &bit_map1_1b3, (const char *)&tiny_font_glyph, (const short *)&tiny_font_x_pos, 0, 180, (UBYTE *)demo_string[demo_string_index]) == 0)
 	{
 		demo_string_index++;
 		if (demo_string_index > DEMO_STRINGS_MAX_INDEX)

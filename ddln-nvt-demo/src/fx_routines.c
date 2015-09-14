@@ -53,6 +53,9 @@ extern struct BitMap *bitmap_side_car;
 
 extern UWORD element_bridgePaletteRGB4[8];
 
+extern struct Image element_tower;
+extern struct BitMap *bitmap_tower;
+
 struct UCopList *copper;
 
 UWORD chip blank_pointer[4]=
@@ -101,7 +104,7 @@ void __inline loadAndDrawDemoPlace(struct BitMap *dest_bitmap)
 
     bitmap_title = load_file_as_bitmap("assets/title_place.dat", 5440, title_place.Width, title_place.Height, title_place.Depth);
     WaitTOF();
-    BLIT_BITMAP_S(bitmap_title, dest_bitmap, title_place.Width, title_place.Height, 320 + ((DISPL_WIDTH1 - title_place.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - title_place.Height) >> 1) + 40);
+    BLIT_BITMAP_S(bitmap_title, dest_bitmap, title_place.Width, title_place.Height, 300 + ((DISPL_WIDTH1 - title_place.Width) >> 1) + dbuffer_offset_2, ((DISPL_HEIGHT1 - title_place.Height) >> 1) + 40);
 
     WaitBlit();
     free_allocated_bitmap(bitmap_title);
@@ -141,6 +144,21 @@ void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_nu
 }
 
 /*
+    TV Tower
+*****************************/
+void __inline loadElementTower(void)
+{   bitmap_tower = load_zlib_file_as_bitmap("assets/element_tower.dat", 827, 3072, element_tower.Width, element_tower.Height, element_tower.Depth);  }
+
+void __inline drawElementTower(struct BitMap *dest_bitmap)
+{   BLIT_BITMAP_S(bitmap_tower, dest_bitmap, element_tower.Width, element_tower.Height, DISPL_WIDTH1 - (element_tower.Width << 1), 0); }
+
+void __inline freeElementTower(void)
+{   
+    free_allocated_bitmap(bitmap_tower);
+    bitmap_tower = NULL; 
+}
+
+/*
     Facing car
 *****************************/
 void __inline loadTrabantFacingGround(void)
@@ -153,7 +171,7 @@ void __inline freeTrabantFacingGround(void)
 {   
     free_allocated_bitmap(bitmap_facing_ground);
     bitmap_facing_ground = NULL;
-    }
+}
 
 void __inline loadTrabantFacingCar(void)
 {   bitmap_facing_car = load_zlib_file_as_bitmap("assets/trabant_facing_car.dat", 2662, 6480, trabant_facing_car.Width, trabant_facing_car.Height, trabant_facing_car.Depth);  }
@@ -381,7 +399,7 @@ void setLogoCopperList(struct ViewPort *vp)
     copper = (struct UCopList *)
     AllocMem( sizeof(struct UCopList), MEMF_PUBLIC|MEMF_CHIP|MEMF_CLEAR );
 
-    CINIT(copper, 32);
+    CINIT(copper, CL_LOGO_LEN * 3 * 2);
     CWAIT(copper, 0, 0);
 
     CMOVE(copper, *((UWORD *)SPR0PTH_ADDR), (LONG)&blank_pointer);

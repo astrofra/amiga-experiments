@@ -13,7 +13,8 @@ const char *demo_string[] = {
 	"NEARBY SHOPS, HOTELS AND LOTS MORE.\0",
 	"     \0",
 	"BASS PIXELS CITY LIGHTS\0",
-	"\0"
+	" \0",	
+	" \0"
 };
 
 const char *ascii_art[] = {

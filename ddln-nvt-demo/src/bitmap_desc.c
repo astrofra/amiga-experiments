@@ -184,5 +184,19 @@ struct Image title_place =
 	NULL		/* NextImage */
 };
 
+UWORD element_towerPaletteRGB4[8] =
+{
+	0x0000,0x0836,0x0947,0x0968,0x0889,0x08AB,0x08CC,0x0EEB
+};
+
+struct Image element_tower =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	28, 256, 3,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0007, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
+
 
 

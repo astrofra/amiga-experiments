@@ -46,4 +46,8 @@ void loadAndDrawDemoTitle(struct BitMap *dest_bitmap);
 void loadAndDrawDemoPlace(struct BitMap *dest_bitmap);
 void setLogoCopperList(struct ViewPort *vp);
 
+void loadElementTower(void);
+void drawElementTower(struct BitMap *dest_bitmap);
+void freeElementTower(void);
+
 #endif // #ifndef FX_ROUTINES
