@@ -103,6 +103,7 @@ struct BitMap *bitmap_side_ground = NULL;
 struct BitMap *bitmap_side_car = NULL;
 
 struct BitMap *bitmap_tower = NULL;
+struct BitMap *bitmap_city_2b = NULL;
 
 extern UWORD trabant_facing_groundPaletteRGB4[8];
 extern UWORD trabant_facing_carPaletteRGB4[8];
@@ -124,6 +125,12 @@ UWORD *pal_mistral_title_fadeout = NULL;
 
 UWORD *pal_demo_title_fadein = NULL;
 UWORD *pal_demo_title_fadeout = NULL;
+
+extern UWORD element_city_2bPaletteRGB4[8];
+extern UWORD element_towerPaletteRGB4[8];
+
+UWORD *pal_infoliner_fadein = NULL;
+UWORD *pal_infoliner_fadeout = NULL;
 
 BOOL voxel_switch = FALSE;
 
@@ -311,6 +318,7 @@ void precalculateDemoTitleFades(void);
 BOOL fxCityScrolling(void);
 void fxVoxelRotation(UWORD *angle);
 void loadTextWriterFont(void);
+void precalculateInfolinerFades(void);
 BOOL fxInfolineScrolling(unsigned int fx_clock);
 
 void main()
@@ -480,10 +488,13 @@ void main()
 	loadTrabantSideGround();
 	loadTrabantSideCar();
 
+	loadElementCity2b();
+
 	loadTextWriterFont();
 
 	precalculateMistralTitleFades();
 	precalculateDemoTitleFades();
+	precalculateInfolinerFades();
 
 	playMusic();
 	// drawElementCity(&bit_map1);
@@ -1178,7 +1189,7 @@ void main()
 
 			case DMPHASE_TITLE_4 | 6:
 				// printf("PTSongPos(theMod) = %d\n", PTSongPos(theMod));
-				if ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
+				if (1) // ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
 					demo_phase++;
 				break;
 
@@ -1248,7 +1259,8 @@ void main()
 			*/
 			case DMPHASE_INFOLINER :
 				// loadElementTower();
-				setPaletteFacingCar();
+				setPaletteToBlack();
+				// setPaletteFacingCar();
 				fx_clock = 0;
 				demo_phase++;
 				break;
@@ -1285,12 +1297,34 @@ void main()
 				break;				
 
 			case DMPHASE_INFOLINER | 5:
-				SetAPen(&rast_port1_1b, 1);
+				drawElementCity2b(&bit_map1);
+				demo_phase++;
+				break;
+
+			case DMPHASE_INFOLINER | 6:
+				freeElementCity2b();
+				demo_phase++;
+				break;				
+
+			case DMPHASE_INFOLINER | 7:
+				/* Fade in */
+				LoadRGB4(&view_port1, pal_infoliner_fadein + ((palette_fade >> 1) << 4), 16);
+				palette_fade++;
+
+				if (palette_fade >= 32)
+				{
+					palette_fade = 0;
+					demo_phase++;
+				}
+				break;
+
+			case DMPHASE_INFOLINER | 8:
+				// SetAPen(&rast_port1_1b, 1);
 				fx_clock = 0;
 				demo_phase++;
 				break;														
 
-			case DMPHASE_INFOLINER | 6:
+			case DMPHASE_INFOLINER | 9:
 				fx_clock++;
 				fxInfolineScrolling(fx_clock);
 				// demo_phase++;
@@ -1671,12 +1705,7 @@ void precalculateDemoTitleFades(void)
 		for(palette_idx = 0; palette_idx < 16; palette_idx++)
 		{
 			if (palette_idx < 8)
-			{
-				// if (palette_idx == 1)
-				// 	tmp_col = 0x00F;
-				// else 
 				tmp_col = title_logoPaletteRGB4[palette_idx];
-			}
 			else
 				tmp_col = title_placePaletteRGB4[palette_idx - 8];
 
@@ -1697,13 +1726,49 @@ void precalculateDemoTitleFades(void)
 		for(palette_idx = 0; palette_idx < 16; palette_idx++)
 		{
 			if (palette_idx < 8)
-				tmp_col = 0x000; // trabant_facing_groundPaletteRGB4[palette_idx];
+				tmp_col = title_logoPaletteRGB4[palette_idx];
 			else
-				tmp_col = mistral_title_PaletteRGB4[palette_idx - 8];
+				tmp_col = title_placePaletteRGB4[palette_idx - 8];
 
 			pal_demo_title_fadeout[palette_idx + (palette_fade << 4)] = mixRGB4Colors(tmp_col, 0x000, palette_fade);
 		}
 }
+
+/*
+	Prepare the fade in/fade out palette
+	for the "Infoliner" screen.
+*/
+void precalculateInfolinerFades(void)
+{
+	short palette_fade, palette_idx;
+	UWORD tmp_col;
+
+	/* Precalc the fade in/out */
+	pal_infoliner_fadein = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+				tmp_col = element_city_2bPaletteRGB4[palette_idx];
+			else
+				tmp_col = element_towerPaletteRGB4[palette_idx - 8];
+
+			pal_infoliner_fadein[palette_idx + (palette_fade << 4)] = mixRGB4Colors(0x000, tmp_col, palette_fade);
+		}
+
+	pal_infoliner_fadeout = AllocMem(sizeof(UWORD) * 16 * 16, MEMF_CLEAR);
+	for(palette_fade = 0; palette_fade < 16; palette_fade++)
+		for(palette_idx = 0; palette_idx < 16; palette_idx++)
+		{
+			if (palette_idx < 8)
+				tmp_col = element_city_2bPaletteRGB4[palette_idx];
+			else
+				tmp_col = element_towerPaletteRGB4[palette_idx - 8];
+
+			pal_infoliner_fadeout[palette_idx + (palette_fade << 4)] = mixRGB4Colors(tmp_col, 0x000, palette_fade);
+		}
+}
+
 
 /*
 	Scrolling of the city scape

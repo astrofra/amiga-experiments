@@ -55,6 +55,8 @@ extern UWORD element_bridgePaletteRGB4[8];
 
 extern struct Image element_tower;
 extern struct BitMap *bitmap_tower;
+extern struct Image element_city_2b;
+extern struct BitMap *bitmap_city_2b;
 
 struct UCopList *copper;
 
@@ -141,6 +143,24 @@ void __inline loadAndDrawMistralTitle(struct BitMap *dest_bitmap, UBYTE title_nu
 
     WaitBlit();
     FREE_ALLOCATED_BITMAP(bitmap_title);
+}
+
+/*
+    2 bitplanes city background
+*****************************/
+void __inline loadElementCity2b(void)
+{   bitmap_city_2b = load_zlib_file_as_bitmap("assets/element_city_2b.dat", 3530, 9280, element_city_2b.Width, element_city_2b.Height, element_city_2b.Depth);  }
+
+void __inline drawElementCity2b(struct BitMap *dest_bitmap)
+{   
+    BLIT_BITMAP_S(bitmap_city_2b, dest_bitmap, element_city_2b.Width, element_city_2b.Height, 0, DISPL_HEIGHT1 - element_city_2b.Height);
+    WaitBlit();
+}
+
+void __inline freeElementCity2b(void)
+{   
+    FREE_ALLOCATED_BITMAP(bitmap_city_2b);
+    bitmap_city_2b = NULL; 
 }
 
 /*

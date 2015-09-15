@@ -198,5 +198,18 @@ struct Image element_tower =
 	NULL		/* NextImage */
 };
 
+UWORD element_city_2bPaletteRGB4[8] =
+{
+	0x0000,0x0222,0x0333,0x0333,0x0FFF,0x0FFF,0x0FFF,0x0FFF
+};
+
+struct Image element_city_2b =
+{
+	0, 0,		/* LeftEdge, TopEdge */
+	320, 116, 2,	/* Width, Height, Depth */
+	NULL,	/* ImageData */
+	0x0003, 0x0000,	/* PlanePick, PlaneOnOff */
+	NULL		/* NextImage */
+};
 
 

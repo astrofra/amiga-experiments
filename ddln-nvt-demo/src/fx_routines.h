@@ -50,4 +50,8 @@ void loadElementTower(void);
 void drawElementTower(struct BitMap *dest_bitmap);
 void freeElementTower(void);
 
+void loadElementCity2b(void);
+void drawElementCity2b(struct BitMap *dest_bitmap);
+void freeElementCity2b(void);
+
 #endif // #ifndef FX_ROUTINES
