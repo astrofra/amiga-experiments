@@ -1189,7 +1189,7 @@ void main()
 
 			case DMPHASE_TITLE_4 | 6:
 				// printf("PTSongPos(theMod) = %d\n", PTSongPos(theMod));
-				if (1) // ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
+				if ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
 					demo_phase++;
 				break;
 
@@ -1405,6 +1405,8 @@ BOOL fxInfolineScrolling(unsigned int fx_clock)
 		if (demo_string_index > DEMO_STRINGS_MAX_INDEX)
 			demo_string_index = 0;
 	}
+
+	return TRUE;
 }
 
 /*
