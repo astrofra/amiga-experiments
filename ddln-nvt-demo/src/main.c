@@ -439,7 +439,16 @@ void main()
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
 
-	printf("Tinfl decrunches while waiting...\n");
+	printf("        ------------------\n");
+	printf("DEADLINE AMIGA DEMOINVIT BY MANDARINE\n");
+	printf("ORIGINAL GFX BY MOG\n");
+	printf("SCROLLTEXT BY V3NOM\n");
+	printf("MUSIC BY MED\n");
+	printf("CODE & GFX ADAPTATION BY FRA\n");
+	printf("MINIZ COMPRESSOR BY RICHGELl999\n");
+	printf("        ------------------\n");
+	printf("MINIZ DECRUNCHES WHILE U WAITING...\n");
+	printf("        ------------------\n");	
 	initMusic();
 
 	WaitTOF();

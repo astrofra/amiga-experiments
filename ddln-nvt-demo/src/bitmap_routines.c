@@ -53,7 +53,7 @@ PLANEPTR load_zlib_getchipmem(UBYTE *name, ULONG input_size, ULONG output_size)
   Close(fileHandle);
 
   tinfl_return_value = tinfl_decompress_mem_to_mem(unzip_mem, output_size, temp_mem, input_size, 1);
-  printf("tinfl_decompress_mem_to_mem() returned %d\n", tinfl_return_value);
+  // printf("tinfl_decompress_mem_to_mem() returned %d\n", tinfl_return_value);
   FreeMem(temp_mem, input_size);
 
   return (unzip_mem);

@@ -35,7 +35,7 @@ void free_allocated_bitmap(struct BitMap *allocated_bitmap);
 void disp_whack(struct BitMap *src_BitMap, struct BitMap *dest_BitMap, UWORD width, UWORD height, UWORD x, UWORD y, UWORD depth);
 void disp_interleaved_st_format(PLANEPTR data, struct BitMap *dest_BitMap, UWORD width, UWORD height, UWORD src_y, UWORD x, UWORD y, UWORD depth);
 
-#define FREE_ALLOCATED_BITMAP(ptr_name) printf("free_allocated_bitmap(%s) : 0x%x\n", #ptr_name, ptr_name); free_allocated_bitmap(ptr_name);
+#define FREE_ALLOCATED_BITMAP(ptr_name) /*printf("free_allocated_bitmap(%s) : 0x%x\n", #ptr_name, ptr_name);*/ free_allocated_bitmap(ptr_name);
 
 /*  Simple bitblit  */
 #define BLIT_BITMAP_S(SRC_BITMAP, DEST_BITMAP, WIDTH, HEIGHT, X, Y) BltBitMap(SRC_BITMAP, 0, 0, \
