@@ -439,16 +439,17 @@ void main()
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
 
-	printf("        ------------------\n");
-	printf("DEADLINE AMIGA DEMOINVIT BY MANDARINE\n");
-	printf("ORIGINAL GFX BY MOG\n");
-	printf("SCROLLTEXT BY V3NOM\n");
-	printf("MUSIC BY MED\n");
-	printf("CODE & GFX ADAPTATION BY FRA\n");
-	printf("MINIZ COMPRESSOR BY RICHGELl999\n");
-	printf("        ------------------\n");
-	printf("MINIZ DECRUNCHES WHILE U WAITING...\n");
-	printf("        ------------------\n");	
+	printf("\n");
+	printf("                       ------------------\n");
+	printf("               'DEADLINE' AMIGA DEMOINVITE BY MANDARINE\n\n");
+	printf("               ORIGINAL GFX BY MOG\n");
+	printf("               SCROLLTEXT BY V3NOM\n");
+	printf("               MUSIC BY MED\n");
+	printf("               CODE & GFX ADAPTATION BY FRA\n");
+	printf("               MINIZ COMPRESSOR BY RICHGELl999\n");
+	printf("                       ------------------\n");
+	printf("               MINIZ DECRUNCHES WHILE U WAITING...\n");
+	printf("                       ------------------\n");	
 	initMusic();
 
 	WaitTOF();
@@ -1190,19 +1191,23 @@ void main()
 
 				if (palette_fade >= 32)
 				{
-					loadElementTower();
 					palette_fade = 0;
 					demo_phase++;
 				}
 				break;
 
 			case DMPHASE_TITLE_4 | 6:
+					loadElementTower();
+					demo_phase++;
+				break;
+
+			case DMPHASE_TITLE_4 | 7:
 				// printf("PTSongPos(theMod) = %d\n", PTSongPos(theMod));
 				if ((PTSongPos(theMod) == 6 && PTPatternPos(theMod) > 0x30) || (PTSongPos(theMod) > 6))
 					demo_phase++;
 				break;
 
-			case DMPHASE_TITLE_4 | 7:
+			case DMPHASE_TITLE_4 | 8:
 				/* Fade out */
 				LoadRGB4(&view_port1, pal_demo_title_fadeout + (palette_fade << 4), 16);
 				palette_fade++;
@@ -1221,7 +1226,7 @@ void main()
 				break;
 
 			/*	Clear the screen */
-			case DMPHASE_TITLE_4 | 8:
+			case DMPHASE_TITLE_4 | 9:
 				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
@@ -1231,7 +1236,7 @@ void main()
 				}
 				break;
 
-			case DMPHASE_TITLE_4 | 9:
+			case DMPHASE_TITLE_4 | 10:
 				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
 					fx_clock++;
 				else
@@ -1243,19 +1248,19 @@ void main()
 
 
 			/*	Clear copper list */
-			case DMPHASE_TITLE_4 | 10:
+			case DMPHASE_TITLE_4 | 11:
 				setEmptyCopperList(&view_port1);
 				demo_phase++;
 				break;
 
-			case DMPHASE_TITLE_4 | 11:
+			case DMPHASE_TITLE_4 | 12:
 				MrgCop(&my_view);
 				LoadView( &my_view );
 				demo_phase++;
 				break;
 
 			/*	Next fx!!! */
-			case DMPHASE_TITLE_4 | 12:
+			case DMPHASE_TITLE_4 | 13:
 				resetViewportOffset();
 				scr1_x_offset = 0;
 				scr2_x_offset = 0;
