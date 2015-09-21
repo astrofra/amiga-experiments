@@ -1,0 +1,4 @@
+FROM LIB:c.o "main.o"+"mul_by_ten.o"
+TO "main.exe"
+LIB LIB:scnb.lib LIB:amiga.lib
+
