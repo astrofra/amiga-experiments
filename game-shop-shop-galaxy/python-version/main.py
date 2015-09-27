@@ -5,7 +5,23 @@ import gs.plus.input as input
 import ball_physics as ball
 
 def project3DTo2D():
-	return ball.pos_x, ball.pos_z, 0.5
+	top_left_x = 68
+	top_right_x = 320 - 68
+	top_y = 8
+
+	bottom_left_x = 0
+	bottom_right_x = 320
+	bottom_y = 130
+
+	norm_x = (ball.pos_x / ball.board_width) + 0.5
+	norm_y = (ball.pos_z / ball.board_length) + 0.5
+	top_2d_x = (1.0 - norm_x) * top_left_x + norm_x * top_right_x
+	bottom_2d_x = (1.0 - norm_x) * bottom_left_x + norm_x * bottom_right_x
+
+	proj_2d_x = (1.0 - norm_y) * top_2d_x + norm_y * bottom_2d_x
+	proj_2d_y = (1.0 - norm_y) * top_y + norm_y * bottom_y
+
+	return proj_2d_x, proj_2d_y, 1.0
 
 SCR_PHYSIC_WIDTH = 320
 SCR_PHYSIC_HEIGHT = 200
