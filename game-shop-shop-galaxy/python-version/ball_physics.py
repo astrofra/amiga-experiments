@@ -8,8 +8,8 @@ pos_z = 0.0
 
 radius = 1.0
 
-board_width = 10.0
-board_length = 30.0
+board_width = 16.0
+board_length = 24.0
 
 def reset():
 	pos_x = 0.0
@@ -24,6 +24,7 @@ def applyImpulse(x,z):
 
 def update(dt):
 	global pos_x, pos_z, velocity_x, velocity_z, board_width, board_length
+	# pos_x = board_width * 0.5
 	pos_x += velocity_x * dt
 	pos_z += velocity_z * dt
 
@@ -43,3 +44,5 @@ def update(dt):
 		if pos_z < board_length * -0.5:
 			pos_z = board_length * -0.5
 			velocity_z *= -1
+
+	# pos_z = 0
