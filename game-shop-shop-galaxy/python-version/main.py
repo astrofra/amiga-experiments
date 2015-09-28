@@ -27,7 +27,7 @@ def project3DTo2D():
 	norm_x = (ball.pos_x / ball.board_width) + 0.5
 	norm_y = (ball.pos_z / ball.board_length) + 0.5
 
-	persp_coef = [2, 5, 9, 13, 17, 22, 27, 34, 42, 51, 64, 80, 102, 132]
+	persp_coef = [1, 5, 9, 13, 17, 22, 27, 34, 42, 51, 64, 80, 102, 132]
 	persp_coef = list(map(lambda z: z / 132.0, persp_coef))
 	norm_y = mapValueToArray(norm_y, 0.0, 1.0, persp_coef)
 	
@@ -37,7 +37,7 @@ def project3DTo2D():
 	proj_2d_x = (1.0 - norm_y) * top_2d_x + norm_y * bottom_2d_x
 	proj_2d_y = (1.0 - norm_y) * top_y + norm_y * bottom_y
 
-	proj_scale = (norm_y + 1.0) * 0.5
+	proj_scale = RangeAdjust(norm_y, 0.0, 1.0, 0.375, 1.0) #(norm_y + 1.0) * 0.5
 
 	return proj_2d_x, proj_2d_y, proj_scale
 
