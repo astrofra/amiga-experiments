@@ -45,4 +45,4 @@ def update(dt):
 			pos_z = board_length * -0.5
 			velocity_z *= -1
 
-	# pos_z = 0
+	# pos_z = 0.5
