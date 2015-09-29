@@ -65,7 +65,9 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	ball_2d_y = SCR_DISP_HEIGHT - (ball_2d_y * SCR_SCALE_FACTOR)
 
 	render.clear()
+	render.set_blend_mode2d(render.BlendAlpha)
 	render.image2d(scr_margin_x, 0, SCR_SCALE_FACTOR, "@assets/game_board.png")
 	render.image2d(scr_margin_x, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
 	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - 130, 36 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
+	render.set_blend_mode2d(render.BlendOpaque)
 	render.flip()
