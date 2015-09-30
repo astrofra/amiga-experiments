@@ -37,7 +37,7 @@ def project3DTo2D():
 	proj_2d_x = (1.0 - norm_y) * top_2d_x + norm_y * bottom_2d_x
 	proj_2d_y = (1.0 - norm_y) * top_y + norm_y * bottom_y
 
-	proj_scale = RangeAdjust(norm_y, 0.0, 1.0, 0.375, 1.0) #(norm_y + 1.0) * 0.5
+	proj_scale = RangeAdjust(norm_y, 0.0, 1.0, 0.285, 1.0) #(norm_y + 1.0) * 0.5
 
 	return proj_2d_x, proj_2d_y, proj_scale
 
@@ -55,7 +55,7 @@ render.init(SCR_DISP_WIDTH, SCR_DISP_HEIGHT, "pkg.core")
 gs.MountFileDriver(gs.StdFileDriver("assets/"), "@assets/")
 
 ball.reset()
-ball.applyImpulse(10.0, 10.0)
+ball.setImpulse(10.0, 10.0)
 
 while not input.key_press(gs.InputDevice.KeyEscape):
 	scr_margin_x = (SCR_DISP_WIDTH - (SCR_PHYSIC_WIDTH * SCR_SCALE_FACTOR)) / 2.0
@@ -66,6 +66,7 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 
 	render.clear()
 	render.set_blend_mode2d(render.BlendAlpha)
+	render.sprite2d(scr_margin_x + (320 * 0.5) * SCR_SCALE_FACTOR, (SCR_PHYSIC_HEIGHT - 96 * 0.5) * SCR_SCALE_FACTOR, 106 * SCR_SCALE_FACTOR, "@assets/robot5.png")
 	render.image2d(scr_margin_x, 0, SCR_SCALE_FACTOR, "@assets/game_board.png")
 	render.image2d(scr_margin_x, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
 	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - 130, 36 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
