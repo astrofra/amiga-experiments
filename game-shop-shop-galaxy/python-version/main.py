@@ -37,8 +37,8 @@ def project3DTo2D(x, z, board_width, board_length):
 SCR_PHYSIC_WIDTH = 320
 SCR_PHYSIC_HEIGHT = 200
 
-SCR_DISP_WIDTH = 320 * 2
-SCR_DISP_HEIGHT = 200 * 2
+SCR_DISP_WIDTH = 320
+SCR_DISP_HEIGHT = 200
 
 SCR_SCALE_FACTOR = min(SCR_DISP_WIDTH / SCR_PHYSIC_WIDTH, SCR_DISP_HEIGHT / SCR_PHYSIC_HEIGHT)
 
@@ -88,7 +88,7 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	render.image2d(scr_margin_x, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
 
 	# Ball
-	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 36 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
+	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
 
 	# Player racket
 	render.sprite2d(scr_margin_x + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
