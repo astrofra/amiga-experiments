@@ -4,9 +4,11 @@ import gs.plus.input as input
 
 import math
 from utils import *
+from basic_vector import *
 import ball_physics as ball
 import player_racket as player
 import board as board
+import intersection as col
 
 def project3DTo2D(x, z, board_width, board_length):
 	top_left_x = 120
@@ -37,8 +39,8 @@ def project3DTo2D(x, z, board_width, board_length):
 SCR_PHYSIC_WIDTH = 320
 SCR_PHYSIC_HEIGHT = 200
 
-SCR_DISP_WIDTH = 320
-SCR_DISP_HEIGHT = 200
+SCR_DISP_WIDTH = 320 * 2
+SCR_DISP_HEIGHT = 200 * 2
 
 SCR_SCALE_FACTOR = min(SCR_DISP_WIDTH / SCR_PHYSIC_WIDTH, SCR_DISP_HEIGHT / SCR_PHYSIC_HEIGHT)
 
@@ -52,6 +54,14 @@ ball.setImpulse(10.0, 10.0)
 
 player.initial_pox_z = (board.board_length * 0.45)
 player.reset()
+
+def renderBall():
+	# Ball
+	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
+
+def renderPlayer():
+	# Player racket
+	render.sprite2d(scr_margin_x + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
 
 while not input.key_press(gs.InputDevice.KeyEscape):
 	scr_margin_x = (SCR_DISP_WIDTH - (SCR_PHYSIC_WIDTH * SCR_SCALE_FACTOR)) / 2.0
@@ -74,7 +84,19 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	# Compute the ball motion
 	player_2d_x, player_2d_y, player_2d_scale = project3DTo2D(player.pos_x, player.pos_z, board.board_width, board.board_length)
 	player_2d_x *= SCR_SCALE_FACTOR
-	player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)	
+	player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
+
+	if col.collideCircleVsHSegment(player.pos_x - player.width * 0.5, player.pos_x + player.width * 0.5, player.pos_z - player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):
+		ball.bounceZ()
+	else:
+		if col.collideCircleVsHSegment(player.pos_x - player.width * 0.5, player.pos_x + player.width * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):
+			ball.bounceZ()
+
+	if col.collideCircleVsVSegment(player.pos_x - player.width * 0.5, player.pos_z - player.length * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):			
+		ball.bounceX()
+	else:
+		if col.collideCircleVsVSegment(player.pos_x + player.width * 0.5, player.pos_z - player.length * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):			
+			ball.bounceX()
 
 	render.clear()
 	render.set_blend_mode2d(render.BlendAlpha)
@@ -87,11 +109,13 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	# Score panel
 	render.image2d(scr_margin_x, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
 
-	# Ball
-	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
-
-	# Player racket
-	render.sprite2d(scr_margin_x + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
+	# Render moving items according to their Z position
+	if ball.pos_z < player.pos_z:
+		renderBall()
+		renderPlayer()
+	else:
+		renderPlayer()
+		renderBall()
 
 	render.set_blend_mode2d(render.BlendOpaque)
 	render.flip()

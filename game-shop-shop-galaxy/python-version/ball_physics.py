@@ -1,5 +1,6 @@
 import math
 import board
+from basic_vector import *
 
 inertia = 0.1
 
@@ -12,12 +13,17 @@ initial_pox_z = 0.0
 pos_x = 0.0
 pos_z = 0.0
 
+prev_pos_x = 0.0
+prev_pos_z = 0.0
+
 radius = 0.5
 
 def reset():
 	global pos_x, pos_z, initial_pox_x, initial_pox_z
 	pos_x = initial_pox_x
 	pos_z = initial_pox_z
+	prev_pos_x = pos_x
+	prev_pos_z = pos_z
 	velocity_x = 0.0
 	velocity_z = 0.0
 
@@ -26,43 +32,44 @@ def setImpulse(x,z):
 	velocity_x = x
 	velocity_z = z
 
-def addVectors(ax, az, bx, bz):
-	return ax + bx, az + bz
+def bounceX():
+	global velocity_x
+	velocity_x *= -1
 
-def mulVectorByScalar(ax, az, s):
-	return ax * s, az * s
-
-def getVectorLength(ax, az):
-	return math.sqrt(ax * ax + az * az)
-
+def bounceZ():
+	global velocity_z
+	velocity_z *= -1
 
 def update(dt):
 	global pos_x, pos_z, velocity_x, velocity_z
 
+	# Keep track of the ball's previous position
+	prev_pos_x = pos_x
+	prev_pos_z = pos_z
+
+	# Move the ball according to its velocity
 	pos_x += velocity_x * dt
 	pos_z += velocity_z * dt
 
 	# basic dynamics & collision
 	if pos_x > (board.board_width * 0.5) - radius:
 		pos_x = (board.board_width * 0.5) - radius
-		velocity_x *= -1
+		bounceX()
 	else:
 		if pos_x < (board.board_width * -0.5) + radius:
 			pos_x = (board.board_width * -0.5) + radius
-			velocity_x *= -1
+			bounceX()
 
 	if pos_z > (board.board_length * 0.5) - radius:
 		pos_z = (board.board_length * 0.5) - radius
-		velocity_z *= -1
+		bounceZ()
 	else:
 		if pos_z < (board.board_length * -0.5) + radius:
 			pos_z = (board.board_length * -0.5) + radius
-			velocity_z *= -1
+			bounceZ()
 
 	# Limit the friction/damping to the areas
 	# where the puck can be reached by one of the players
-	if abs(pos_z) > board.board_length * 0.25:
-		friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
-		velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)
-
-	# pos_z = 0.5
+	# if abs(pos_z) > board.board_length * 0.25:
+	# 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
+	# 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)
