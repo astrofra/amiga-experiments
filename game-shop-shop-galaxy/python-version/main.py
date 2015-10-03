@@ -87,9 +87,11 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
 
 	if col.collideCircleVsHSegment(player.pos_x - player.width * 0.5, player.pos_x + player.width * 0.5, player.pos_z - player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):
+		ball.pos = player.pos_z - ball.radius - player.length * 0.55
 		ball.bounceZ()
 	else:
 		if col.collideCircleVsHSegment(player.pos_x - player.width * 0.5, player.pos_x + player.width * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):
+			ball.pos = player.pos_z + ball.radius + player.length * 0.55
 			ball.bounceZ()
 
 	if col.collideCircleVsVSegment(player.pos_x - player.width * 0.5, player.pos_z - player.length * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):			
