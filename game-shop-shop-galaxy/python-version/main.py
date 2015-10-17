@@ -8,7 +8,7 @@ from basic_vector import *
 import ball_physics as ball
 import player_racket as player
 import board as board
-import intersection as col
+# import intersection as col
 
 def project3DTo2D(x, z, board_width, board_length):
 	top_left_x = 120
@@ -36,6 +36,42 @@ def project3DTo2D(x, z, board_width, board_length):
 
 	return proj_2d_x, proj_2d_y, proj_scale
 
+def gameReset():
+	ball.reset()
+	ball.setImpulse(10.0, 10.0)
+
+def renderBall():
+	# Ball
+	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
+
+def renderPlayer():
+	# Player racket
+	render.sprite2d(scr_margin_x + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
+
+def ballIsBehindRacket(ball, racket):
+	if ball.pos_z < racket.pos_z:
+		return True
+
+	return False
+
+def BallIsWithinXReach(ball, racket):
+	if ball.pos_x > racket.pos_x - racket.width * 0.5 and ball.pos_x < racket.pos_x + racket.width * 0.5:
+		return True
+
+	return False
+
+def ballWasBehindRacket(ball, racket):
+	if ball.prev_pos_z < racket.prev_pos_z:
+		return True
+
+	return False
+
+def BallWasWithinXReach(ball, racket):
+	if ball.prev_pos_x > racket.prev_pos_x - racket.width * 0.5 and ball.prev_pos_x < racket.prev_pos_x + racket.width * 0.5:
+		return True
+
+	return False	
+
 SCR_PHYSIC_WIDTH = 320
 SCR_PHYSIC_HEIGHT = 200
 
@@ -49,21 +85,13 @@ render.init(SCR_DISP_WIDTH, SCR_DISP_HEIGHT, "pkg.core")
 # provide access to the data folder
 gs.MountFileDriver(gs.StdFileDriver("assets/"), "@assets/")
 
-ball.reset()
-ball.setImpulse(10.0, 10.0)
-
+gameReset()
 player.initial_pox_z = (board.board_length * 0.45)
 player.reset()
 
-def renderBall():
-	# Ball
-	render.sprite2d(scr_margin_x + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
-
-def renderPlayer():
-	# Player racket
-	render.sprite2d(scr_margin_x + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
-
 while not input.key_press(gs.InputDevice.KeyEscape):
+	dt = 1.0 / 60.0
+
 	scr_margin_x = (SCR_DISP_WIDTH - (SCR_PHYSIC_WIDTH * SCR_SCALE_FACTOR)) / 2.0
 
 	# update mouse
@@ -72,33 +100,28 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	# get the mouse device
 	mouse_device = gs.GetInputSystem().GetDevice("mouse")
 
-	# Compute the ball motion
-	ball.update(1.0 / 60.0)
+	# Update the ball motion
+	ball.update(dt)
+
+	# Update the player motion
+	player.setMouse(mouse_device.GetValue(gs.InputDevice.InputAxisX) / SCR_DISP_WIDTH, mouse_device.GetValue(gs.InputDevice.InputAxisY) / SCR_DISP_HEIGHT)
+	player.update(dt)
+
+	# Collisions
+	if ball.velocity_z > 0.0:
+		if (not ballIsBehindRacket(ball, player)) and BallIsWithinXReach(ball, player) and ballWasBehindRacket(ball, player) and BallWasWithinXReach(ball, player):
+			ball.setPosition(ball.pos_x, player.pos_z - ball.velocity_z * dt + min(0.0, player.velocity_z) * dt)
+			player.setPosition(player.pos_x, ball.pos_z + player.length)
+			ball.bounceZ()
+
+	# Compute 3D/2D projections
 	ball_2d_x, ball_2d_y, ball_2d_scale = project3DTo2D(ball.pos_x, ball.pos_z, board.board_width, board.board_length)
 	ball_2d_x *= SCR_SCALE_FACTOR
 	ball_2d_y = SCR_DISP_HEIGHT - (ball_2d_y * SCR_SCALE_FACTOR)
 
-	player.setMouse(mouse_device.GetValue(gs.InputDevice.InputAxisX) / SCR_DISP_WIDTH, mouse_device.GetValue(gs.InputDevice.InputAxisY) / SCR_DISP_HEIGHT)
-	player.update(1.0 / 60.0)
-
-	# Compute the ball motion
 	player_2d_x, player_2d_y, player_2d_scale = project3DTo2D(player.pos_x, player.pos_z, board.board_width, board.board_length)
 	player_2d_x *= SCR_SCALE_FACTOR
 	player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
-
-	if col.collideCircleVsHSegment(player.pos_x - player.width * 0.5, player.pos_x + player.width * 0.5, player.pos_z - player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):
-		ball.pos = player.pos_z - ball.radius - player.length * 0.55
-		ball.bounceZ()
-	else:
-		if col.collideCircleVsHSegment(player.pos_x - player.width * 0.5, player.pos_x + player.width * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):
-			ball.pos = player.pos_z + ball.radius + player.length * 0.55
-			ball.bounceZ()
-
-	if col.collideCircleVsVSegment(player.pos_x - player.width * 0.5, player.pos_z - player.length * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):			
-		ball.bounceX()
-	else:
-		if col.collideCircleVsVSegment(player.pos_x + player.width * 0.5, player.pos_z - player.length * 0.5, player.pos_z + player.length * 0.5, ball.pos_x, ball.pos_z, ball.radius):			
-			ball.bounceX()
 
 	render.clear()
 	render.set_blend_mode2d(render.BlendAlpha)
@@ -112,7 +135,7 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	render.image2d(scr_margin_x, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
 
 	# Render moving items according to their Z position
-	if ball.pos_z < player.pos_z:
+	if ball.pos_z < player.pos_z + player.length:
 		renderBall()
 		renderPlayer()
 	else:

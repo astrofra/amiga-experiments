@@ -40,8 +40,13 @@ def bounceZ():
 	global velocity_z
 	velocity_z *= -1
 
+def setPosition(x,z):
+	global pos_x, pos_z
+	pos_x = x
+	pos_z = z
+
 def update(dt):
-	global pos_x, pos_z, velocity_x, velocity_z
+	global pos_x, pos_z, velocity_x, velocity_z, prev_pos_x, prev_pos_z
 
 	# Keep track of the ball's previous position
 	prev_pos_x = pos_x
@@ -52,20 +57,20 @@ def update(dt):
 	pos_z += velocity_z * dt
 
 	# basic dynamics & collision
-	if pos_x > (board.board_width * 0.5) - radius:
-		pos_x = (board.board_width * 0.5) - radius
+	if pos_x > (board.board_width * 0.5): # - radius:
+		pos_x = (board.board_width * 0.5) # - radius
 		bounceX()
 	else:
-		if pos_x < (board.board_width * -0.5) + radius:
-			pos_x = (board.board_width * -0.5) + radius
+		if pos_x < (board.board_width * -0.5): # + radius:
+			pos_x = (board.board_width * -0.5) # + radius
 			bounceX()
 
-	if pos_z > (board.board_length * 0.5) - radius:
-		pos_z = (board.board_length * 0.5) - radius
+	if pos_z > (board.board_length * 0.5): # - radius:
+		pos_z = (board.board_length * 0.5) # - radius
 		bounceZ()
 	else:
-		if pos_z < (board.board_length * -0.5) + radius:
-			pos_z = (board.board_length * -0.5) + radius
+		if pos_z < (board.board_length * -0.5): # + radius:
+			pos_z = (board.board_length * -0.5) # + radius
 			bounceZ()
 
 	# Limit the friction/damping to the areas
