@@ -40,10 +40,10 @@ def setMouse(x,y):
 	global target_pos_x, target_pos_z
 
 	x = Clamp(x, 0, 1.0)
-	y = Clamp(y, 0, 1.0)
+	y = Clamp(y, 0, 0.5)
 
 	target_pos_x = RangeAdjust(x, 0.0, 1.0, board.board_width * -0.5 + (width * 0.5), board.board_width * 0.5 - (width * 0.5))
-	target_pos_z = RangeAdjust(y, 0.0, 0.5, board.board_length * 0.5 - (length * 0.5), board.board_length * 0.35)
+	target_pos_z = RangeAdjust(y, 0.0, 0.5, board.board_length * 0.5 - (length * 0.5), board.board_length * 0.35 - (length * 0.5))
 
 
 def update(dt):

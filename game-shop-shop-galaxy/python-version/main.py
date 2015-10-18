@@ -55,7 +55,7 @@ def ballIsBehindRacket(ball, racket):
 	return False
 
 def BallIsWithinXReach(ball, racket):
-	if ball.pos_x > racket.pos_x - racket.width * 0.5 and ball.pos_x < racket.pos_x + racket.width * 0.5:
+	if ball.pos_x + ball.radius > racket.pos_x - racket.width * 0.5 and ball.pos_x - ball.radius < racket.pos_x + racket.width * 0.5:
 		return True
 
 	return False
@@ -67,7 +67,7 @@ def ballWasBehindRacket(ball, racket):
 	return False
 
 def BallWasWithinXReach(ball, racket):
-	if ball.prev_pos_x > racket.prev_pos_x - racket.width * 0.5 and ball.prev_pos_x < racket.prev_pos_x + racket.width * 0.5:
+	if ball.prev_pos_x + ball.radius > racket.prev_pos_x - racket.width * 0.5 and ball.prev_pos_x - ball.radius < racket.prev_pos_x + racket.width * 0.5:
 		return True
 
 	return False	
