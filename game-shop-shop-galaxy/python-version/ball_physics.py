@@ -65,16 +65,22 @@ def update(dt):
 			pos_x = (board.board_width * -0.5) # + radius
 			bounceX()
 
-	if pos_z > (board.board_length * 0.5): # - radius:
-		pos_z = (board.board_length * 0.5) # - radius
+	# if pos_z > (board.board_length * 0.5): # - radius:
+	# 	pos_z = (board.board_length * 0.5) # - radius
+	# 	bounceZ()
+	# else:
+	if pos_z < (board.board_length * -0.5): # + radius:
+		pos_z = (board.board_length * -0.5) # + radius
 		bounceZ()
-	else:
-		if pos_z < (board.board_length * -0.5): # + radius:
-			pos_z = (board.board_length * -0.5) # + radius
-			bounceZ()
+
+	if pos_z > (board.board_length * 0.5): # - radius:
+		pos_x = initial_pox_x
+		pos_z = initial_pox_z
+		prev_pos_x = pos_x
+		prev_pos_z = pos_z
 
 	# Limit the friction/damping to the areas
 	# where the puck can be reached by one of the players
-	# if abs(pos_z) > board.board_length * 0.25:
-	# 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
-	# 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)
+	if abs(pos_z) > board.board_length * 0.25:
+		friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
+		velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)

@@ -2,7 +2,7 @@ import math
 import board
 from utils import *
 
-racket_speed = 20
+racket_speed = 50
 
 velocity_x = 0.0
 velocity_z = 0.0

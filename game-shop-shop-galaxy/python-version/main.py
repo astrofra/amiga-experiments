@@ -7,6 +7,7 @@ from utils import *
 from basic_vector import *
 import ball_physics as ball
 import player_racket as player
+import ai_racket as ai
 import board as board
 # import intersection as col
 
@@ -48,6 +49,11 @@ def renderPlayer():
 	# Player racket
 	render.sprite2d(scr_margin_x + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
 
+def renderAI():
+	# Player racket
+	render.sprite2d(scr_margin_x + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
+
+
 def ballIsBehindRacket(ball, racket):
 	if ball.pos_z < racket.pos_z:
 		return True
@@ -60,17 +66,11 @@ def BallIsWithinXReach(ball, racket):
 
 	return False
 
-def ballWasBehindRacket(ball, racket):
-	if ball.prev_pos_z < racket.prev_pos_z:
-		return True
-
-	return False
-
 def BallWasWithinXReach(ball, racket):
 	if ball.prev_pos_x + ball.radius > racket.prev_pos_x - racket.width * 0.5 and ball.prev_pos_x - ball.radius < racket.prev_pos_x + racket.width * 0.5:
 		return True
 
-	return False	
+	return False
 
 SCR_PHYSIC_WIDTH = 320
 SCR_PHYSIC_HEIGHT = 200
@@ -107,9 +107,13 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	player.setMouse(mouse_device.GetValue(gs.InputDevice.InputAxisX) / SCR_DISP_WIDTH, mouse_device.GetValue(gs.InputDevice.InputAxisY) / SCR_DISP_HEIGHT)
 	player.update(dt)
 
+	# Update the AI
+	ai.updateGameData(ball.pos_x, ball.pos_z, board.board_width, board.board_length)
+	ai.update(dt)
+
 	# Collisions
 	if ball.velocity_z > 0.0:
-		if (not ballIsBehindRacket(ball, player)) and ballWasBehindRacket(ball, player) and (BallWasWithinXReach(ball, player) or BallIsWithinXReach(ball, player)):
+		if (not ballIsBehindRacket(ball, player)) and (BallWasWithinXReach(ball, player) or BallIsWithinXReach(ball, player)):
 			ball.setPosition(ball.pos_x, player.pos_z - ball.velocity_z * dt + min(0.0, player.velocity_z) * dt)
 			player.setPosition(player.pos_x, ball.pos_z + player.length)
 			ball.bounceZ()
@@ -123,6 +127,10 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	player_2d_x *= SCR_SCALE_FACTOR
 	player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
 
+	ai_2d_x, ai_2d_y, ai_2d_scale = project3DTo2D(ai.pos_x, ai.pos_z, board.board_width, board.board_length)
+	ai_2d_x *= SCR_SCALE_FACTOR
+	ai_2d_y = SCR_DISP_HEIGHT - (ai_2d_y * SCR_SCALE_FACTOR)	
+
 	render.clear()
 	render.set_blend_mode2d(render.BlendAlpha)
 	# Opponent
@@ -135,7 +143,9 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 	render.image2d(scr_margin_x, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
 
 	# Render moving items according to their Z position
-	if ball.pos_z < player.pos_z + player.length:
+	renderAI()
+
+	if ball.pos_z - ball.radius < player.pos_z + player.length:
 		renderBall()
 		renderPlayer()
 	else:
