@@ -75,8 +75,8 @@ def BallWasWithinXReach(ball, racket):
 SCR_PHYSIC_WIDTH = 320
 SCR_PHYSIC_HEIGHT = 200
 
-SCR_DISP_WIDTH = 320 * 2
-SCR_DISP_HEIGHT = 200 * 2
+SCR_DISP_WIDTH = 320 * 1
+SCR_DISP_HEIGHT = 200 * 1
 
 SCR_SCALE_FACTOR = min(SCR_DISP_WIDTH / SCR_PHYSIC_WIDTH, SCR_DISP_HEIGHT / SCR_PHYSIC_HEIGHT)
 
@@ -109,7 +109,7 @@ while not input.key_press(gs.InputDevice.KeyEscape):
 
 	# Collisions
 	if ball.velocity_z > 0.0:
-		if (not ballIsBehindRacket(ball, player)) and BallIsWithinXReach(ball, player) and ballWasBehindRacket(ball, player) and BallWasWithinXReach(ball, player):
+		if (not ballIsBehindRacket(ball, player)) and ballWasBehindRacket(ball, player) and (BallWasWithinXReach(ball, player) or BallIsWithinXReach(ball, player)):
 			ball.setPosition(ball.pos_x, player.pos_z - ball.velocity_z * dt + min(0.0, player.velocity_z) * dt)
 			player.setPosition(player.pos_x, ball.pos_z + player.length)
 			ball.bounceZ()
