@@ -1,5 +1,5 @@
 import math
-import board
+import game_puck_board as board
 from basic_vector import *
 
 inertia = 0.1

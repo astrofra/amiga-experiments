@@ -1,8 +1,9 @@
 import math
-import board
+import game_puck_board as board
 from utils import *
 
-racket_speed = 50
+max_racket_speed = 50
+racket_speed = max_racket_speed
 
 velocity_x = 0.0
 velocity_z = 0.0
@@ -23,9 +24,9 @@ width = 2.0
 length = 0.5
 
 def setPosition(x,z):
-	global pos_x, pos_z
-	pos_x = x
-	pos_z = z
+	global pos_x, pos_z, target_pos_x, target_pos_z
+	pos_x, pos_z = x, z
+	target_pos_x, target_pos_z = x, z
 
 
 def reset():
@@ -36,14 +37,15 @@ def reset():
 	prev_pos_z = pos_z	
 
 
-def setMouse(x,y):
-	global target_pos_x, target_pos_z
+def updateGameData(ball_pos_x, ball_pos_z, board_width, board_length):
+	global target_pos_x, target_pos_z, racket_speed
 
-	x = Clamp(x, 0, 1.0)
-	y = Clamp(y, 0, 0.5)
+	target_pos_x = ball_pos_x
+	target_pos_z = board_length * -0.5
 
-	target_pos_x = RangeAdjust(x, 0.0, 1.0, board.board_width * -0.5 + (width * 0.5), board.board_width * 0.5 - (width * 0.5))
-	target_pos_z = RangeAdjust(y, 0.0, 0.5, board.board_length * 0.5 - (length * 0.5), board.board_length * 0.35 - (length * 0.5))
+	racket_speed = RangeAdjust(ball_pos_z, board_length * -0.5, board_length * -0.35, 0.0, 1.0)
+	racket_speed = Clamp(racket_speed, 0.0, 1.0)
+	racket_speed = RangeAdjust(racket_speed, 0.0, 1.0, max_racket_speed, max_racket_speed * 0.01)
 
 
 def update(dt):
@@ -53,7 +55,7 @@ def update(dt):
 	prev_pos_z = pos_z
 
 	pos_x += (target_pos_x - pos_x) * dt * racket_speed
-	pos_z += (target_pos_z - pos_z) * dt * racket_speed
+	pos_z += (target_pos_z - pos_z) * dt * max_racket_speed
 
 	velocity_x = pos_x - prev_pos_x
 	velocity_z = pos_z - prev_pos_z
