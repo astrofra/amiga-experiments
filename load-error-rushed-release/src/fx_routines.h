@@ -8,8 +8,8 @@
 BOOL progressiveClearRaster(struct RastPort *rp, unsigned int fx_clock, const int max_width, const int max_height,  UBYTE color_index);
 void setEmptyCopperList(struct ViewPort *vp);
 
-void loadDogSprite(void);
-void drawDogSprite(struct BitMap *dest_bitmap);
-void freeDogSprite(void);
+void loadRedbotSprite(void);
+void drawRedbotSprite(struct BitMap *dest_bitmap);
+void freeRedbotSprite(void);
 
 #endif // #ifndef FX_ROUTINES

@@ -87,8 +87,8 @@ struct RastPort rast_port2;
 UBYTE demo_string_index = 0;
 struct BitMap *bitmap_font = NULL;
 
-extern ULONG dog_16cPaletteRGB32[50];
-struct BitMap *bitmap_dog = NULL;
+extern ULONG redbotPaletteRGB32[50];
+struct BitMap *bitmap_redbot = NULL;
 
 extern UWORD trabant_facing_groundPaletteRGB4[8];
 extern UWORD trabant_facing_carPaletteRGB4[8];
@@ -186,7 +186,7 @@ void close_demo(STRPTR message)
 	{
 		PTStop(theMod);
 		PTFreeMod(theMod);
-		FreeMem(mod, 221128);
+		FreeMem(mod, 201310);
 	}
 
 	if (PTReplayBase) CloseLibrary(PTReplayBase);
@@ -248,7 +248,7 @@ void __inline resetViewportOffset(void)
 void setPaletteToBlack(void);
 void fxVoxelRotation(UWORD *angle);
 void loadTextWriterFont(void);
-void setPaletteDog(void);
+void setPaletteRedbot(void);
 
 void main()
 {
@@ -404,11 +404,13 @@ void main()
 	// setPaletteFacingCar();
 	// setPaletteToBlack();
 
-	playMusic();
 	// drawElementCity(&bit_map1);
 	// drawElementCity(&bit_map2);
 	// LoadRGB4(&view_port1, trabant_facing_groundPaletteRGB4, 8);
-	// loadDogSprite();
+	loadRedbotSprite();
+
+	WaitTOF();
+	playMusic();
 
 	#define DMPHASE_TITLE_0		0
 	#define DMPHASE_FACING_CAR	(1 << 4)
@@ -440,9 +442,9 @@ void main()
 			case DMPHASE_TITLE_0:
 				palette_fade = 0;
 				resetViewportOffset();
-				// loadAndDrawMistralTitle(&bit_map2, 0);
-				setPaletteDog();
-				// drawDogSprite(&bit_map2);
+
+				setPaletteRedbot();
+				drawRedbotSprite(&bit_map2);
 				demo_phase++;
 				break;
 
@@ -513,15 +515,15 @@ void setPaletteToBlack(void)
 		SetRGB4(&view_port1, loop, 0x0, 0x0, 0x0);
 }
 
-void setPaletteDog(void)
+void setPaletteRedbot(void)
 {
 	short loop, idx = 1;
 	unsigned long r, g, b;
 	for(loop = 0; loop < 16; loop++)
 	{
-		r = dog_16cPaletteRGB32[idx++];
-		g = dog_16cPaletteRGB32[idx++];
-		b = dog_16cPaletteRGB32[idx++];
+		r = redbotPaletteRGB32[idx++];
+		g = redbotPaletteRGB32[idx++];
+		b = redbotPaletteRGB32[idx++];
 		// SetRGB32(&view_port1, loop, r, g, b);
 		SetRGB32(&view_port1, loop + 8, r, g, b);
 	}

@@ -19,8 +19,8 @@ extern struct ViewPort view_port1;
 extern int dbuffer_offset_1;
 extern int dbuffer_offset_2;
 
-extern struct Image dog_16c;
-extern struct BitMap *bitmap_dog;
+extern struct Image redbot;
+extern struct BitMap *bitmap_redbot;
 
 struct UCopList *copper;
 
@@ -64,17 +64,17 @@ void setEmptyCopperList(struct ViewPort *vp)
     vp->UCopIns = copper;    
 }
 
-void __inline loadDogSprite(void)
-{   bitmap_dog = load_file_as_bitmap("assets/dog.dat", 0, dog_16c.Width, dog_16c.Height, dog_16c.Depth);  }
+void __inline loadRedbotSprite(void)
+{   bitmap_redbot = load_zlib_file_as_bitmap("assets/redbot.data", 0, 18432, redbot.Width, redbot.Height, redbot.Depth);  }
 
-void __inline drawDogSprite(struct BitMap *dest_bitmap)
+void __inline drawRedbotSprite(struct BitMap *dest_bitmap)
 {   
-    BLIT_BITMAP_S(bitmap_dog, dest_bitmap, dog_16c.Width, dog_16c.Height, DEFAULT_WIDTH >> 1, DEFAULT_HEIGHT >> 1);
+    BLIT_BITMAP_S(bitmap_redbot, dest_bitmap, redbot.Width, redbot.Height, 0, 0);
     WaitBlit();
 }
 
-void __inline freeDogSprite(void)
+void __inline freeRedbotSprite(void)
 {   
-    FREE_ALLOCATED_BITMAP(bitmap_dog);
-    bitmap_dog = NULL; 
+    FREE_ALLOCATED_BITMAP(bitmap_redbot);
+    bitmap_redbot = NULL; 
 }
