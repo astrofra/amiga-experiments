@@ -276,6 +276,17 @@ void main()
 
 	is_cpu_a_020();
 
+	/*	Loading sequence 
+		loads everything! 
+	*/
+	printf("\n");
+	printf("                       ------------------\n");
+	printf("               MINIZ DECRUNCHES WHILE U WAITING...\n");
+	printf("                       ------------------\n");	
+	initMusic();
+
+	loadRedbotSprite();	
+
 	/* Save the current View, so we can restore it later: */
 	my_old_view = GfxBase->ActiView;
 
@@ -368,12 +379,6 @@ void main()
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
 
-	printf("\n");
-	printf("                       ------------------\n");
-	printf("               MINIZ DECRUNCHES WHILE U WAITING...\n");
-	printf("                       ------------------\n");	
-	initMusic();
-
 	WaitTOF();
 
 	// setCityCopperList(&view_port1);
@@ -407,9 +412,9 @@ void main()
 	// drawElementCity(&bit_map1);
 	// drawElementCity(&bit_map2);
 	// LoadRGB4(&view_port1, trabant_facing_groundPaletteRGB4, 8);
-	loadRedbotSprite();
 
 	WaitTOF();
+
 	playMusic();
 
 	#define DMPHASE_TITLE_0		0
