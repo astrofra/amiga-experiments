@@ -89,6 +89,13 @@ struct BitMap *bitmap_font = NULL;
 
 extern ULONG redbotPaletteRGB32[50];
 struct BitMap *bitmap_redbot = NULL;
+struct BitMap *bitmap_astronaut = NULL;
+struct BitMap *bitmap_demo_title = NULL;
+struct BitMap *bitmap_face = NULL;
+struct BitMap *bitmap_guard = NULL;
+struct BitMap *bitmap_mountain = NULL;
+struct BitMap *bitmap_mummy = NULL;
+struct BitMap *bitmap_ufo = NULL;
 
 extern UWORD trabant_facing_groundPaletteRGB4[8];
 extern UWORD trabant_facing_carPaletteRGB4[8];
@@ -283,9 +290,14 @@ void main()
 	printf("                       ------------------\n");
 	printf("               MINIZ DECRUNCHES WHILE U WAITING...\n");
 	printf("                       ------------------\n");	
-	initMusic();
 
-	loadRedbotSprite();	
+	printf("                       -");
+	initMusic();
+	printf("-");
+	loadRedbotSprite();
+	printf("-");
+	loadAstronautprite();
+	printf("-");
 
 	/* Save the current View, so we can restore it later: */
 	my_old_view = GfxBase->ActiView;

@@ -22,6 +22,27 @@ extern int dbuffer_offset_2;
 extern struct Image redbot;
 extern struct BitMap *bitmap_redbot;
 
+extern struct Image astronaut;
+extern struct BitMap *bitmap_astronaut;
+
+extern struct Image demo_title;
+extern struct BitMap *bitmap_demo_title;
+
+extern struct Image face;
+extern struct BitMap *bitmap_face;
+
+extern struct Image guard;
+extern struct BitMap *bitmap_guard;
+
+extern struct Image mountain;
+extern struct BitMap *bitmap_mountain;
+
+extern struct Image mummy;
+extern struct BitMap *bitmap_mummy;
+
+extern struct Image ufo;
+extern struct BitMap *bitmap_ufo;
+
 struct UCopList *copper;
 
 UWORD chip blank_pointer[4]=
@@ -77,4 +98,19 @@ void __inline freeRedbotSprite(void)
 {   
     FREE_ALLOCATED_BITMAP(bitmap_redbot);
     bitmap_redbot = NULL; 
+}
+
+void __inline loadAstronautprite(void)
+{   bitmap_astronaut = load_zlib_file_as_bitmap("assets/astronaut.data", 0, 10560, astronaut.Width, astronaut.Height, astronaut.Depth);  }
+
+void __inline drawAstronautSprite(struct BitMap *dest_bitmap)
+{   
+    BLIT_BITMAP_S(bitmap_astronaut, dest_bitmap, astronaut.Width, astronaut.Height, 0, 0);
+    WaitBlit();
+}
+
+void __inline freeAstronautSprite(void)
+{   
+    FREE_ALLOCATED_BITMAP(bitmap_astronaut);
+    bitmap_astronaut = NULL; 
 }

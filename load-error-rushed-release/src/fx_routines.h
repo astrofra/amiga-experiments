@@ -12,4 +12,8 @@ void loadRedbotSprite(void);
 void drawRedbotSprite(struct BitMap *dest_bitmap);
 void freeRedbotSprite(void);
 
+void loadAstronautprite(void);
+void drawAstronautSprite(struct BitMap *dest_bitmap);
+void freeAstronautSprite(void);
+
 #endif // #ifndef FX_ROUTINES
