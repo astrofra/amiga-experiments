@@ -12,8 +12,32 @@ void loadRedbotSprite(void);
 void drawRedbotSprite(struct BitMap *dest_bitmap);
 void freeRedbotSprite(void);
 
-void loadAstronautprite(void);
+void loadAstronautSprite(void);
 void drawAstronautSprite(struct BitMap *dest_bitmap);
 void freeAstronautSprite(void);
+
+void loadTitleSprite(void);
+void drawTitleSprite(struct BitMap *dest_bitmap);
+void freeTitleSprite(void);
+
+void loadFaceSprite(void);
+void drawFaceSprite(struct BitMap *dest_bitmap);
+void freeFaceSprite(void);
+
+void loadGuardSprite(void);
+void drawGuardSprite(struct BitMap *dest_bitmap);
+void freeGuardSprite(void);
+
+void loadMountainSprite(void);
+void drawMountainSprite(struct BitMap *dest_bitmap);
+void freeMountainSprite(void);
+
+void loadMummySprite(void);
+void drawMummySprite(struct BitMap *dest_bitmap);
+void freeMummySprite(void);
+
+void loadUfoSprite(void);
+void drawUfoSprite(struct BitMap *dest_bitmap);
+void freeUfoSprite(void);
 
 #endif // #ifndef FX_ROUTINES

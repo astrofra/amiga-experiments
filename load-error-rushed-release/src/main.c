@@ -88,6 +88,14 @@ UBYTE demo_string_index = 0;
 struct BitMap *bitmap_font = NULL;
 
 extern ULONG redbotPaletteRGB32[50];
+extern ULONG astronautPaletteRGB32[50];
+extern ULONG demo_titlePaletteRGB32[50];
+extern ULONG facePaletteRGB32[50];
+extern ULONG guardPaletteRGB32[50];
+extern ULONG mountainPaletteRGB32[26];
+extern ULONG mummyPaletteRGB32[50];
+extern ULONG ufoPaletteRGB32[50];
+
 struct BitMap *bitmap_redbot = NULL;
 struct BitMap *bitmap_astronaut = NULL;
 struct BitMap *bitmap_demo_title = NULL;
@@ -97,13 +105,23 @@ struct BitMap *bitmap_mountain = NULL;
 struct BitMap *bitmap_mummy = NULL;
 struct BitMap *bitmap_ufo = NULL;
 
-extern UWORD trabant_facing_groundPaletteRGB4[8];
-extern UWORD trabant_facing_carPaletteRGB4[8];
-
 BOOL voxel_switch = FALSE;
 
 #define PTREPLAY_MUSIC
 struct SoundInfo *background = NULL;
+
+#define SET_PALETTE_MACRO(PAL_NAME, COLOR_AMOUNT) \
+{ \
+	short loop, idx = 1; \
+	unsigned long r, g, b; \
+	for(loop = 0; loop < COLOR_AMOUNT; loop++) \
+	{ \
+		r = PAL_NAME[idx++]; \
+		g = PAL_NAME[idx++]; \
+		b = PAL_NAME[idx++]; \
+		SetRGB32(&view_port1, loop + 8, r, g, b); \
+	} \
+};
 
 UBYTE is_cpu_a_020(void)
 {
@@ -169,6 +187,15 @@ void close_demo(STRPTR message)
 	WaitBlit();
 
 	FREE_ALLOCATED_BITMAP(bitmap_font);
+
+	freeRedbotSprite();
+	freeAstronautSprite();
+	freeTitleSprite();
+	freeFaceSprite();
+	freeGuardSprite();
+	freeMountainSprite();
+	freeMummySprite();
+	freeUfoSprite();	
 
 	/*	Free the voxel structures */
 	deleteMatrix();
@@ -255,7 +282,7 @@ void __inline resetViewportOffset(void)
 void setPaletteToBlack(void);
 void fxVoxelRotation(UWORD *angle);
 void loadTextWriterFont(void);
-void setPaletteRedbot(void);
+// void setPaletteRedbot(void);
 
 void main()
 {
@@ -291,13 +318,15 @@ void main()
 	printf("               MINIZ DECRUNCHES WHILE U WAITING...\n");
 	printf("                       ------------------\n");	
 
-	printf("                       -");
-	initMusic();
-	printf("-");
+	// initMusic();
 	loadRedbotSprite();
-	printf("-");
-	loadAstronautprite();
-	printf("-");
+	loadAstronautSprite();
+	loadTitleSprite();
+	loadFaceSprite();
+	loadGuardSprite();
+	loadMountainSprite();
+	loadMummySprite();
+	loadUfoSprite();
 
 	/* Save the current View, so we can restore it later: */
 	my_old_view = GfxBase->ActiView;
@@ -429,15 +458,15 @@ void main()
 
 	playMusic();
 
-	#define DMPHASE_TITLE_0		0
-	#define DMPHASE_FACING_CAR	(1 << 4)
-	#define DMPHASE_TITLE_1		(2 << 4)
-	#define DMPHASE_SIDE_CAR	(3 << 4)
-	#define DMPHASE_TITLE_2		(4 << 4)
-	#define DMPHASE_TITLE_3		(5 << 4)
-	#define DMPHASE_BERLIN_0	(6 << 4)
-	#define DMPHASE_TITLE_4		(7 << 4)
-	#define DMPHASE_INFOLINER	(8 << 4)
+	#define DMPHASE_0		0
+	#define DMPHASE_1		(1 << 4)
+	#define DMPHASE_2		(2 << 4)
+	#define DMPHASE_3		(3 << 4)
+	#define DMPHASE_4		(4 << 4)
+	#define DMPHASE_5		(5 << 4)
+	#define DMPHASE_6		(6 << 4)
+	#define DMPHASE_7		(7 << 4)
+	#define DMPHASE_8		(8 << 4)
 
 	demo_phase = 0;
 	fx_clock = 0;
@@ -453,24 +482,23 @@ void main()
 		switch(demo_phase)
 		{
 			/*	
-				Screen/FX :
-				Mistral Title : 1983
+				Phase 0
 			***********************/
-			case DMPHASE_TITLE_0:
+			case DMPHASE_0:
 				palette_fade = 0;
+				buildLinesListAsCube(1);
 				resetViewportOffset();
-
-				setPaletteRedbot();
+				SET_PALETTE_MACRO(redbotPaletteRGB32, 16);
 				drawRedbotSprite(&bit_map2);
 				demo_phase++;
 				break;
 
-			case DMPHASE_TITLE_0 | 1:
+			case DMPHASE_0 | 1:
 				if (1) // ((PTSongPos(theMod) == 0 && PTPatternPos(theMod) > 0x10) || (PTSongPos(theMod) > 0))
 					demo_phase++;
 				break;
 
-			case DMPHASE_TITLE_0 | 2:
+			case DMPHASE_0 | 2:
 				fxVoxelRotation(&angle);
 				// LoadRGB4(&view_port1, pal_mistral_title_fadein + (palette_fade << 4), 16);
 				palette_fade++;		
@@ -483,11 +511,111 @@ void main()
 				}
 				break;
 
-			case DMPHASE_TITLE_0 | 3:
+			case DMPHASE_0 | 3:
 				fxVoxelRotation(&angle);
-				// if (fx_clock++ > 180)
-				// 	demo_phase++;
-				break;											
+				if (fx_clock++ > 180)
+					demo_phase++;
+				break;
+
+			case DMPHASE_0 | 4:
+				// setPaletteToBlack();
+				demo_phase++;
+				break;														
+
+			/*	Clear the screen */
+			case DMPHASE_0 | 5:
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;
+
+			case DMPHASE_0 | 6:
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;						
+
+			/*	Next fx!!! */
+			case DMPHASE_0 | 7:
+				resetViewportOffset();
+				demo_phase = DMPHASE_1;
+				break;
+
+			/*	
+				Phase 1
+			***********************/
+			case DMPHASE_1:
+				palette_fade = 0;
+				buildLinesListAsCube(2);
+				resetViewportOffset();
+				SET_PALETTE_MACRO(astronautPaletteRGB32, 16);
+				drawAstronautSprite(&bit_map2);
+				demo_phase++;
+				break;
+
+			case DMPHASE_1 | 1:
+				if (1) // ((PTSongPos(theMod) == 0 && PTPatternPos(theMod) > 0x10) || (PTSongPos(theMod) > 0))
+					demo_phase++;
+				break;
+
+			case DMPHASE_1 | 2:
+				fxVoxelRotation(&angle);
+				// LoadRGB4(&view_port1, pal_mistral_title_fadein + (palette_fade << 4), 16);
+				palette_fade++;		
+
+				if (palette_fade >= 16)
+				{
+					palette_fade = 0;
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;
+
+			case DMPHASE_1 | 3:
+				fxVoxelRotation(&angle);
+				if (fx_clock++ > 180)
+					demo_phase++;
+				break;
+
+			case DMPHASE_1 | 4:
+				// setPaletteToBlack();
+				demo_phase++;
+				break;														
+
+			/*	Clear the screen */
+			case DMPHASE_1 | 5:
+				if (progressiveClearRaster(&rast_port1, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;
+
+			case DMPHASE_1 | 6:
+				if (progressiveClearRaster(&rast_port2, fx_clock, WIDTH1, HEIGHT1, 0))
+					fx_clock++;
+				else
+				{
+					fx_clock = 0;
+					demo_phase++;
+				}
+				break;						
+
+			/*	Next fx!!! */
+			case DMPHASE_1 | 7:
+				resetViewportOffset();
+				demo_phase = DMPHASE_0;
+				break;															
 		}
 
 		if (enable_dbuffer_1)
@@ -532,20 +660,6 @@ void setPaletteToBlack(void)
 		SetRGB4(&view_port1, loop, 0x0, 0x0, 0x0);
 }
 
-void setPaletteRedbot(void)
-{
-	short loop, idx = 1;
-	unsigned long r, g, b;
-	for(loop = 0; loop < 16; loop++)
-	{
-		r = redbotPaletteRGB32[idx++];
-		g = redbotPaletteRGB32[idx++];
-		b = redbotPaletteRGB32[idx++];
-		// SetRGB32(&view_port1, loop, r, g, b);
-		SetRGB32(&view_port1, loop + 8, r, g, b);
-	}
-}
-
 void loadTextWriterFont(void)
 {
     bitmap_font = load_array_as_bitmap(font_data, 288 << 1, font_image.Width, font_image.Height, font_image.Depth);
@@ -555,7 +669,7 @@ void __inline fxVoxelRotation(UWORD *angle)
 {
 	if (voxel_switch)
 	{
-		swapDoubleBuffer1();
+		// swapDoubleBuffer1();
 
 		SetAPen(&rast_port1_1b, 0);
 		RectFill(&rast_port1_1b, (DISPL_WIDTH1 >> 1) - 48 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) - 48, (DISPL_WIDTH1 >> 1) + 48 + dbuffer_offset_1, (DISPL_HEIGHT1 >> 1) + 48);

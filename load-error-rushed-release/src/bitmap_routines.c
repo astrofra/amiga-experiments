@@ -28,7 +28,7 @@ PLANEPTR load_getchipmem(UBYTE *name, ULONG size)
     fib = (struct FileInfoBlock *)AllocMem((LONG)sizeof(struct FileInfoBlock), MEMF_CLEAR);
     ExamineFH(fileHandle, fib);
     size = fib->fib_Size;
-    printf("load_getchipmem(), guessed byte_size = %d\n", size);
+    // printf("load_getchipmem(), guessed byte_size = %d\n", size);
   }   
 
   if (!(mem = AllocMem(size, MEMF_CHIP)))
@@ -54,7 +54,7 @@ PLANEPTR load_zlib_getchipmem(UBYTE *name, ULONG input_size, ULONG output_size)
     fib = (struct FileInfoBlock *)AllocMem((LONG)sizeof(struct FileInfoBlock), MEMF_CLEAR);
     ExamineFH(fileHandle, fib);
     input_size = fib->fib_Size;
-    printf("load_zlib_getchipmem(), guessed byte_size = %d\n", input_size);
+    // printf("load_zlib_getchipmem(), guessed byte_size = %d\n", input_size);
   }   
 
   if (!(temp_mem = AllocMem(input_size, MEMF_PUBLIC)))
@@ -91,7 +91,7 @@ PLANEPTR load_getmem(UBYTE *name, ULONG size)
     fib = (struct FileInfoBlock *)AllocMem((LONG)sizeof(struct FileInfoBlock), MEMF_CLEAR);
     ExamineFH(fileHandle, fib);
     size = fib->fib_Size;
-    printf("load_zlib_getchipmem(), guessed byte_size = %d\n", size);
+    // printf("load_zlib_getchipmem(), guessed byte_size = %d\n", size);
   }   
 
   if (!(mem = AllocMem(size, 0L)))
@@ -111,11 +111,11 @@ struct BitMap *load_file_as_bitmap(UBYTE *name, ULONG byte_size, UWORD width, UW
   // PLANEPTR new_plane_ptr;
   UWORD i;
 
-  printf("load_file_as_bitmap(), byte_size = %d\n", byte_size);
+  // printf("load_file_as_bitmap(), byte_size = %d\n", byte_size);
 
   if (!(fileHandle = Open(name, MODE_OLDFILE)))
   {
-    printf("!Cannot open file '%s'.\n", name);
+    // printf("!Cannot open file '%s'.\n", name);
     return (NULL);
   }
 
@@ -124,7 +124,7 @@ struct BitMap *load_file_as_bitmap(UBYTE *name, ULONG byte_size, UWORD width, UW
     fib = (struct FileInfoBlock *)AllocMem((LONG)sizeof(struct FileInfoBlock), MEMF_CLEAR);
     ExamineFH(fileHandle, fib);
     byte_size = fib->fib_Size;
-    printf("load_file_as_bitmap(), guessed byte_size = %d\n", byte_size);
+    // printf("load_file_as_bitmap(), guessed byte_size = %d\n", byte_size);
   }  
 
   new_bitmap = (struct BitMap *)AllocMem((LONG)sizeof(struct BitMap), MEMF_CLEAR);
@@ -158,7 +158,7 @@ struct BitMap *load_zlib_file_as_bitmap(UBYTE *name, ULONG input_size, ULONG out
     fib = (struct FileInfoBlock *)AllocMem((LONG)sizeof(struct FileInfoBlock), MEMF_CLEAR);
     ExamineFH(fileHandle, fib);
     input_size = fib->fib_Size;
-    printf("load_zlib_file_as_bitmap(), guessed byte_size = %d\n", input_size);
+    // printf("load_zlib_file_as_bitmap(), guessed byte_size = %d\n", input_size);
   }   
 
   new_bitmap = (struct BitMap *)AllocMem((LONG)sizeof(struct BitMap), MEMF_CLEAR);
