@@ -32,6 +32,7 @@
 #include "image_bg_fish.h"
 #include "cat_copper_imgdata.h"
 #include "cat_copper_list.h"
+#include "ilkke_font.h"
 
 #define OPT_CREATE_WINDOW   FALSE
 #define SCR_WIDTH           320
@@ -44,7 +45,6 @@
 
 void doDualPF (void);
 BOOL installDualPF( struct Screen *, struct RasInfo * );
-void drawSomething( struct RastPort * , short);
 void handleIDCMP ( struct Window * );
 void removeDualPF( struct Screen *s );
 void drawBackgroundFish(struct BitMap *dest_bitmap);
@@ -137,16 +137,11 @@ void InitMainScreen(void)
     }
 }
 
-
-/*
-** Allocate all of the stuff required to add dual playfield to a screen.
-*/
 VOID doDualPF(void)
 {
     myscreen = scr; //win->WScreen;   /* Find the window's screen */
 
     SetRast(&(myscreen->RastPort), 0);
-    // drawSomething(&(myscreen->RastPort), 0);
 
     /* Allocate the second playfield's rasinfo, bitmap, and bitplane */
     rinfo2 = (struct RasInfo *) AllocMem(sizeof(struct RasInfo), MEMF_PUBLIC | MEMF_CLEAR);
@@ -187,10 +182,6 @@ VOID doDualPF(void)
     }
 }
 
-/*
-** Manhandle the viewport:
-** install second playfield and change modes
-*/
 BOOL installDualPF(struct Screen *scrn, struct RasInfo *rinfo2)
 {
     ULONG screen_modeID;
@@ -222,73 +213,6 @@ BOOL installDualPF(struct Screen *scrn, struct RasInfo *rinfo2)
 
     return(return_code);
 }
-
-/*
-** Draw some lines in a rast port...This is used to get some data into
-** the second playfield.  The windows on the screen will move underneath
-** these graphics without disturbing them.
-*/
-VOID drawSomething(struct RastPort *rp, short top_down)
-{
-    int width, height;
-    int r, c, i = 0;
-
-    width = SCR_WIDTH + OVERSCAN_W - 1; // rp->BitMap->BytesPerRow * 8;
-    height = SCR_HEIGHT + OVERSCAN_H - 1; // rp->BitMap->Rows;
-
-    for (r = 0; r < height; r += 40)
-    {
-        for (c = 0; c < width; c += 40)
-        {
-            SetAPen(rp, i);
-            if (top_down)
-            {
-                Move(rp, 0L, r);
-                Draw(rp, c, 0L);
-            }
-            else
-            {
-                Move(rp, 0L, height - r);
-                Draw(rp, c, height);    
-            }
-
-            if (i++ > 7)
-                i = 1;
-        }
-    }
-}
-
-// /*
-// ** simple event loop to wait for the user to hit the close gadget
-// ** on the window.
-// */
-// VOID handleIDCMP(struct Window *win)
-// {
-//     BOOL done = FALSE;
-//     struct IntuiMessage *message = NULL;
-//     ULONG class;
-//     ULONG signals;
-
-//     while (!done)
-//     {
-//         signals = Wait(1L << win->UserPort->mp_SigBit);
-//         if (signals & (1L << win->UserPort->mp_SigBit))
-//         {
-//             while ((!done) && (message = (struct IntuiMessage *)GetMsg(win->UserPort)))
-//             {
-//                 class = message->Class;
-//                 ReplyMsg((struct Message *)message);
-
-//                 switch (class)
-//                 {
-//                     case IDCMP_CLOSEWINDOW:
-//                         done = TRUE;
-//                         break;
-//                 }
-//             }
-//         }
-//     }
-// }
 
 /*
 ** remove the effects of installDualPF().
