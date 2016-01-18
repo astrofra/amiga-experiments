@@ -11,6 +11,9 @@ int main()
 	return 0;
 }
 
+/*	
+	Ball game object
+*/
 struct {
 	fix16	inertia;
 
@@ -28,6 +31,28 @@ struct {
 
 	fix16 	radius;
 }ball;
+
+/*
+	Player game object
+*/
+struct {
+	fix16	racket_speed;
+
+	fix16	velocity_x,
+			velocity_z;
+
+	fix16	initial_pox_x,
+			initial_pox_z;
+
+	fix16	pos_x,
+			pos_z;
+
+	fix16	prev_pos_x,
+			prev_pos_z;
+
+	fix16	width,
+			length;
+}racket;
 
 static void game_ShufflePuck()
 {
@@ -143,6 +168,49 @@ static void game_ShufflePuck()
 		// 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
 		// 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)	
 	}
+
+	void gameReset(void){		
+		ball_reset();
+		ball_setImpulse(FIX16(10.0), FIX16(10.0));
+	}
+
+	void renderBall(u16 ball_2d_x,u16  ball_2d_y, u16 ball_2d_scale){
+		// render.sprite2d(SCR_MARGIN_X + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
+	}
+
+	void renderPlayer(u16 player_2d_x, u16 player_2d_y, u16 player_2d_scale){
+		// render.sprite2d(SCR_MARGIN_X + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
+	}
+
+	void renderAI(u16 ai_2d_x, u16 ai_2d_y, u16 ai_2d_scale){
+		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
+	}
+
+	u8 ballIsBehindRacket(void)
+	{
+		if (ball.pos_z < racket.pos_z)
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	u8 BallIsWithinXReach(void){
+		if (fix16Add(ball.pos_x, ball.radius) > fix16Sub(racket.pos_x, fix16Mul(racket.width, FIX16(0.5))) 
+			&& fix16Sub(ball.pos_x, ball.radius) < fix16Add(racket.pos_x, fix16Mul(racket.width, FIX16(0.5))))
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	u8 BallWasWithinXReach(void){
+		if (fix16Add(ball.prev_pos_x, ball.radius) > fix16Sub(racket.prev_pos_x,  fix16Mul(racket.width, FIX16(0.5))) 
+			&& fix16Sub(ball.prev_pos_x, ball.radius) < fix16Add(racket.prev_pos_x, fix16Mul(racket.width, FIX16(0.5))))
+			return TRUE;
+		else
+			return FALSE;	
+	}
+
+	/*	System stuff */
 
 	SYS_disableInts();
 
