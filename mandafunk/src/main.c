@@ -87,7 +87,7 @@ static void starsGrid()
 	SYS_disableInts();
 
 	/* Set a larger tileplan to be able to scroll */
-	VDP_setPlanSize(64, 32);
+	VDP_setPlanSize(64, 64);
 
 	/* Load the fond tiles */
 	VDP_drawImageEx(APLAN, &stars_anim, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
@@ -107,9 +107,9 @@ static void starsGrid()
 	while (TRUE)
 	{
 		VDP_waitVSync();
-		drawStarsGrid();
+		if ((vblCount & 0x1) == 0)	drawStarsGrid();
 		vblCount++;
-		VDP_setHorizontalScrollTile(PLAN_A, 0, tile_scroll_h + (vblCount & 1023), 32, TRUE);
-		VDP_setVerticalScrollTile(PLAN_A, 0, tile_scroll_v + ((vblCount << 1) & 1023), 32, TRUE);
+		VDP_setHorizontalScrollTile(PLAN_A, 0, tile_scroll_h + (vblCount & 511), 32, TRUE);
+		VDP_setVerticalScrollTile(PLAN_A, 0, tile_scroll_v + ((vblCount << 1) & 511), 32, TRUE);
 	}
 }
