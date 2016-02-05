@@ -29,7 +29,7 @@ static void starsGrid()
 
 	static void inline drawStarsGrid(void)
 	{
-		u16 i = 0, j = 0, luma;
+		u16 i = 0, j = 0, k = 0, luma;
 		u16 plan_width_by_y = 0;
 
 	    vu32 *plctrl;
@@ -39,27 +39,40 @@ static void starsGrid()
 		plctrl = (u32 *) CST_CTRL_PORT;
 	    pwdata = (u16 *) CST_DATA_PORT;
 
-		while(j < (240 >> 3))
+		while(j < 26)
 		{
 			luma = ((i + vblCount) & 30) << 2;
-			if ((j & 0x1) != 0)
-				luma += 2;
+			// if ((j & 0x1) != 0)
+			// 	luma += 2;
 		
-			addr = VDP_PLAN_A + ((i + plan_width_by_y) << 1);
+			addr = VDP_PLAN_A + ((i + k + plan_width_by_y) << 1);
 		    *plctrl = CST_GFX_WRITE_VRAM_ADDR(addr);
 		    *pwdata = TILE_USERINDEX + luma;
-		    i++;
 
-			addr = VDP_PLAN_A + ((i + plan_width_by_y) << 1);
+			addr += 2;
 		    *plctrl = CST_GFX_WRITE_VRAM_ADDR(addr);
 		    *pwdata = TILE_USERINDEX + luma + 1;
-		    i++;		    	
+
+			addr = VDP_PLAN_A + ((i + k + VDP_getPlanWidth() * (j + 1)) << 1);
+		    *plctrl = CST_GFX_WRITE_VRAM_ADDR(addr);
+		    *pwdata = TILE_USERINDEX + luma + 2;
+
+			addr += 2;
+		    *plctrl = CST_GFX_WRITE_VRAM_ADDR(addr);
+		    *pwdata = TILE_USERINDEX + luma + 3;		    
+
+		    i += 5;	
 	
 			if (i >= 40)
 			{
 				i = 0;
-				j++;
+				j += 3;
+				if (k == 0)
+					k = 3;
+				else
+					k = 0;
 				plan_width_by_y = VDP_getPlanWidth() * j;
+				// return;
 			}
 		}
 	}
@@ -69,12 +82,12 @@ static void starsGrid()
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);
 
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);
-
 	/* Load the fond tiles */
 	VDP_drawImageEx(APLAN, &stars_anim, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), 0, 0, FALSE, FALSE);
 	vramIndex += stars_anim.tileset->numTile;
+
+	VDP_clearPlan(APLAN, 0);
+	VDP_clearPlan(BPLAN, 0);
 
 	VDP_setPalette(PAL0, stars_anim.palette->data);
 
