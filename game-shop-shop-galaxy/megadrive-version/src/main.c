@@ -54,11 +54,40 @@ struct {
 			length;
 }racket;
 
+/*
+	Enemy game object
+*/
+struct {
+	fix16	max_racket_speed;
+	fix16	racket_speed;
+
+	fix16	velocity_x,
+			velocity_z;
+
+	fix16	initial_pox_x,
+			initial_pox_z;
+
+	fix16	pos_x,
+			pos_z;
+
+	fix16	prev_pos_x,
+			prev_pos_z;
+
+	fix16	width,
+			length;
+}ai;
+
 static void game_ShufflePuck()
 {
+	char str[16];	/* debug string */
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
-	Sprite sprites[16];	
+	Sprite sprites[16];
+
+	/* Ball sprite coordinates */
+	s16 ball_2d_x,
+		ball_2d_y,
+		ball_2d_scale;
 
 	const fix16 persp_coef[] = {fix16DivFloats(1.0, 132.0), fix16DivFloats(5, 132.0), fix16DivFloats(9, 132.0), fix16DivFloats(13, 132.0), fix16DivFloats(17, 132.0), 
 								fix16DivFloats(22, 132.0), fix16DivFloats(27, 132.0), fix16DivFloats(34, 132.0), fix16DivFloats(42, 132.0), fix16DivFloats(51, 132.0), 
@@ -155,7 +184,7 @@ static void game_ShufflePuck()
 			ball_bounceZ();
 		}
 
-		if (ball.pos_z > fix16Mul(board_length, FIX16(-0.5))){
+		if (ball.pos_z > fix16Mul(board_length, FIX16(0.5))){
 			ball.pos_x = ball.initial_pox_x;
 			ball.pos_z = ball.initial_pox_z;
 			ball.prev_pos_x = ball.pos_x;
@@ -175,6 +204,13 @@ static void game_ShufflePuck()
 	}
 
 	void renderBall(u16 ball_2d_x,u16  ball_2d_y, u16 ball_2d_scale){
+		// ball_2d_y += (240 - 136);
+
+		intToStr(ball_2d_x, str, 0);
+		BMP_drawText(str, 0, 0);	
+		intToStr(ball_2d_y, str, 0);
+		BMP_drawText(str, 10, 0);		
+		SPR_setPosition(&sprites[0], ball_2d_x, ball_2d_y); //  - 65);
 		// render.sprite2d(SCR_MARGIN_X + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
 	}
 
@@ -186,8 +222,7 @@ static void game_ShufflePuck()
 		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
 	}
 
-	u8 ballIsBehindRacket(void)
-	{
+	u8 ballIsBehindRacket(void){
 		if (ball.pos_z < racket.pos_z)
 			return TRUE;
 		else
@@ -207,15 +242,84 @@ static void game_ShufflePuck()
 			&& fix16Sub(ball.prev_pos_x, ball.radius) < fix16Add(racket.prev_pos_x, fix16Mul(racket.width, FIX16(0.5))))
 			return TRUE;
 		else
-			return FALSE;	
+			return FALSE;
+	}
+
+	void gameMainLoop(fix16 dt){
+		/* Update the ball motion */
+		ball_update(dt);
+
+		/* Update the player motion */
+		// player_setMouse(mouse_device.GetValue(gs.InputDevice.InputAxisX) / SCR_DISP_WIDTH, mouse_device.GetValue(gs.InputDevice.InputAxisY) / SCR_DISP_HEIGHT);
+		// player_update(dt);
+
+		/* Update the AI */
+		// ai_updateGameData(ball.pos_x, ball.pos_z, board.board_width, board.board_length);
+		// ai_update(dt);
+
+		/* Collisions */
+		// if (ball.velocity_z > 0.0)
+		// {
+		// 	if (!ballIsBehindRacket(ball, player)) && (BallWasWithinXReach(ball, player) or BallIsWithinXReach(ball, player))
+		// 	{
+		// 		ball.setPosition(ball.pos_x, player.pos_z - ball.velocity_z * dt + min(0.0, player.velocity_z) * dt);
+		// 		player.setPosition(player.pos_x, ball.pos_z + player.length);
+		// 		ball.bounceZ();
+		// 	}
+		// }
+
+		/* Compute 3D/2D projections */
+		Vect3D_f16 pvect; 
+		pvect = project3DTo2D(ball.pos_x, ball.pos_z);
+		ball_2d_x = pvect.x;
+		ball_2d_y = pvect.y;
+		ball_2d_scale = pvect.z;
+
+		// ball_2d_x *= SCR_SCALE_FACTOR
+		// ball_2d_y = SCR_DISP_HEIGHT - (ball_2d_y * SCR_SCALE_FACTOR)
+
+		// player_2d_x, player_2d_y, player_2d_scale = project3DTo2D(player.pos_x, player.pos_z, board.board_width, board.board_length)
+		// player_2d_x *= SCR_SCALE_FACTOR
+		// player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
+
+		// ai_2d_x, ai_2d_y, ai_2d_scale = project3DTo2D(ai.pos_x, ai.pos_z, board.board_width, board.board_length)
+		// ai_2d_x *= SCR_SCALE_FACTOR
+		// ai_2d_y = SCR_DISP_HEIGHT - (ai_2d_y * SCR_SCALE_FACTOR)
+
+		// render.clear()
+		// render.set_blend_mode2d(render.BlendAlpha)
+		// /* Opponent */
+		// render.sprite2d(SCR_MARGIN_X + (320 * 0.5) * SCR_SCALE_FACTOR, (SCR_PHYSIC_HEIGHT - 96 * 0.5) * SCR_SCALE_FACTOR, 106 * SCR_SCALE_FACTOR, "@assets/robot5.png")
+
+		// /* Game board */
+		// render.image2d(SCR_MARGIN_X, 0, SCR_SCALE_FACTOR, "@assets/game_board.png")
+
+		// /* Score panel */
+		// render.image2d(SCR_MARGIN_X, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
+
+		/* Render moving items according to their Z position */
+		// renderAI(ai_2d_x, ai_2d_y, ai_2d_scale)
+
+		// if (ball.pos_z - ball.radius < player.pos_z + player.length)
+		// {
+			renderBall(fix16ToInt(ball_2d_x), fix16ToInt(ball_2d_y), ball_2d_scale);
+		// 	renderPlayer(player_2d_x, player_2d_y, player_2d_scale)
+		// }
+		// else
+		// {
+		// 	renderPlayer(player_2d_x, player_2d_y, player_2d_scale)
+		// 	renderBall(ball_2d_x, ball_2d_y, ball_2d_scale)
+		// }
+
+		// render.set_blend_mode2d(render.BlendOpaque)
 	}
 
 	/*	System stuff */
-
 	SYS_disableInts();
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);
+	SPR_init(256);
 
 	VDP_clearPlan(APLAN, 0);
 	VDP_clearPlan(BPLAN, 0);
@@ -229,19 +333,22 @@ static void game_ShufflePuck()
 
 	VDP_setPalette(PAL0, game_robot_5.palette->data);
 	VDP_setPalette(PAL1, game_board.palette->data);
+	VDP_setPalette(PAL2, game_ball.palette->data);
 
-	// SPR_init(257);
- //    SPR_initSprite(&sprites[0], &rse_logo_shadow, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
+    SPR_initSprite(&sprites[0], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
  //    // SPR_initSprite(&sprites[1], &rse_logo_shadow_alt, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
-	// SPR_setPosition(&sprites[0], (320 - 160) >> 1, ((240 - 50) >> 1) + 8);
- //    SPR_update(sprites, 1);	
+	SPR_setPosition(&sprites[0], 64, 64);
+ 	SPR_update(sprites, 1);	
 
 	SYS_enableInts();
+
+	gameReset();
 
 	while (TRUE)
 	{
 		VDP_waitVSync();
-	    // SPR_update(sprites, 1);	
+		gameMainLoop(FIX16(1.0/60.0));
+	    SPR_update(sprites, 1);	
 		vblCount++;
 	}
 }
