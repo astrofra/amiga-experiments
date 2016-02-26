@@ -79,7 +79,7 @@ struct {
 
 static void game_ShufflePuck()
 {
-	char str[16];	/* debug string */
+	char str[32];	/* debug string */
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[16];
@@ -354,7 +354,7 @@ static void game_ShufflePuck()
 	VDP_setPalette(PAL1, game_board.palette->data);
 	VDP_setPalette(PAL2, game_ball.palette->data);
 
-    SPR_initSprite(&sprites[0], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
+    SPR_initSprite(&sprites[0], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
  //    // SPR_initSprite(&sprites[1], &rse_logo_shadow_alt, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
 	SPR_setPosition(&sprites[0], 64, 64);
  	SPR_update(sprites, 1);	
@@ -363,11 +363,15 @@ static void game_ShufflePuck()
 
 	gameReset();
 
+
 	while (TRUE)
 	{
 		VDP_waitVSync();
+
+		// utils_unit_tests();
+
 		gameMainLoop(FIX16(1.0/60.0));
 	    SPR_update(sprites, 1);	
-		vblCount++;
+		// vblCount++;
 	}
 }
