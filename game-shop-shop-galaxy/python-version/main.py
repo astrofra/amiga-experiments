@@ -1,6 +1,7 @@
 import gs
 import gs.plus.render as render
 import gs.plus.input as input
+import gs.plus.clock as clock
 
 import math
 from utils import *
@@ -135,11 +136,13 @@ def BallWasWithinXReach(ball, racket):
 SCR_PHYSIC_WIDTH = 320
 SCR_PHYSIC_HEIGHT = 200
 
-SCR_DISP_WIDTH = 320 * 1
-SCR_DISP_HEIGHT = 200 * 1
+SCR_DISP_WIDTH = 320 * 2
+SCR_DISP_HEIGHT = 200 * 2
 
 SCR_SCALE_FACTOR = min(SCR_DISP_WIDTH / SCR_PHYSIC_WIDTH, SCR_DISP_HEIGHT / SCR_PHYSIC_HEIGHT)
 SCR_MARGIN_X = (SCR_DISP_WIDTH - (SCR_PHYSIC_WIDTH * SCR_SCALE_FACTOR)) / 2.0
+
+gs.LoadPlugins(gs.get_default_plugins_path())
 
 render.init(SCR_DISP_WIDTH, SCR_DISP_HEIGHT, "pkg.core")
 
@@ -151,7 +154,7 @@ player.initial_pox_z = (board.board_length * 0.45)
 player.reset()
 
 while not input.key_press(gs.InputDevice.KeyEscape):
-	dt = 1.0 / 60.0
+	dt = clock.update() # 1.0 / 60.0
 
 	# update mouse
 	gs.GetInputSystem().Update()
