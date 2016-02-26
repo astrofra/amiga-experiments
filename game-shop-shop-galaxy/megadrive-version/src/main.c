@@ -144,11 +144,11 @@ static void game_ShufflePuck()
 	}
 
 	void ball_bounceX(void){
-		fix16Mul(ball.velocity_x, FIX16(-1.0));
+		ball.velocity_x = fix16Mul(ball.velocity_x, FIX16(-1.0));
 	}	
 
 	void ball_bounceZ(void){
-		fix16Mul(ball.velocity_z, FIX16(-1.0));
+		ball.velocity_z = fix16Mul(ball.velocity_z, FIX16(-1.0));
 	}
 
 	void ball_setPosition(fix16 x, fix16 z){
@@ -179,23 +179,42 @@ static void game_ShufflePuck()
 			}
 		}
 
-		if (ball.pos_z < fix16Mul(board_length, FIX16(-0.5))){
-			ball.pos_z = fix16Mul(board_length, FIX16(-0.5));
+		if (ball.pos_z > fix16Mul(board_length, FIX16(0.5))){
+			ball.pos_z = fix16Mul(board_length, FIX16(0.5));
 			ball_bounceZ();
 		}
-
-		if (ball.pos_z > fix16Mul(board_length, FIX16(0.5))){
-			ball.pos_x = ball.initial_pox_x;
-			ball.pos_z = ball.initial_pox_z;
-			ball.prev_pos_x = ball.pos_x;
-			ball.prev_pos_z = ball.pos_z;
+		else{
+			if (ball.pos_z < fix16Mul(board_length, FIX16(-0.5))){
+				ball.pos_z = fix16Mul(board_length, FIX16(-0.5));
+				ball_bounceZ();
+			}
 		}
+
+		// if (ball.pos_z > fix16Mul(board_length, FIX16(0.5))){
+		// 	ball.pos_x = ball.initial_pox_x;
+		// 	ball.pos_z = ball.initial_pox_z;
+		// 	ball.prev_pos_x = ball.pos_x;
+		// 	ball.prev_pos_z = ball.pos_z;
+		// }
 
 		/*	Limit the friction/damping to the areas
 			where the puck can be reached by one of the players */
 		// if (abs(pos_z) > board_length * 0.25):
 		// 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
 		// 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)	
+
+		BMP_drawText("dt = ", 0, 0);
+		fix16ToStr(dt, str, 8);
+		BMP_drawText(str, 6, 0);	
+
+		fix16ToStr(ball.velocity_x, str, 8);
+		BMP_drawText(str, 0, 1);	
+		fix16ToStr(ball.velocity_z, str, 8);
+		BMP_drawText(str, 10, 1);
+		fix16ToStr(ball.pos_x, str, 8);
+		BMP_drawText(str, 0, 2);	
+		fix16ToStr(ball.pos_z, str, 8);
+		BMP_drawText(str, 10, 2);			
 	}
 
 	void gameReset(void){		
@@ -206,10 +225,10 @@ static void game_ShufflePuck()
 	void renderBall(u16 ball_2d_x,u16  ball_2d_y, u16 ball_2d_scale){
 		// ball_2d_y += (240 - 136);
 
-		intToStr(ball_2d_x, str, 0);
-		BMP_drawText(str, 0, 0);	
-		intToStr(ball_2d_y, str, 0);
-		BMP_drawText(str, 10, 0);		
+		// intToStr(ball_2d_x, str, 8);
+		// BMP_drawText(str, 0, 1);	
+		// intToStr(ball_2d_y, str, 8);
+		// BMP_drawText(str, 10, 1);		
 		SPR_setPosition(&sprites[0], ball_2d_x, ball_2d_y); //  - 65);
 		// render.sprite2d(SCR_MARGIN_X + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
 	}
