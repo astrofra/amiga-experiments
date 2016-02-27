@@ -321,7 +321,7 @@ static void game_ShufflePuck()
 
 		// if (ball.pos_z - ball.radius < player.pos_z + player.length)
 		// {
-			renderBall(fix16ToInt(ball_2d_x), fix16ToInt(ball_2d_y), ball_2d_scale);
+			renderBall(fix16ToInt(ball_2d_x) - 12, fix16ToInt(ball_2d_y) + (224 - 136), ball_2d_scale);
 		// 	renderPlayer(player_2d_x, player_2d_y, player_2d_scale)
 		// }
 		// else
@@ -344,10 +344,10 @@ static void game_ShufflePuck()
 	VDP_clearPlan(BPLAN, 0);
 
 	/* Load the fond tiles */
-	VDP_drawImageEx(APLAN, &game_robot_5, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 112) / 16, (240 - 112) / 64	, FALSE, FALSE);
+	VDP_drawImageEx(APLAN, &game_robot_5, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 112) / 16, (224 - 112) / 64	, FALSE, FALSE);
 	vramIndex += game_robot_5.tileset->numTile;
 
-	VDP_drawImageEx(BPLAN, &game_board, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, (240 - 136) / 8, FALSE, FALSE);
+	VDP_drawImageEx(BPLAN, &game_board, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 136) / 8, FALSE, FALSE);
 	vramIndex += game_board.tileset->numTile;	
 
 	VDP_setPalette(PAL0, game_robot_5.palette->data);

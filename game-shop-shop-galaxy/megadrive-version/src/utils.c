@@ -38,10 +38,16 @@ fix16 fix16mapValueToArray(fix16 val, fix16 in_lower, fix16 in_upper, const fix1
 	fix16 array_pos = fix16Mul(val, FIX16(mapping_array_len - 1));
 	u16 ceil_pos = fix16CeilToU16(array_pos);
 	u16 floor_pos = fix16FloorToU16(array_pos);
-	fix16 k = fix16Sub(ceil_pos, array_pos);
+	fix16 k = fix16Sub(FIX16(ceil_pos), array_pos);
 	return fix16Add(fix16Mul(mapping_array[floor_pos], k), fix16Mul(mapping_array[ceil_pos], fix16InvCoef(k)));
 	// return mapping_array[floor_pos] * float(ceil_pos - array_pos) + mapping_array[ceil_pos] * (1.0 - (float(ceil_pos - array_pos)))
 }
+
+// void array_mapper_unit_tests(void)
+// {
+// 	const fix16 persp_coef[] = [];
+// 	fix16mapValueToArray()
+// }
 
 void utils_unit_tests(void)
 {
