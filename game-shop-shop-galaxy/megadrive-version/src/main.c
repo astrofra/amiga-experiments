@@ -15,42 +15,42 @@ int main()
 	Ball game object
 */
 struct {
-	fix16	inertia;
+	fix32	inertia;
 
-	fix16	velocity_x,
+	fix32	velocity_x,
 			velocity_z;
 
-	fix16	initial_pox_x,
+	fix32	initial_pox_x,
 			initial_pox_z;
 
-	fix16	pos_x,
+	fix32	pos_x,
 			pos_z;
 
-	fix16	prev_pos_x,
+	fix32	prev_pos_x,
 			prev_pos_z;
 
-	fix16 	radius;
+	fix32 	radius;
 }ball;
 
 /*
 	Player game object
 */
 struct {
-	fix16	racket_speed;
+	fix32	racket_speed;
 
-	fix16	velocity_x,
+	fix32	velocity_x,
 			velocity_z;
 
-	fix16	initial_pox_x,
+	fix32	initial_pox_x,
 			initial_pox_z;
 
-	fix16	pos_x,
+	fix32	pos_x,
 			pos_z;
 
-	fix16	prev_pos_x,
+	fix32	prev_pos_x,
 			prev_pos_z;
 
-	fix16	width,
+	fix32	width,
 			length;
 }racket;
 
@@ -58,22 +58,22 @@ struct {
 	Enemy game object
 */
 struct {
-	fix16	max_racket_speed;
-	fix16	racket_speed;
+	fix32	max_racket_speed;
+	fix32	racket_speed;
 
-	fix16	velocity_x,
+	fix32	velocity_x,
 			velocity_z;
 
-	fix16	initial_pox_x,
+	fix32	initial_pox_x,
 			initial_pox_z;
 
-	fix16	pos_x,
+	fix32	pos_x,
 			pos_z;
 
-	fix16	prev_pos_x,
+	fix32	prev_pos_x,
 			prev_pos_z;
 
-	fix16	width,
+	fix32	width,
 			length;
 }ai;
 
@@ -85,40 +85,40 @@ static void game_ShufflePuck()
 	Sprite sprites[16];
 
 	/* Ball sprite coordinates */
-	s16 ball_2d_x,
+	int ball_2d_x,
 		ball_2d_y,
 		ball_2d_scale;
 
-	const fix16 persp_coef[] = {fix16DivFloats(1.0, 132.0), fix16DivFloats(5, 132.0), fix16DivFloats(9, 132.0), fix16DivFloats(13, 132.0), fix16DivFloats(17, 132.0), 
-								fix16DivFloats(22, 132.0), fix16DivFloats(27, 132.0), fix16DivFloats(34, 132.0), fix16DivFloats(42, 132.0), fix16DivFloats(51, 132.0), 
-								fix16DivFloats(64, 132.0), fix16DivFloats(80, 132.0), fix16DivFloats(102, 132.0), fix16DivFloats(132, 132.0)};
+	const fix32 persp_coef[] = {fix32DivFloats(1.0, 132.0), fix32DivFloats(5, 132.0), fix32DivFloats(9, 132.0), fix32DivFloats(13, 132.0), fix32DivFloats(17, 132.0), 
+								fix32DivFloats(22, 132.0), fix32DivFloats(27, 132.0), fix32DivFloats(34, 132.0), fix32DivFloats(42, 132.0), fix32DivFloats(51, 132.0), 
+								fix32DivFloats(64, 132.0), fix32DivFloats(80, 132.0), fix32DivFloats(102, 132.0), fix32DivFloats(132, 132.0)};
 
 	/*	Specific 3D -> 2D Projection */
-	static Vect3D_f16 inline project3DTo2D(fix16 x, fix16 z)
+	static Vect3D_f32 inline project3DTo2D(fix32 x, fix32 z)
 	{
-		const fix16 top_left_x = FIX16(120);
-		const fix16 top_right_x = FIX16(320 - 120);
-		const fix16 top_y = FIX16(8);
+		const fix32 top_left_x = FIX32(120);
+		const fix32 top_right_x = FIX32(320 - 120);
+		const fix32 top_y = FIX32(8);
 
-		const fix16 bottom_left_x = FIX16(0);
-		const fix16 bottom_right_x = FIX16(320);
-		const fix16 bottom_y = FIX16(130);
+		const fix32 bottom_left_x = FIX32(0);
+		const fix32 bottom_right_x = FIX32(320);
+		const fix32 bottom_y = FIX32(130);
 
-		fix16 top_2d_x, bottom_2d_x;
+		fix32 top_2d_x, bottom_2d_x;
 
-		Vect3D_f16 ret_tuple;
+		Vect3D_f32 ret_tuple;
 
-		fix16 norm_x = fix16Add(fix16Div(x, board_width), FIX16(0.5));
-		fix16 norm_y = fix16Add(fix16Div(z, board_length), FIX16(0.5));
+		fix32 norm_x = fix32Add(fix32Div(x, board_width), FIX32(0.5));
+		fix32 norm_y = fix32Add(fix32Div(z, board_length), FIX32(0.5));
 
-		norm_y = fix16mapValueToArray(norm_y, FIX16(0.0), FIX16(1.0), persp_coef, 14);
+		norm_y = fix32mapValueToArray(norm_y, FIX32(0.0), FIX32(1.0), persp_coef, 14);
 		
-		top_2d_x = fix16Add(fix16Mul(fix16InvCoef(norm_x), top_left_x), fix16Mul(norm_x, top_right_x));
-		bottom_2d_x = fix16Add(fix16Mul(fix16InvCoef(norm_x), bottom_left_x), fix16Mul(norm_x, bottom_right_x));
+		top_2d_x = fix32Add(fix32Mul(fix32InvCoef(norm_x), top_left_x), fix32Mul(norm_x, top_right_x));
+		bottom_2d_x = fix32Add(fix32Mul(fix32InvCoef(norm_x), bottom_left_x), fix32Mul(norm_x, bottom_right_x));
 
-		ret_tuple.x = fix16Add(fix16Mul(fix16InvCoef(norm_y), top_2d_x),  fix16Mul(norm_y, bottom_2d_x)); /* proj_2d_x */
-		ret_tuple.y = fix16Add(fix16Mul(fix16InvCoef(norm_y), top_y), fix16Mul(norm_y, bottom_y));	/* proj_2d_y */
-		ret_tuple.z = fix16RangeAdjust(norm_y, FIX16(0.0), FIX16(1.0), FIX16(0.285), FIX16(1.0));	/* proj_scale */
+		ret_tuple.x = fix32Add(fix32Mul(fix32InvCoef(norm_y), top_2d_x),  fix32Mul(norm_y, bottom_2d_x)); /* proj_2d_x */
+		ret_tuple.y = fix32Add(fix32Mul(fix32InvCoef(norm_y), top_y), fix32Mul(norm_y, bottom_y));	/* proj_2d_y */
+		ret_tuple.z = fix32RangeAdjust(norm_y, FIX32(0.0), FIX32(1.0), FIX32(0.285), FIX32(1.0));	/* proj_scale */
 
 		return ret_tuple;
 	}
@@ -126,8 +126,8 @@ static void game_ShufflePuck()
 	/*	Ball logic */
 	void ball_reset(void){
 		// global pos_x, pos_z, initial_pox_x, initial_pox_z
-		ball.inertia = FIX16(0.1);
-		ball.radius = FIX16(0.5);
+		ball.inertia = FIX32(0.1);
+		ball.radius = FIX32(0.5);
 		ball.initial_pox_x = 0;
 		ball.initial_pox_z = 0;
 		ball.pos_x = ball.initial_pox_x;
@@ -138,25 +138,25 @@ static void game_ShufflePuck()
 		ball.velocity_z = 0;
 	}
 
-	void ball_setImpulse(fix16 x, fix16 z){
+	void ball_setImpulse(fix32 x, fix32 z){
 		ball.velocity_x = x;
 		ball.velocity_z = z;
 	}
 
 	void ball_bounceX(void){
-		ball.velocity_x = fix16Mul(ball.velocity_x, FIX16(-1.0));
+		ball.velocity_x = fix32Mul(ball.velocity_x, FIX32(-1.0));
 	}	
 
 	void ball_bounceZ(void){
-		ball.velocity_z = fix16Mul(ball.velocity_z, FIX16(-1.0));
+		ball.velocity_z = fix32Mul(ball.velocity_z, FIX32(-1.0));
 	}
 
-	void ball_setPosition(fix16 x, fix16 z){
+	void ball_setPosition(fix32 x, fix32 z){
 		ball.pos_x = x;
 		ball.pos_z = z;
 	}
 
-	void ball_update(fix16 dt){
+	void ball_update(fix32 dt){
 		// global pos_x, pos_z, velocity_x, velocity_z, prev_pos_x, prev_pos_z
 
 		/*  Keep track of the ball's previous position */
@@ -164,33 +164,33 @@ static void game_ShufflePuck()
 		ball.prev_pos_z = ball.pos_z;
 
 		/* Move the ball according to its velocity */
-		ball.pos_x = fix16Add(ball.pos_x, fix16Mul(ball.velocity_x, dt));
-		ball.pos_z = fix16Add(ball.pos_z, fix16Mul(ball.velocity_z, dt));
+		ball.pos_x = fix32Add(ball.pos_x, fix32Mul(ball.velocity_x, dt));
+		ball.pos_z = fix32Add(ball.pos_z, fix32Mul(ball.velocity_z, dt));
 
 		/* basic dynamics & collision */
-		if (ball.pos_x > fix16Mul(board_width, FIX16(0.5))){
-			ball.pos_x = fix16Mul(board_width, FIX16(0.5));
+		if (ball.pos_x > fix32Mul(board_width, FIX32(0.5))){
+			ball.pos_x = fix32Mul(board_width, FIX32(0.5));
 			ball_bounceX();
 		}
 		else{
-			if (ball.pos_x < fix16Mul(board_width, FIX16(-0.5))){
-				ball.pos_x = fix16Mul(board_width, FIX16(-0.5));
+			if (ball.pos_x < fix32Mul(board_width, FIX32(-0.5))){
+				ball.pos_x = fix32Mul(board_width, FIX32(-0.5));
 				ball_bounceX();
 			}
 		}
 
-		if (ball.pos_z > fix16Mul(board_length, FIX16(0.5))){
-			ball.pos_z = fix16Mul(board_length, FIX16(0.5));
+		if (ball.pos_z > fix32Mul(board_length, FIX32(0.5))){
+			ball.pos_z = fix32Mul(board_length, FIX32(0.5));
 			ball_bounceZ();
 		}
 		else{
-			if (ball.pos_z < fix16Mul(board_length, FIX16(-0.5))){
-				ball.pos_z = fix16Mul(board_length, FIX16(-0.5));
+			if (ball.pos_z < fix32Mul(board_length, FIX32(-0.5))){
+				ball.pos_z = fix32Mul(board_length, FIX32(-0.5));
 				ball_bounceZ();
 			}
 		}
 
-		// if (ball.pos_z > fix16Mul(board_length, FIX16(0.5))){
+		// if (ball.pos_z > fix32Mul(board_length, FIX32(0.5))){
 		// 	ball.pos_x = ball.initial_pox_x;
 		// 	ball.pos_z = ball.initial_pox_z;
 		// 	ball.prev_pos_x = ball.pos_x;
@@ -203,41 +203,40 @@ static void game_ShufflePuck()
 		// 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
 		// 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)	
 
-		BMP_drawText("dt = ", 0, 0);
-		fix16ToStr(dt, str, 8);
-		BMP_drawText(str, 6, 0);	
+		// BMP_drawText("dt = ", 0, 0);
+		// fix32ToStr(dt, str, 8);
+		// BMP_drawText(str, 6, 0);	
 
-		fix16ToStr(ball.velocity_x, str, 8);
-		BMP_drawText(str, 0, 1);	
-		fix16ToStr(ball.velocity_z, str, 8);
-		BMP_drawText(str, 10, 1);
-		fix16ToStr(ball.pos_x, str, 8);
-		BMP_drawText(str, 0, 2);	
-		fix16ToStr(ball.pos_z, str, 8);
-		BMP_drawText(str, 10, 2);			
+		// fix32ToStr(ball.velocity_x, str, 8);
+		// BMP_drawText(str, 0, 1);	
+		// fix32ToStr(ball.velocity_z, str, 8);
+		// BMP_drawText(str, 10, 1);
+		// fix32ToStr(ball.pos_x, str, 8);
+		// BMP_drawText(str, 0, 2);	
+		// fix32ToStr(ball.pos_z, str, 8);
+		// BMP_drawText(str, 10, 2);			
 	}
 
 	void gameReset(void){		
 		ball_reset();
-		ball_setImpulse(FIX16(10.0), FIX16(10.0));
+		ball_setImpulse(FIX32(10.0), FIX32(10.0));
 	}
 
-	void renderBall(u16 ball_2d_x,u16  ball_2d_y, u16 ball_2d_scale){
+	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale){
 		// ball_2d_y += (240 - 136);
 
-		// intToStr(ball_2d_x, str, 8);
-		// BMP_drawText(str, 0, 1);	
-		// intToStr(ball_2d_y, str, 8);
-		// BMP_drawText(str, 10, 1);		
-		SPR_setPosition(&sprites[0], ball_2d_x, ball_2d_y); //  - 65);
-		// render.sprite2d(SCR_MARGIN_X + ball_2d_x, ball_2d_y - (65 * SCR_SCALE_FACTOR), 24 * SCR_SCALE_FACTOR * ball_2d_scale, "@assets/game_ball.png")
+		// intToStr(ball_2d_x, str, 0);
+		// BMP_drawText(str, 0, 3);	
+		// intToStr(ball_2d_y, str, 0);
+		// BMP_drawText(str, 10, 3);
+		SPR_setPosition(&sprites[0], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 12));
 	}
 
-	void renderPlayer(u16 player_2d_x, u16 player_2d_y, u16 player_2d_scale){
+	void renderPlayer(int player_2d_x, int player_2d_y, int player_2d_scale){
 		// render.sprite2d(SCR_MARGIN_X + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
 	}
 
-	void renderAI(u16 ai_2d_x, u16 ai_2d_y, u16 ai_2d_scale){
+	void renderAI(int ai_2d_x, int ai_2d_y, int ai_2d_scale){
 		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
 	}
 
@@ -249,22 +248,22 @@ static void game_ShufflePuck()
 	}
 
 	u8 BallIsWithinXReach(void){
-		if (fix16Add(ball.pos_x, ball.radius) > fix16Sub(racket.pos_x, fix16Mul(racket.width, FIX16(0.5))) 
-			&& fix16Sub(ball.pos_x, ball.radius) < fix16Add(racket.pos_x, fix16Mul(racket.width, FIX16(0.5))))
+		if (fix32Add(ball.pos_x, ball.radius) > fix32Sub(racket.pos_x, fix32Mul(racket.width, FIX32(0.5))) 
+			&& fix32Sub(ball.pos_x, ball.radius) < fix32Add(racket.pos_x, fix32Mul(racket.width, FIX32(0.5))))
 			return TRUE;
 		else
 			return FALSE;
 	}
 
 	u8 BallWasWithinXReach(void){
-		if (fix16Add(ball.prev_pos_x, ball.radius) > fix16Sub(racket.prev_pos_x,  fix16Mul(racket.width, FIX16(0.5))) 
-			&& fix16Sub(ball.prev_pos_x, ball.radius) < fix16Add(racket.prev_pos_x, fix16Mul(racket.width, FIX16(0.5))))
+		if (fix32Add(ball.prev_pos_x, ball.radius) > fix32Sub(racket.prev_pos_x,  fix32Mul(racket.width, FIX32(0.5))) 
+			&& fix32Sub(ball.prev_pos_x, ball.radius) < fix32Add(racket.prev_pos_x, fix32Mul(racket.width, FIX32(0.5))))
 			return TRUE;
 		else
 			return FALSE;
 	}
 
-	void gameMainLoop(fix16 dt){
+	void gameMainLoop(fix32 dt){
 		/* Update the ball motion */
 		ball_update(dt);
 
@@ -288,7 +287,7 @@ static void game_ShufflePuck()
 		// }
 
 		/* Compute 3D/2D projections */
-		Vect3D_f16 pvect; 
+		Vect3D_f32 pvect; 
 		pvect = project3DTo2D(ball.pos_x, ball.pos_z);
 		ball_2d_x = pvect.x;
 		ball_2d_y = pvect.y;
@@ -321,7 +320,7 @@ static void game_ShufflePuck()
 
 		// if (ball.pos_z - ball.radius < player.pos_z + player.length)
 		// {
-			renderBall(fix16ToInt(ball_2d_x) - 12, fix16ToInt(ball_2d_y) + (224 - 136), ball_2d_scale);
+			renderBall(fix32ToInt(ball_2d_x), fix32ToInt(ball_2d_y), ball_2d_scale);
 		// 	renderPlayer(player_2d_x, player_2d_y, player_2d_scale)
 		// }
 		// else
@@ -354,7 +353,7 @@ static void game_ShufflePuck()
 	VDP_setPalette(PAL1, game_board.palette->data);
 	VDP_setPalette(PAL2, game_ball.palette->data);
 
-    SPR_initSprite(&sprites[0], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_initSprite(&sprites[0], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
  //    // SPR_initSprite(&sprites[1], &rse_logo_shadow_alt, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
 	SPR_setPosition(&sprites[0], 64, 64);
  	SPR_update(sprites, 1);	
@@ -370,8 +369,8 @@ static void game_ShufflePuck()
 
 		// utils_unit_tests();
 
-		gameMainLoop(FIX16(1.0/60.0));
-	    SPR_update(sprites, 1);	
+		gameMainLoop(FIX32(1.0/60.0));
+		SPR_update(sprites, 1);	
 		// vblCount++;
 	}
 }

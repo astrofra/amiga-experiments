@@ -1,12 +1,19 @@
 #include <genesis.h>
 
-#define fix16InvCoef(K)  (fix16Sub(FIX16(1.0), K))
-#define fix16DivFloats(A,B) fix16Div(FIX16(A), FIX16(B))
+typedef struct
+{
+    fix32 x;
+    fix32 y;
+    fix32 z;
+} Vect3D_f32;
 
-fix16 fix16Min(fix16 a, fix16 b);
-fix16 fix16Max(fix16 a, fix16 b);
-fix16 fix16RangeAdjust(fix16 val, fix16 in_lower, fix16 in_upper, fix16 out_lower, fix16 out_upper);
-fix16 fix16Clamp(fix16 x, fix16 in_lower, fix16 in_upper);
-fix16 fix16mapValueToArray(fix16 val, fix16 in_lower, fix16 in_upper, const fix16* mapping_array, const u16 mapping_array_len);
+#define fix32InvCoef(K)  (fix32Sub(FIX32(1.0), K))
+#define fix32DivFloats(A,B) fix32Div(FIX32(A), FIX32(B))
+
+fix32 fix32Min(fix32 a, fix32 b);
+fix32 fix32Max(fix32 a, fix32 b);
+fix32 fix32RangeAdjust(fix32 val, fix32 in_lower, fix32 in_upper, fix32 out_lower, fix32 out_upper);
+fix32 fix32Clamp(fix32 x, fix32 in_lower, fix32 in_upper);
+fix32 fix32mapValueToArray(fix32 val, fix32 in_lower, fix32 in_upper, const fix32* mapping_array, const u16 mapping_array_len);
 
 void utils_unit_tests(void);
