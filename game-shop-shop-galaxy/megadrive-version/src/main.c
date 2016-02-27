@@ -35,47 +35,12 @@ struct {
 /*
 	Player game object
 */
-struct {
-	fix32	racket_speed;
-
-	fix32	velocity_x,
-			velocity_z;
-
-	fix32	initial_pox_x,
-			initial_pox_z;
-
-	fix32	pos_x,
-			pos_z;
-
-	fix32	prev_pos_x,
-			prev_pos_z;
-
-	fix32	width,
-			length;
-}racket;
+shuffle_racket racket;
 
 /*
 	Enemy game object
 */
-struct {
-	fix32	max_racket_speed;
-	fix32	racket_speed;
-
-	fix32	velocity_x,
-			velocity_z;
-
-	fix32	initial_pox_x,
-			initial_pox_z;
-
-	fix32	pos_x,
-			pos_z;
-
-	fix32	prev_pos_x,
-			prev_pos_z;
-
-	fix32	width,
-			length;
-}ai;
+shuffle_racket ai;
 
 static void game_ShufflePuck()
 {
@@ -219,7 +184,7 @@ static void game_ShufflePuck()
 
 	void gameReset(void){		
 		ball_reset();
-		ball_setImpulse(FIX32(10.0), FIX32(10.0));
+		ball_setImpulse(FIX32(10.0 * board_scale), FIX32(10.0 * board_scale));
 	}
 
 	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale){
@@ -229,7 +194,7 @@ static void game_ShufflePuck()
 		// BMP_drawText(str, 0, 3);	
 		// intToStr(ball_2d_y, str, 0);
 		// BMP_drawText(str, 10, 3);
-		SPR_setPosition(&sprites[0], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 12));
+		SPR_setPosition(&sprites[0], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 8));
 	}
 
 	void renderPlayer(int player_2d_x, int player_2d_y, int player_2d_scale){
@@ -366,6 +331,7 @@ static void game_ShufflePuck()
 	while (TRUE)
 	{
 		VDP_waitVSync();
+		BMP_showFPS(1);
 
 		// utils_unit_tests();
 

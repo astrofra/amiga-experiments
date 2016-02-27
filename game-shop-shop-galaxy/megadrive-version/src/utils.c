@@ -1,35 +1,35 @@
 #include <genesis.h>
 
-fix32 fix32Min(fix32 a, fix32 b){
+fix32 inline fix32Min(fix32 a, fix32 b){
 	if (a < b)
 		return a;
 	else
 		return b;
 }
 
-fix32 fix32Max(fix32 a, fix32 b){
+fix32 inline fix32Max(fix32 a, fix32 b){
 	if (a > b)
 		return a;
 	else
 		return b;
 }
 
-fix32 fix32RangeAdjust(fix32 val, fix32 in_lower, fix32 in_upper, fix32 out_lower, fix32 out_upper){
+fix32 inline fix32RangeAdjust(fix32 val, fix32 in_lower, fix32 in_upper, fix32 out_lower, fix32 out_upper){
 	/* return (val - in_lower) / (in_upper - in_lower) * (out_upper - out_lower) + out_lower */
     return fix32Add(fix32Div(fix32Sub(val, in_lower), fix32Mul(fix32Sub(in_upper, in_lower), fix32Sub(out_upper, out_lower))), out_lower);
 }
 
-fix32 fix32Clamp(fix32 x, fix32 in_lower, fix32 in_upper){
+fix32 inline fix32Clamp(fix32 x, fix32 in_lower, fix32 in_upper){
 	return fix32Min(fix32Max(x, in_lower), in_upper);
 }
 
-int fix32CeilToInt(fix32 x)
+int inline fix32CeilToInt(fix32 x)
 {	return (fix32ToInt(x) + 1);	}
 
-int fix32FloorToInt(fix32 x)
+int inline fix32FloorToInt(fix32 x)
 {	return fix32ToInt(x);	}
 
-fix32 fix32InvCoef(fix32 x)
+fix32 inline fix32InvCoef(fix32 x)
 {	return fix32Sub(FIX32(1.0), x); }
 
 fix32 fix32mapValueToArray(fix32 val, fix32 in_lower, fix32 in_upper, const fix32* mapping_array, const int mapping_array_len){
