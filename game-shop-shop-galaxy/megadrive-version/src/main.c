@@ -2,6 +2,7 @@
 #include <gfx.h>
 #include "utils.h"
 #include "game_shufflepuck.h"
+#include "resources.h"
 
 static void game_ShufflePuck();
 
@@ -182,11 +183,6 @@ static void game_ShufflePuck()
 		// BMP_drawText(str, 10, 2);			
 	}
 
-	void gameReset(void){		
-		ball_reset();
-		ball_setImpulse(FIX32(10.0 * board_scale), FIX32(10.0 * board_scale));
-	}
-
 	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale){
 		// ball_2d_y += (240 - 136);
 
@@ -194,10 +190,11 @@ static void game_ShufflePuck()
 		// BMP_drawText(str, 0, 3);	
 		// intToStr(ball_2d_y, str, 0);
 		// BMP_drawText(str, 10, 3);
-		SPR_setPosition(&sprites[0], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 8));
+		SPR_setPosition(&sprites[1], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 8));
 	}
 
 	void renderPlayer(int player_2d_x, int player_2d_y, int player_2d_scale){
+		SPR_setPosition(&sprites[0], player_2d_x - 32, player_2d_y + ((224 - 136) - 16));
 		// render.sprite2d(SCR_MARGIN_X + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
 	}
 
@@ -227,6 +224,11 @@ static void game_ShufflePuck()
 		else
 			return FALSE;
 	}
+
+	void gameReset(void){		
+		ball_reset();
+		ball_setImpulse(FIX32(10.0 * board_scale), FIX32(10.0 * board_scale));
+	}	
 
 	void gameMainLoop(fix32 dt){
 		/* Update the ball motion */
@@ -318,12 +320,18 @@ static void game_ShufflePuck()
 	VDP_setPalette(PAL1, game_board.palette->data);
 	VDP_setPalette(PAL2, game_ball.palette->data);
 
-	SPR_initSprite(&sprites[0], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
- //    // SPR_initSprite(&sprites[1], &rse_logo_shadow_alt, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, 0));
-	SPR_setPosition(&sprites[0], 64, 64);
- 	SPR_update(sprites, 1);	
+	SPR_initSprite(&sprites[1], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(&sprites[1], 64, 64);
+
+	SPR_initSprite(&sprites[0], &game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(&sprites[0], (320 / 2) - 32, 128);
+
+ 	SPR_update(sprites, 2);	
 
 	SYS_enableInts();
+
+	SND_startPlay_XGM(maak_music_2);
+	SND_setMusicTempo_XGM(50);		
 
 	gameReset();
 
@@ -336,7 +344,7 @@ static void game_ShufflePuck()
 		// utils_unit_tests();
 
 		gameMainLoop(FIX32(1.0/60.0));
-		SPR_update(sprites, 1);	
+		SPR_update(sprites, 2);	
 		// vblCount++;
 	}
 }
