@@ -3,7 +3,7 @@
 	by Mandarine
 */
 
-#include "includes.prl"
+#include "includes.h"
 #include "time.h"
 #include <intuition/intuition.h>
 #include <graphics/gfxbase.h>
@@ -310,23 +310,10 @@ void main()
 
 	is_cpu_a_020();
 
-	/*	Loading sequence 
-		loads everything! 
-	*/
 	printf("\n");
 	printf("                       ------------------\n");
 	printf("               MINIZ DECRUNCHES WHILE U WAITING...\n");
-	printf("                       ------------------\n");	
-
-	// initMusic();
-	loadRedbotSprite();
-	loadAstronautSprite();
-	loadTitleSprite();
-	loadFaceSprite();
-	loadGuardSprite();
-	loadMountainSprite();
-	loadMummySprite();
-	loadUfoSprite();
+	printf("                       ------------------\n");
 
 	/* Save the current View, so we can restore it later: */
 	my_old_view = GfxBase->ActiView;
@@ -367,7 +354,7 @@ void main()
 	{
 		bit_map1.Planes[ loop ] = (PLANEPTR) AllocRaster( WIDTH1, HEIGHT1 + 8);
 		if( bit_map1.Planes[ loop ] == NULL )
-			close_demo( "Could NOT allocate enough memory for the raster!" );
+			close_demo( "Could NOT allocate enough memory for the raster (bit_map1)!" );
 	/* Clear the display memory with help of the Blitter: */
 		BltClear( bit_map1.Planes[ loop ], RASSIZE( WIDTH1, HEIGHT1 + 8), 0 );
 	}
@@ -383,7 +370,7 @@ void main()
 	{
 		bit_map2.Planes[ loop ] = (PLANEPTR) AllocRaster( WIDTH1, HEIGHT1 + 8);
 		if( bit_map2.Planes[ loop ] == NULL )
-			close_demo( "Could NOT allocate enough memory for the raster!" );
+			close_demo( "Could NOT allocate enough memory for the raster (bit_map2)!" );
 	/* Clear the display memory with help of the Blitter: */
 		BltClear( bit_map2.Planes[ loop ], RASSIZE( WIDTH1, HEIGHT1 + 8), 0 );
 	}
@@ -420,9 +407,9 @@ void main()
 	/* Create the display */
 	MakeVPort(&my_view, &view_port1); /* Prepare ViewPort 1 */
 
-	WaitTOF();
+	// WaitTOF();
 
-	// setCityCopperList(&view_port1);
+	setEmptyCopperList(&view_port1);
 
 	MrgCop(&my_view);
 
@@ -431,6 +418,19 @@ void main()
 
 	WaitTOF();
 	WaitTOF();
+
+	/*	Loading sequence 
+		loads everything! 
+	*/
+	initMusic();
+	loadRedbotSprite();
+	loadAstronautSprite();
+	loadTitleSprite();
+	loadFaceSprite();
+	loadGuardSprite();
+	loadMountainSprite();
+	loadMummySprite();
+	loadUfoSprite();
 
 	myTask = FindTask(NULL);
 	oldPri = SetTaskPri(myTask, 127);	

@@ -7,13 +7,13 @@ import colorsys
 
 
 global fc, fh
-max_color_index = 7
+max_color_index = 2
 
 def main():
 
-	root_name_list = ['city']
+	root_name_list = ['logo']
 
-	filename_out = 'city'
+	filename_out = 'logo'
 
 	print('png_to_vertical_copper_list')
 
@@ -35,7 +35,7 @@ def main():
 		png_list = []
 
 		##	Get size & depth
-		h = 256
+		h = 68
 		# print('w = ' + str(w) + ', h = ' + str(h))
 
 		fc.write('UWORD cl_' + filename_out + '[] =\n')
@@ -95,7 +95,7 @@ def main():
 			packed_line_palette = []
 			idx = 0
 			for color_hex in current_line_palette:
-				if len(prev_line_palette) == 0 or (len(prev_line_palette) > 0 and color_hex != prev_line_palette[idx]):
+				if len(prev_line_palette) == 0 or (len(prev_line_palette) > 0 and color_hex != prev_line_palette[idx]): ## or idx == 0:
 					packed_line_palette.append([idx, color_hex])
 				idx += 1
 

@@ -19,6 +19,16 @@ PLANEPTR load_getchipmem(UBYTE *name, ULONG size)
   BPTR fileHandle;
   PLANEPTR mem;
 
+  if (size == 0)
+  {
+    if (!(fileHandle = Open(name, MODE_OLDFILE)))
+    {
+      fseek(fileHandle, 0L, SEEK_END);
+      size = ftell(fileHandle);
+      printf("load_getchipmem(), size = %d\n", size);
+    }
+  }
+
   if (!(fileHandle = Open(name, MODE_OLDFILE)))
     return (NULL);
 
@@ -85,6 +95,16 @@ struct BitMap *load_file_as_bitmap(UBYTE *name, ULONG byte_size, UWORD width, UW
 
   if (!(fileHandle = Open(name, MODE_OLDFILE)))
     return (NULL);
+
+  if (byte_size == 0)
+  {
+    if (!(fileHandle = Open(name, MODE_OLDFILE)))
+    {
+      fseek(fileHandle, 0L, SEEK_END);
+      byte_size = ftell(fileHandle);
+      printf("load_file_as_bitmap(), byte_size = %d\n", byte_size);
+    }
+  }  
 
   new_bitmap = (struct BitMap *)AllocMem((LONG)sizeof(struct BitMap), MEMF_CLEAR);
   InitBitMap(new_bitmap, depth, width, height);

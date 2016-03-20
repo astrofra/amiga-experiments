@@ -81,6 +81,6 @@ def update(dt):
 
 	# Limit the friction/damping to the areas
 	# where the puck can be reached by one of the players
-	if abs(pos_z) > board.board_length * 0.25:
-		friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
-		velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)
+	# if abs(pos_z) > board.board_length * 0.25:
+	# 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
+	# 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)
