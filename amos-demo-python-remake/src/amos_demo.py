@@ -12,13 +12,10 @@
 #                its called "IMPORTANT_TEXT_FILE.ASC".       
 # ---------------------------------------------------------------------
 
-import os
 import gs
 import gs.plus.render as render
-import gs.plus.input as input
 import gs.plus.clock as clock
 import math
-import time
 from utils import *
 
 demo_screen_size = [1280, 720]
@@ -46,6 +43,14 @@ def play_music():
 def update_music():
 	global al, channel
 	al.GetPlayState(channel)
+
+def render_credits():
+   # MIDDLE["THE AMOS DEMO",25,1,1]
+   # MIDDLE["PROGRAMMING BY",60,1,0]
+   # MIDDLE["Peter Hickman",75,1,0]
+   # MIDDLE["MUSIC BY",105,1,0]
+   # MIDDLE["Allister Brimble",120,1,0]
+   pass
 
 
 def render_title_page_bouncing():
@@ -75,6 +80,7 @@ def render_title_page_still():
 		render.flip()
 
 
+render_credits()
 render_title_page_bouncing()
 play_music()
 render_title_page_still()
