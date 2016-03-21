@@ -34,6 +34,7 @@ gs.MountFileDriver(gs.StdFileDriver("assets/"), "@assets/")
 al = None
 channel = None
 
+
 def play_music():
 	global al, channel
 	# create an OpenAL mixer and wrap it with the MixerAsync interface
@@ -41,23 +42,39 @@ def play_music():
 	al.Open()
 	channel = al.Stream("@assets/amos_demo_music.xm")
 
-def render_title_page():
+
+def update_music():
+	global al, channel
+	al.GetPlayState(channel)
+
+
+def render_title_page_bouncing():
 	global al, channel
 	fx_timer = 0.0
 	fx_duration = math.pi
-	while True:
+	while fx_timer < 4.0:
 		dt_sec = clock.update()
 		fx_timer += dt_sec
-		render.clear()
 		y_damping = RangeAdjust(fx_timer, 0.0, fx_duration, 1.0, 0.0)
 		y_damping = Clamp(y_damping, 0.0, 1.0)
 		y_damping = EaseInOutQuick(y_damping)
 		y_scr = abs(math.sin((fx_timer + 1.2) * 4.0)) * y_damping
+		render.clear()
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5, y_scr * demo_screen_size[1], zoom_size, "@assets/titlepage.png")
-		al.GetPlayState(channel)
 		render.flip()
 
 
-play_music()
+def render_title_page_still():
+	fx_timer = 0.0
+	while fx_timer < 4.0:
+		dt_sec = clock.update()
+		fx_timer += dt_sec
+		render.clear()
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5, 0, zoom_size, "@assets/titlepage.png")
+		update_music()
+		render.flip()
 
-render_title_page()
+
+render_title_page_bouncing()
+play_music()
+render_title_page_still()
