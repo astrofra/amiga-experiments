@@ -44,17 +44,25 @@ def update_music():
 	global al, channel
 	al.GetPlayState(channel)
 
+
 def render_credits():
-   # MIDDLE["THE AMOS DEMO",25,1,1]
-   # MIDDLE["PROGRAMMING BY",60,1,0]
-   # MIDDLE["Peter Hickman",75,1,0]
-   # MIDDLE["MUSIC BY",105,1,0]
-   # MIDDLE["Allister Brimble",120,1,0]
-   pass
+	strings = [["THE AMOS DEMO",25,1,1],
+	           ["PROGRAMMING BY",60,1,0],
+	           ["Peter Hickman",75,1,0],
+	           ["MUSIC BY",105,1,0],
+	           ["Allister Brimble",120,1,0]]
+
+	fx_timer = 0.0
+	while fx_timer < 4.0:
+		dt_sec = clock.update()
+		fx_timer += dt_sec
+		render.clear()
+		for line in strings:
+			render.text2d(0, (256 - line[1]) * zoom_size, line[0], 30, font_path="@assets/topaz-new.ttf")
+		render.flip()
 
 
 def render_title_page_bouncing():
-	global al, channel
 	fx_timer = 0.0
 	fx_duration = math.pi
 	while fx_timer < 4.0:
