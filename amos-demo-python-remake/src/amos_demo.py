@@ -77,7 +77,6 @@ def render_text_screen(strings = None, duration = 4.0, fade_duration = 1.0):
 		return
 
 	sys = render.get_render_system()
-	render.get_renderer().EnableBlending(True)
 
 	fonts_dict = {}
 	fx_timer = 0.0
@@ -94,6 +93,8 @@ def render_text_screen(strings = None, duration = 4.0, fade_duration = 1.0):
 				fade = RangeAdjust(fx_timer, duration - fade_duration, duration, 1.0, 0.0)
 
 		render.clear()
+		render.get_renderer().EnableBlending(True)
+
 		for line in strings:
 			font_key = line[4] + "_" + str(line[5])
 			if not font_key in fonts_dict:
@@ -105,11 +106,20 @@ def render_text_screen(strings = None, duration = 4.0, fade_duration = 1.0):
 			fonts_dict[font_key].Write(sys, line[0], gs.Vector3(x, y, 0.5), gs.Color.White * fade)
 
 		sys.DrawRasterFontBatch()
+
+		render.get_renderer().EnableBlending(False)
+
+		# underline ?
+		for line in strings:
+			if line[3] == 1:
+				font_key = line[4] + "_" + str(line[5])
+				rect = fonts_dict[font_key].GetTextRect(sys, line[0])
+				x = (demo_screen_size[0] - rect.GetWidth()) * 0.5
+				y = (amiga_screen_size[1] - line[1]) * zoom_size - (line[5] * 0.2)
+				render.line2d(x, y, x + rect.GetWidth(), y, gs.Color.White * fade, gs.Color.White * fade)
+
 		update_music()
 		render.flip()
-
-	render.get_renderer().EnableBlending(False)
-
 
 def render_title_page_bouncing():
 	fx_timer = 0.0
