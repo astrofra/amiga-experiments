@@ -55,7 +55,17 @@ def render_credits():
 			["OVER THIS DEMO PRESS SPACE NOW", 165, 1, 0, "amiga4ever-pro2", 18],
 			["There is an IMPORTANT text file", 185, 1,0, "amiga4ever-pro2", 18],
 			["on this disk, please read it.", 195, 1,0, "amiga4ever-pro2", 18]]
+
 	render_text_screen(strings)
+
+	strings = [["On some of the",40,1,0, "dustismo-roman-bold", 42],
+	           ["demonstrations you",65,1,0, "dustismo-roman-bold", 42],
+	           ["will be able to move",90,1,0, "dustismo-roman-bold", 42],
+	           ["some of the SPRITES or",115,1,0, "dustismo-roman-bold", 42],
+	           ["BOBS with the mouse.",140,1,0, "dustismo-roman-bold", 42]]
+
+	render_text_screen(strings)
+
 
 def render_title_page():
 	strings = [["Let your imagination",40,1,0, "dustismo-roman-bold", 42],
@@ -70,6 +80,18 @@ def render_title_page():
 	           ["hidden inside your Amiga.",90,1,0, "dustismo-roman-bold", 42]]
 
 	render_text_screen(strings)
+
+
+def render_hardsprite():
+	strings = [["By pushing your Amiga to",40,1,0, "dustismo-roman-bold", 42],
+	           ["its limit AMOS allows you",65,1,0, "dustismo-roman-bold", 42],
+	           ["to exceed the maximum",90,1,0, "dustismo-roman-bold", 42],
+	           ["amount of hardware",115,1,0, "dustismo-roman-bold", 42],
+	           ["SPRITES normally",140,1,0, "dustismo-roman-bold", 42],
+	           ["available to the user.",165,1,0, "dustismo-roman-bold", 42]]
+
+	render_text_screen(strings)
+
 
 def render_text_screen(strings = None, duration = 4.0, fade_duration = 1.0):
 
@@ -152,3 +174,4 @@ play_music()
 render_title_page_still()
 render_credits()
 render_title_page()
+render_hardsprite()
