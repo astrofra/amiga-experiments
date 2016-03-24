@@ -124,7 +124,7 @@ def render_hardsprite():
 		for spr_index in range(v_max_sprites):
 			spr_name = sprites[image_data[spr_index * 3 + 2]]
 			if not (spr_index in sprite_data):
-				x, y = image_data[spr_index * 3], image_data[spr_index * 3 + 1] + 32
+				x, y = image_data[spr_index * 3], image_data[spr_index * 3 + 1] * 0.925 + 32
 				vel = (1.0 if x < amiga_screen_size[0] * 0.5 else -1)
 				sprite_data[spr_index] = {'frame_index': 0.0, 'max_frames': get_sprite_seq_max_frame(spr_name), 'x':x, 'y':y, 'x_velocity':vel}
 
@@ -138,6 +138,50 @@ def render_hardsprite():
 						"@assets/" + spr_name + str(int(sprite_data[spr_index]['frame_index'])) + ".png")
 		render.set_blend_mode2d(render.BlendOpaque)
 
+		render.flip()
+
+
+def render_hotdog_screen():
+	strings = [["Software SPRITES (BOBS)",30,1,0, "dustismo-roman", 42],
+			["are also available. Their",55,1,0, "dustismo-roman", 42],
+			["size and range of colours",80,1,0, "dustismo-roman", 42],
+			["are limited only by the",105,1,0, "dustismo-roman", 42],
+			["amount of free memory!",130,1,0, "dustismo-roman", 42]]
+
+	render_text_screen(strings)
+
+	bobs = [
+			[120, 40, "jumbo_dog_quarter", 0.5],
+			[400, 60, "jumbo_dog_quarter", -0.5],
+			[400, 120, "jumbo_dog_quarter", 0.6],
+			[-120, 190, "jumbo_dog_quarter", 0.5],
+			[400, 100, "jumbo_dog_half", -1],
+			[-120, 195, "jumbo_dog_half", 1],
+			[-200, 150, "jumbo_dog_half", -1.2],
+			[360, 150, "jumbo_dog", -2],
+	        ]
+
+	fx_timer = 0.0
+	fx_duration = 15.0
+	while fx_timer < fx_duration:
+		dt_sec = clock.update()
+		fx_timer += dt_sec
+		render.clear()
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size * 3) * 0.5, 0, zoom_size, "@assets/backgr.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5, 0, zoom_size, "@assets/backgr.png")
+		render.image2d((demo_screen_size[0] + amiga_screen_size[0] * zoom_size) * 0.5, 0, zoom_size, "@assets/backgr.png")
+		render.set_blend_mode2d(render.BlendAlpha)
+		for b in bobs:
+			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5 + b[0] * zoom_size,
+			               (amiga_screen_size[1] - b[1]) * zoom_size, zoom_size, "@assets/" + b[2] + ".png")
+			b[0] += dt_sec * 60.0 * b[3]
+			if b[0] > 440:
+				b[0] = -340
+			else:
+				if b[0] < -340:
+					b[0] = 440
+
+		render.set_blend_mode2d(render.BlendOpaque)
 		render.flip()
 
 
@@ -172,3 +216,4 @@ render_title_page_still()
 render_credits()
 render_title_page()
 render_hardsprite()
+render_hotdog_screen()
