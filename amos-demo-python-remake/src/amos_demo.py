@@ -91,12 +91,13 @@ def render_hardsprite():
 				230,49,2, 60,50,0, 180,80,3, 100,75,1,
 				230,99,2, 60,100,0, 180,130,3, 100,125,1,
 				230,150,2, 60,149,0, 180,180,3, 100,175,1]
+	sprite_data = {}
 	max_sprites = 16
 
 	fx_timer = 0.0
 	intro_duration = 4.0
-	still_duration = 5.0
-	total_duration = 14.0
+	expose_duration = 1.0
+	total_duration = 10.0
 	while fx_timer < total_duration:
 		dt_sec = clock.update()
 		fx_timer += dt_sec
@@ -107,16 +108,34 @@ def render_hardsprite():
 
 		if fx_timer < intro_duration:
 			v_max_sprites = int(RangeAdjust(fx_timer, 0.0, intro_duration, 1, max_sprites))
+			strings = [["SPRITE", 13 * 8, 1, 0, "amiga4ever-pro2", 18],
+						["NUMBER", 15 * 8, 1, 0, "amiga4ever-pro2", 18],
+						[str(v_max_sprites), 17 * 8, 1, 0, "amiga4ever-pro2", 18]]
+			render_strings_array(strings)
 		else:
 			v_max_sprites = max_sprites
+			if fx_timer >= intro_duration and fx_timer < intro_duration + expose_duration:
+				strings = [["ANIMATE!", 13 * 8, 1, 0, "amiga4ever-pro2", 18]]
+				render_strings_array(strings)
+			else:
+				strings = [["MOVE IT!", 13 * 8, 1, 0, "amiga4ever-pro2", 18]]
+				render_strings_array(strings)
 
 		for spr_index in range(v_max_sprites):
-			image_index = 0
-			x, y = image_data[spr_index * 3], image_data[spr_index * 3 + 1]
 			spr_name = sprites[image_data[spr_index * 3 + 2]]
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5 + (x * zoom_size),
-						(amiga_screen_size[1] - y) * zoom_size, zoom_size / 2,
-						"@assets/" + spr_name + str(image_index) + ".png")
+			if not (spr_index in sprite_data):
+				x, y = image_data[spr_index * 3], image_data[spr_index * 3 + 1] + 32
+				vel = (1.0 if x < amiga_screen_size[0] * 0.5 else -1)
+				sprite_data[spr_index] = {'frame_index': 0.0, 'max_frames': get_sprite_seq_max_frame(spr_name), 'x':x, 'y':y, 'x_velocity':vel}
+
+			if fx_timer > intro_duration:
+				sprite_data[spr_index]['frame_index'] = math.fmod((sprite_data[spr_index]['frame_index'] + dt_sec * 10.0), sprite_data[spr_index]['max_frames'])
+			if fx_timer > intro_duration + expose_duration:
+				sprite_data[spr_index]['x'] += dt_sec * 60.0 * sprite_data[spr_index]['x_velocity']
+
+			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5 + (sprite_data[spr_index]['x'] * zoom_size),
+						(amiga_screen_size[1] - sprite_data[spr_index]['y']) * zoom_size, zoom_size / 2,
+						"@assets/" + spr_name + str(int(sprite_data[spr_index]['frame_index'])) + ".png")
 		render.set_blend_mode2d(render.BlendOpaque)
 
 		render.flip()
