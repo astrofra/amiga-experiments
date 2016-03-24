@@ -50,7 +50,7 @@ def render_credits():
 			["There is an IMPORTANT text file", 185, 1,0, "amiga4ever-pro2", 18],
 			["on this disk, please read it.", 195, 1,0, "amiga4ever-pro2", 18]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, duration=9.0)
 
 	strings = [["On some of the",40,1,0, "dustismo-roman", 42],
 			["demonstrations you",65,1,0, "dustismo-roman", 42],
@@ -58,7 +58,7 @@ def render_credits():
 			["some of the SPRITES or",115,1,0, "dustismo-roman", 42],
 			["BOBS with the mouse.",140,1,0, "dustismo-roman", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, duration=5.0)
 
 
 def render_title_page():
@@ -84,7 +84,7 @@ def render_hardsprite():
 			["SPRITES normally",140,1,0, "dustismo-roman", 42],
 			["available to the user.",165,1,0, "dustismo-roman", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, duration=6.0)
 
 	sprites = ["sprite_bike_", "sprite_skate_", "sprite_glide_", "sprite_plane_"]
 	image_data = [230,-1,2, 60,0,0, 180,30,3, 100,25,1,
@@ -148,18 +148,16 @@ def render_hotdog_screen():
 			["are limited only by the",105,1,0, "dustismo-roman", 42],
 			["amount of free memory!",130,1,0, "dustismo-roman", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, duration=5.0)
 
-	bobs = [
-			[120, 40, "jumbo_dog_quarter", 0.5],
+	bobs = [[120, 40, "jumbo_dog_quarter", 0.5],
 			[400, 60, "jumbo_dog_quarter", -0.5],
 			[400, 120, "jumbo_dog_quarter", 0.6],
 			[-120, 190, "jumbo_dog_quarter", 0.5],
 			[400, 100, "jumbo_dog_half", -1],
 			[-120, 195, "jumbo_dog_half", 1],
 			[-200, 150, "jumbo_dog_half", -1.2],
-			[360, 150, "jumbo_dog", -2],
-	        ]
+			[360, 150, "jumbo_dog", -2]]
 
 	fx_timer = 0.0
 	fx_duration = 15.0
@@ -183,6 +181,15 @@ def render_hotdog_screen():
 
 		render.set_blend_mode2d(render.BlendOpaque)
 		render.flip()
+
+
+def render_gipper():
+
+	strings = [["Software SPRITES (BOBS)",40,1,0, "dustismo-roman", 42],
+	          ["can be used in many",65,1,0, "dustismo-roman", 42],
+	           ["different ways.",90,1,0, "dustismo-roman", 42]]
+
+	render_text_screen(strings)
 
 
 def render_title_page_bouncing():
@@ -217,3 +224,4 @@ render_credits()
 render_title_page()
 render_hardsprite()
 render_hotdog_screen()
+render_gipper()
