@@ -233,6 +233,43 @@ def render_gipper():
 
 	render_text_screen(strings)
 
+	fx_timer = 0.0
+	run_duration = 1.5
+	brake_duration = 0.5
+	shoot_duration = 2.5
+	fx_duration = 7.0
+	render.set_blend_mode2d(render.BlendAlpha)
+
+	x, y, sprite_index = -55, 75 + 48, 0
+
+	while fx_timer < fx_duration:
+		dt_sec = clock.update()
+		fx_timer += dt_sec
+		render.clear()
+
+		if fx_timer < run_duration:
+			x += dt_sec * 60.0 * 1.7
+			sprite_index = math.fmod(sprite_index + dt_sec * 8.0, 5)
+		elif fx_timer < run_duration + brake_duration:
+			x += dt_sec * 60.0 * 1.25
+			sprite_index = 7
+		elif fx_timer < run_duration + brake_duration + shoot_duration:
+			sprite_index += dt_sec * 10.0
+			if sprite_index < 10:
+				sprite_index = 10
+			elif sprite_index > 17:
+				sprite_index = 10
+		else:
+			x += dt_sec * 60.0 * 1.7
+			sprite_index = math.fmod(sprite_index + dt_sec * 8.0, 5)
+
+
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
+		               (amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
+
+		render.flip()
+
+	render.set_blend_mode2d(render.BlendOpaque)
 
 def render_title_page_bouncing():
 	fx_timer = 0.0
