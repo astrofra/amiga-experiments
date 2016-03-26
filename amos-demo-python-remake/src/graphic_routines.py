@@ -21,11 +21,11 @@ def render_strings_array(strings = None, fade = 1.0, fonts_dict = {}):
 	for line in strings:
 		font_key = line[4] + "_" + str(line[5])
 		if not font_key in fonts_dict:
-			fonts_dict[font_key] = gs.RasterFont("@assets/" + line[4] + ".ttf", line[5], 512)
+			fonts_dict[font_key] = gs.RasterFont("@assets/" + line[4] + ".ttf", line[5] * zoom_size() / 3, 512)
 
 		rect = fonts_dict[font_key].GetTextRect(sys, line[0])
 		x = (demo_screen_size[0] - rect.GetWidth()) * 0.5
-		y = (amiga_screen_size[1] - line[1]) * zoom_size
+		y = (amiga_screen_size[1] - line[1]) * zoom_size()
 		fonts_dict[font_key].Write(sys, line[0], gs.Vector3(x, y, 0.5), gs.Color.White * fade)
 
 	sys.DrawRasterFontBatch()
@@ -38,7 +38,7 @@ def render_strings_array(strings = None, fade = 1.0, fonts_dict = {}):
 			font_key = line[4] + "_" + str(line[5])
 			rect = fonts_dict[font_key].GetTextRect(sys, line[0])
 			x = (demo_screen_size[0] - rect.GetWidth()) * 0.5
-			y = (amiga_screen_size[1] - line[1]) * zoom_size - (line[5] * 0.2)
+			y = (amiga_screen_size[1] - line[1]) * zoom_size() - (line[5] * 0.2 * zoom_size() / 3)
 			render.line2d(x, y, x + rect.GetWidth(), y, gs.Color.White * fade, gs.Color.White * fade)
 
 	return fonts_dict

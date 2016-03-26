@@ -16,18 +16,60 @@ import gs
 import gs.plus.render as render
 import gs.plus.clock as clock
 import math
+import easygui
 from utils import *
 from graphic_routines import *
 from screen_specs import *
 
-gs.LoadPlugins(gs.get_default_plugins_path())
-render.init(demo_screen_size[0], demo_screen_size[1], "pkg.core")
 
-# mount the system file driver
-gs.MountFileDriver(gs.StdFileDriver("assets/"), "@assets/")
+def resolution_requester():
+	res_list = ["320x200", "640x400", "800x600", "1280x720", "1600x900", "1920x1080", "1920x1200"]
+	choice = easygui.choicebox(msg='Select your screen resolution', title='Screen Resolution', choices=(res_list))
+	if choice is not None:
+		demo_screen_size[0] = int(choice.split("x")[0])
+		demo_screen_size[1] = int(choice.split("x")[1])
 
-al = None
-channel = None
+
+def engine_init():
+	global al, channel
+	gs.LoadPlugins(gs.get_default_plugins_path())
+	render.init(demo_screen_size[0], demo_screen_size[1], "pkg.core")
+
+	# mount the system file driver
+	gs.MountFileDriver(gs.StdFileDriver("assets/"), "@assets/")
+
+	al = None
+	channel = None
+
+
+def startup_sequence():
+	print("")
+	print("                           =========")
+	print("                           AMOS DEMO")
+	print("                           =========")
+	print("")
+	print("                    AMOS by Francois Lionet")
+	print("")
+	print("                 AMOS DEMO by Peter J. Hickman")
+	print("")
+	print("                      Music by A. Brimble")
+	print("")
+	print("    THIS DEMO WILL NOT WORK ON AN A1000, THE CAUSE OF THE")
+	print("    PROBLEM IS CURRENTLY BEING RECTIFIED AND WHEN AMOS IS")
+	print("    RELEASED IT WILL WORK ON ALL COMMODORE AMIGA MACHINES.")
+	print("")
+	print("There is a text file on this disc called IMPORTANT_TEXT_FILE")
+	print("            Please read it before running this demo")
+	print("             Press <control> + <C> to stop the demo")
+	print("")
+	print("                 For More Information contact:")
+	print(" MANDARIN SOFTWARE, EUROPA HOUSE, ADLINGTON PARK, ADLINGTON,")
+	print("                    MACCLESFIELD SK10 4NP")
+	print("                     PHONE (0625) 859333")
+	print("")
+	print("                   Python port by Astrofra")
+	print("")
+
 
 
 def play_music():
@@ -133,8 +175,8 @@ def render_hardsprite():
 			if fx_timer > intro_duration + expose_duration:
 				sprite_data[spr_index]['x'] += dt_sec * 60.0 * sprite_data[spr_index]['x_velocity']
 
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5 + (sprite_data[spr_index]['x'] * zoom_size),
-						(amiga_screen_size[1] - sprite_data[spr_index]['y']) * zoom_size, zoom_size / 2,
+			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (sprite_data[spr_index]['x'] * zoom_size()),
+						(amiga_screen_size[1] - sprite_data[spr_index]['y']) * zoom_size(), zoom_size() / 2,
 						"@assets/" + spr_name + str(int(sprite_data[spr_index]['frame_index'])) + ".png")
 		render.set_blend_mode2d(render.BlendOpaque)
 
@@ -165,13 +207,13 @@ def render_hotdog_screen():
 		dt_sec = clock.update()
 		fx_timer += dt_sec
 		render.clear()
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size * 3) * 0.5, 0, zoom_size, "@assets/backgr.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5, 0, zoom_size, "@assets/backgr.png")
-		render.image2d((demo_screen_size[0] + amiga_screen_size[0] * zoom_size) * 0.5, 0, zoom_size, "@assets/backgr.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size() * 3) * 0.5, 0, zoom_size(), "@assets/backgr.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/backgr.png")
+		render.image2d((demo_screen_size[0] + amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/backgr.png")
 		render.set_blend_mode2d(render.BlendAlpha)
 		for b in bobs:
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5 + b[0] * zoom_size,
-			               (amiga_screen_size[1] - b[1]) * zoom_size, zoom_size, "@assets/" + b[2] + ".png")
+			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + b[0] * zoom_size(),
+			               (amiga_screen_size[1] - b[1]) * zoom_size(), zoom_size(), "@assets/" + b[2] + ".png")
 			b[0] += dt_sec * 60.0 * b[3]
 			if b[0] > 440:
 				b[0] = -340
@@ -203,7 +245,7 @@ def render_title_page_bouncing():
 		y_damping = EaseInOutQuick(y_damping)
 		y_scr = abs(math.sin((fx_timer + 1.2) * 4.0)) * y_damping
 		render.clear()
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5, y_scr * demo_screen_size[1], zoom_size, "@assets/titlepage.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, y_scr * demo_screen_size[1], zoom_size(), "@assets/titlepage.png")
 		render.flip()
 
 
@@ -213,10 +255,13 @@ def render_title_page_still():
 		dt_sec = clock.update()
 		fx_timer += dt_sec
 		render.clear()
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size) * 0.5, 0, zoom_size, "@assets/titlepage.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/titlepage.png")
 		render.flip()
 
 
+startup_sequence()
+resolution_requester()
+engine_init()
 render_title_page_bouncing()
 play_music()
 render_title_page_still()
