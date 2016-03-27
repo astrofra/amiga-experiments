@@ -344,15 +344,15 @@ def render_star():
 
 def render_overlay():
 	strings = [["AMOS allows up to",40,1,0, "bilko-opti-bold", 42],
-	           ["eight screens to be",65,1,0, "bilko-opti-bold", 42],
-	           ["displayed at any",90,1,0, "bilko-opti-bold", 42],
-	           ["one time.",115,1,0, "bilko-opti-bold", 42]]
+			   ["eight screens to be",65,1,0, "bilko-opti-bold", 42],
+			   ["displayed at any",90,1,0, "bilko-opti-bold", 42],
+			   ["one time.",115,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings)
 
 	strings = [["Each screen can",40,1,0, "bilko-opti-bold", 42],
-	           ["be manipulated in a",65,1,0, "bilko-opti-bold", 42],
-	           ["variety of unusual ways.",90,1,0, "bilko-opti-bold", 42]]
+			   ["be manipulated in a",65,1,0, "bilko-opti-bold", 42],
+			   ["variety of unusual ways.",90,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings)
 
@@ -371,11 +371,11 @@ def render_overlay():
 
 		# back image
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
-		               (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
-		               zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
+					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
-		               (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
-		               zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
+					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
 
 		screen_0[0] += dt_sec * 60.0 * screen_0[2]
 		if screen_0[0] < -amiga_screen_size[0]:
@@ -387,8 +387,8 @@ def render_overlay():
 
 		# front image
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
-               (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
-               zoom_size() * 0.5, "@assets/multiscreen_ham.png")
+			   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+			   zoom_size() * 0.5, "@assets/multiscreen_ham.png")
 
 		screen_1[1] += dt_sec * 60.0 * screen_1[2]
 		if screen_1[1] > amiga_screen_size[1] * 2:
@@ -405,23 +405,23 @@ def render_overlay():
 
 def render_change_fonts():
 	strings = [["AMOS is much more flexible",40,1,0, "bilko-opti-bold", 42],
-	           ["then any other Amiga",65,1,0, "bilko-opti-bold", 42],
-	           ["programming language.",90,1,0, "bilko-opti-bold", 42]]
+			   ["then any other Amiga",65,1,0, "bilko-opti-bold", 42],
+			   ["programming language.",90,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings)
 
 	strings = [["You can even use",40,1,0, "bilko-opti-bold", 42],
-	           ["standard Deluxe Paint",65,1,0, "bilko-opti-bold", 42],
-	           ["compatible fonts.",90,1,0, "bilko-opti-bold", 42]]
+			   ["standard Deluxe Paint",65,1,0, "bilko-opti-bold", 42],
+			   ["compatible fonts.",90,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings)
 
 	fonts = [["common6", 42, 13],
-	         ["bilko-opti-bold", 42, 13], ["bilko-opti-bold", 32, 17],
-	         ["eka-s-handwriting", 50, 11], ["eka-s-handwriting", 32, 17],
-	         ["voyage-fant", 50, 11],
-	         ["limelight", 46, 12],
-	         ]
+			 ["bilko-opti-bold", 42, 13], ["bilko-opti-bold", 32, 17],
+			 ["eka-s-handwriting", 50, 11], ["eka-s-handwriting", 32, 17],
+			 ["voyage-fant", 50, 11],
+			 ["limelight", 46, 12],
+			 ]
 
 	for _font in fonts:
 		strings = []
@@ -438,24 +438,92 @@ def render_price_mandarin_logo():
 					(amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/mandarin_logo.png")
 	render.set_blend_mode2d(render.BlendOpaque)
 
-def render_price():
 
+def render_price():
 	y = 8
-	strings=[["AMOS will be available in",25 - y,1,0, "bilko-opti-bold", 40],
-	         ["March for £49.95 from ",38 - y,1,0, "bilko-opti-bold", 40],
-	         ["FOR DETAILED SPECIFICATIONS",85 - y,1,0, "amiga4ever-pro2", 18],
-	         ["WRITE TO:",95 - y,1,0, "amiga4ever-pro2", 18],
-	         ["AMOS INFORMATION",105 - y,1,0, "amiga4ever-pro2", 18],
-	         ["MANDARIN SOFTWARE",115 - y,1,0, "amiga4ever-pro2", 18],
-	         ["EUROPA HOUSE, ADLINGTON PARK",125 - y,1,0, "amiga4ever-pro2", 18],
-	         ["ADLINGTON, MACCLESFIELD",135 - y,1,0, "amiga4ever-pro2", 18],
-	         ["SK10 4NP",145 - y,1,0, "amiga4ever-pro2", 18],
-	         ["PHONE: (0625) 859333",160 - y,1,0, "amiga4ever-pro2", 18],
-	         ["Press space for more information",175 - y,1,0, "amiga4ever-pro2", 18],
-	         ["Any other key",185 - y,1,1, "amiga4ever-pro2", 18],
-	         ["restarts this demo.",195 - y,1,1, "amiga4ever-pro2", 18]]
+	strings = [["AMOS will be available in",25 - y,1,0, "bilko-opti-bold", 40],
+				["March for £49.95 from ",38 - y,1,0, "bilko-opti-bold", 40],
+				["FOR DETAILED SPECIFICATIONS",85 - y,1,0, "amiga4ever-pro2", 18],
+				["WRITE TO:",95 - y,1,0, "amiga4ever-pro2", 18],
+				["AMOS INFORMATION",105 - y,1,0, "amiga4ever-pro2", 18],
+				["MANDARIN SOFTWARE",115 - y,1,0, "amiga4ever-pro2", 18],
+				["EUROPA HOUSE, ADLINGTON PARK",125 - y,1,0, "amiga4ever-pro2", 18],
+				["ADLINGTON, MACCLESFIELD",135 - y,1,0, "amiga4ever-pro2", 18],
+				["SK10 4NP",145 - y,1,0, "amiga4ever-pro2", 18],
+				["PHONE: (0625) 859333",160 - y,1,0, "amiga4ever-pro2", 18],
+				["Press space for more information",175 - y,1,0, "amiga4ever-pro2", 18],
+				["Any other key",185 - y,1,1, "amiga4ever-pro2", 18],
+				["restarts this demo.",195 - y,1,1, "amiga4ever-pro2", 18]]
 
 	render_text_screen(strings, duration=len(strings), fade_duration=0.2, render_callback=render_price_mandarin_logo)
+
+
+def render_dual_playfield():
+	strings = [["With AMOS you can easily",30,1,0, "bilko-opti-bold", 42],
+				["utilise the unique Amiga",55,1,0, "bilko-opti-bold", 42],
+				["Dual Playfield mode, Which",80,1,0, "bilko-opti-bold", 42],
+				["allows two screens to be",105,1,0, "bilko-opti-bold", 42],
+				["overlayed on top of each",130,1,0, "bilko-opti-bold", 42],
+				["each other.",155,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=len(strings))
+
+	strings = [["This allows you to create",30,1,0, "bilko-opti-bold", 42],
+				["stunning parallax scrolling",55,1,0, "bilko-opti-bold", 42],
+				["games like XENON II and",80,1,0, "bilko-opti-bold", 42],
+				["SILKWORM.",105,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=len(strings))
+
+	fx_timer = 0.0
+	fx_duration = 15.0
+	screen_0 = [0, 200, -1]
+	screen_1 = [0, 200, -2]
+
+	while fx_timer < fx_duration:
+		dt_sec = clock.update()
+		fx_timer += dt_sec
+		render.clear()
+		render.set_blend_mode2d(render.BlendAlpha)
+
+		# back image
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] - amiga_screen_size[0]) * zoom_size(),
+					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
+					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
+					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0] * 2) * zoom_size(),
+					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+
+		screen_0[0] += dt_sec * 60.0 * screen_0[2]
+		if screen_0[0] < -amiga_screen_size[0]:
+			screen_0[0] = 0
+
+		# front image
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] - amiga_screen_size[0]) * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0]) * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0] * 2) * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+
+		screen_1[0] += dt_sec * 60.0 * screen_1[2]
+		if screen_1[0] < -amiga_screen_size[0]:
+			screen_1[0] = 0
+
+		render.set_blend_mode2d(render.BlendOpaque)
+		render.flip()
 
 def render_title_page_bouncing():
 	fx_timer = 0.0
@@ -495,6 +563,7 @@ render_hotdog_screen()
 render_gipper()
 render_gippers()
 render_star()
+render_dual_playfield()
 render_overlay()
 render_change_fonts()
 render_price()
