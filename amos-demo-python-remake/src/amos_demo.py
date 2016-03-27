@@ -82,11 +82,11 @@ def play_music():
 
 
 def render_credits():
-	strings = [["THE AMOS DEMO", 25, 1, 1, "dustismo-roman", 42],
-			["PROGRAMMING BY", 60, 1, 0 ,"dustismo-roman", 42],
-			["Peter Hickman", 75, 1, 0, "dustismo-roman", 42],
-			["MUSIC BY", 105, 1, 0, "dustismo-roman", 42],
-			["Allister Brimble", 120, 1, 0, "dustismo-roman", 42],
+	strings = [["THE AMOS DEMO", 25, 1, 1, "bilko-opti-bold", 42],
+			["PROGRAMMING BY", 60, 1, 0 ,"bilko-opti-bold", 42],
+			["Peter Hickman", 75, 1, 0, "bilko-opti-bold", 42],
+			["MUSIC BY", 105, 1, 0, "bilko-opti-bold", 42],
+			["Allister Brimble", 120, 1, 0, "bilko-opti-bold", 42],
 			["IF YOU WOULD LIKE SOME CONTROL", 155, 1, 0, "amiga4ever-pro2", 18],
 			["OVER THIS DEMO PRESS SPACE NOW", 165, 1, 0, "amiga4ever-pro2", 18],
 			["There is an IMPORTANT text file", 185, 1,0, "amiga4ever-pro2", 18],
@@ -94,37 +94,37 @@ def render_credits():
 
 	render_text_screen(strings, duration=9.0)
 
-	strings = [["On some of the",40,1,0, "dustismo-roman", 42],
-			["demonstrations you",65,1,0, "dustismo-roman", 42],
-			["will be able to move",90,1,0, "dustismo-roman", 42],
-			["some of the SPRITES or",115,1,0, "dustismo-roman", 42],
-			["BOBS with the mouse.",140,1,0, "dustismo-roman", 42]]
+	strings = [["On some of the",40,1,0, "bilko-opti-bold", 42],
+			["demonstrations you",65,1,0, "bilko-opti-bold", 42],
+			["will be able to move",90,1,0, "bilko-opti-bold", 42],
+			["some of the SPRITES or",115,1,0, "bilko-opti-bold", 42],
+			["BOBS with the mouse.",140,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings, duration=5.0)
 
 
 def render_title_page():
-	strings = [["Let your imagination",40,1,0, "dustismo-roman", 42],
-			["take control and",65,1,0, "dustismo-roman", 42],
-			["design the game",90,1,0, "dustismo-roman", 42],
-			["of your dreams.",115,1,0, "dustismo-roman", 42]]
+	strings = [["Let your imagination",40,1,0, "bilko-opti-bold", 42],
+			["take control and",65,1,0, "bilko-opti-bold", 42],
+			["design the game",90,1,0, "bilko-opti-bold", 42],
+			["of your dreams.",115,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings)
 
-	strings = [["Over 400 commands",40,1,0, "dustismo-roman", 42],
-			["to unleash the raw power",65,1,0, "dustismo-roman", 42],
-			["hidden inside your Amiga.",90,1,0, "dustismo-roman", 42]]
+	strings = [["Over 400 commands",40,1,0, "bilko-opti-bold", 42],
+			["to unleash the raw power",65,1,0, "bilko-opti-bold", 42],
+			["hidden inside your Amiga.",90,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings)
 
 
 def render_hardsprite():
-	strings = [["By pushing your Amiga to",40,1,0, "dustismo-roman", 42],
-			["its limit AMOS allows you",65,1,0, "dustismo-roman", 42],
-			["to exceed the maximum",90,1,0, "dustismo-roman", 42],
-			["amount of hardware",115,1,0, "dustismo-roman", 42],
-			["SPRITES normally",140,1,0, "dustismo-roman", 42],
-			["available to the user.",165,1,0, "dustismo-roman", 42]]
+	strings = [["By pushing your Amiga to",40,1,0, "bilko-opti-bold", 42],
+			["its limit AMOS allows you",65,1,0, "bilko-opti-bold", 42],
+			["to exceed the maximum",90,1,0, "bilko-opti-bold", 42],
+			["amount of hardware",115,1,0, "bilko-opti-bold", 42],
+			["SPRITES normally",140,1,0, "bilko-opti-bold", 42],
+			["available to the user.",165,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings, duration=6.0)
 
@@ -184,11 +184,11 @@ def render_hardsprite():
 
 
 def render_hotdog_screen():
-	strings = [["Software SPRITES (BOBS)",30,1,0, "dustismo-roman", 42],
-			["are also available. Their",55,1,0, "dustismo-roman", 42],
-			["size and range of colours",80,1,0, "dustismo-roman", 42],
-			["are limited only by the",105,1,0, "dustismo-roman", 42],
-			["amount of free memory!",130,1,0, "dustismo-roman", 42]]
+	strings = [["Software SPRITES (BOBS)",30,1,0, "bilko-opti-bold", 42],
+			["are also available. Their",55,1,0, "bilko-opti-bold", 42],
+			["size and range of colours",80,1,0, "bilko-opti-bold", 42],
+			["are limited only by the",105,1,0, "bilko-opti-bold", 42],
+			["amount of free memory!",130,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings, duration=5.0)
 
@@ -213,7 +213,7 @@ def render_hotdog_screen():
 		render.set_blend_mode2d(render.BlendAlpha)
 		for b in bobs:
 			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + b[0] * zoom_size(),
-			               (amiga_screen_size[1] - b[1]) * zoom_size(), zoom_size(), "@assets/" + b[2] + ".png")
+						   (amiga_screen_size[1] - b[1]) * zoom_size(), zoom_size(), "@assets/" + b[2] + ".png")
 			b[0] += dt_sec * 60.0 * b[3]
 			if b[0] > 440:
 				b[0] = -340
@@ -227,9 +227,9 @@ def render_hotdog_screen():
 
 def render_gipper():
 
-	strings = [["Software SPRITES (BOBS)",40,1,0, "dustismo-roman", 42],
-	          ["can be used in many",65,1,0, "dustismo-roman", 42],
-	           ["different ways.",90,1,0, "dustismo-roman", 42]]
+	strings = [["Software SPRITES (BOBS)",40,1,0, "bilko-opti-bold", 42],
+			  ["can be used in many",65,1,0, "bilko-opti-bold", 42],
+			   ["different ways.",90,1,0, "bilko-opti-bold", 42]]
 
 	render_text_screen(strings)
 
@@ -265,7 +265,7 @@ def render_gipper():
 
 
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
-		               (amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
+					   (amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
 
 		render.flip()
 
@@ -274,13 +274,13 @@ def render_gipper():
 
 def render_gippers():
 
-	strings = [["There is no limit to the",40,1,0, "dustismo-roman", 42],
-				["amount of images you can",65,1,0, "dustismo-roman", 42],
-				["generate. By using just",90,1,0, "dustismo-roman", 42],
-				["one BOB dozens can be",115,1,0, "dustismo-roman", 42],
-				["displayed with ease.",140,1,0, "dustismo-roman", 42]]
+	strings = [["There is no limit to the",40,1,0, "bilko-opti-bold", 42],
+				["amount of images you can",65,1,0, "bilko-opti-bold", 42],
+				["generate. By using just",90,1,0, "bilko-opti-bold", 42],
+				["one BOB dozens can be",115,1,0, "bilko-opti-bold", 42],
+				["displayed with ease.",140,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, duration=5.0)
 
 	fx_timer = 0.0
 	run_duration = 1.5
@@ -317,12 +317,29 @@ def render_gippers():
 				xx = x + (i - 2.5) * 48.0
 				yy = y + (j - 1.5) * 50.0
 				render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + xx * zoom_size(),
-				               (amiga_screen_size[1] - yy) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
+							   (amiga_screen_size[1] - yy) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
 
 		render.flip()
 
 	render.set_blend_mode2d(render.BlendOpaque)
 
+
+def render_star():
+	strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
+			   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
+			   ["This method is very",80,1,0, "bilko-opti-bold", 42],
+			   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
+			   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=5.0)
+
+	strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
+			   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
+			   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
+			   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
+			   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=5.0)
 
 def render_title_page_bouncing():
 	fx_timer = 0.0
@@ -361,3 +378,4 @@ render_hardsprite()
 render_hotdog_screen()
 render_gipper()
 render_gippers()
+render_star()
