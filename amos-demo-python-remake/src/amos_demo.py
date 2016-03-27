@@ -341,6 +341,35 @@ def render_star():
 
 	render_text_screen(strings, duration=5.0)
 
+
+def change_fonts():
+	strings = [["AMOS is much more flexible",40,1,0, "bilko-opti-bold", 42],
+	           ["then any other Amiga",65,1,0, "bilko-opti-bold", 42],
+	           ["programming language.",90,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings)
+
+	strings = [["You can even use",40,1,0, "bilko-opti-bold", 42],
+	           ["standard Deluxe Paint",65,1,0, "bilko-opti-bold", 42],
+	           ["compatible fonts.",90,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings)
+
+	fonts = [["common6", 42, 13],
+	         ["bilko-opti-bold", 42, 13], ["bilko-opti-bold", 32, 17],
+	         ["eka-s-handwriting", 50, 11], ["eka-s-handwriting", 32, 17],
+	         ["voyage-fant", 50, 11],
+	         ["limelight", 46, 12],
+	         ]
+
+	for _font in fonts:
+		strings = []
+		for i in range(_font[2]):
+			strings.append(["AMOS FONTS", (i + 1) * _font[1] / 3, 1, 0, _font[0], _font[1]])
+
+		render_text_screen(strings, fade_duration=0.1)
+
+
 def render_title_page_bouncing():
 	fx_timer = 0.0
 	fx_duration = math.pi
@@ -379,3 +408,4 @@ render_hotdog_screen()
 render_gipper()
 render_gippers()
 render_star()
+change_fonts()
