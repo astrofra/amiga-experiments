@@ -342,7 +342,68 @@ def render_star():
 	render_text_screen(strings, duration=5.0)
 
 
-def change_fonts():
+def render_overlay():
+	strings = [["AMOS allows up to",40,1,0, "bilko-opti-bold", 42],
+	           ["eight screens to be",65,1,0, "bilko-opti-bold", 42],
+	           ["displayed at any",90,1,0, "bilko-opti-bold", 42],
+	           ["one time.",115,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings)
+
+	strings = [["Each screen can",40,1,0, "bilko-opti-bold", 42],
+	           ["be manipulated in a",65,1,0, "bilko-opti-bold", 42],
+	           ["variety of unusual ways.",90,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings)
+
+	strings = [["OVERLAPPING SCREENS WITH DIFFERENT SIZES, RESOLUTIONS AND COLOURS IS EASY", 40, 1, 0, "topaz-a500", 20]]
+
+	fx_timer = 0.0
+	fx_duration = 6.0
+	screen_0 = [0, 200, -2]
+	screen_1 = [0, 0, 3]
+	screen_2 = [0, 0, 1.25]
+
+	while fx_timer < fx_duration:
+		dt_sec = clock.update()
+		fx_timer += dt_sec
+		render.clear()
+
+		# back image
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
+		               (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+		               zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
+		               (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+		               zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
+
+		screen_0[0] += dt_sec * 60.0 * screen_0[2]
+		if screen_0[0] < -amiga_screen_size[0]:
+			screen_0[0] = -amiga_screen_size[0]
+			screen_0[2] *= -1
+		elif screen_0[0] > 0:
+			screen_0[0] = 0
+			screen_0[2] *= -1
+
+		# front image
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
+               (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+               zoom_size() * 0.5, "@assets/multiscreen_ham.png")
+
+		screen_1[1] += dt_sec * 60.0 * screen_1[2]
+		if screen_1[1] > amiga_screen_size[1] * 2:
+			screen_1[1] = -amiga_screen_size[1]
+
+		strings[0][1] = screen_2[1]
+		render_strings_array(strings)
+
+		screen_2[1] += dt_sec * 60.0 * screen_2[2]
+		if screen_2[1] > amiga_screen_size[1] * 1.25:
+			screen_2[1] = -amiga_screen_size[1] * 0.25
+
+		render.flip()
+
+def render_change_fonts():
 	strings = [["AMOS is much more flexible",40,1,0, "bilko-opti-bold", 42],
 	           ["then any other Amiga",65,1,0, "bilko-opti-bold", 42],
 	           ["programming language.",90,1,0, "bilko-opti-bold", 42]]
@@ -370,6 +431,32 @@ def change_fonts():
 		render_text_screen(strings, fade_duration=0.1)
 
 
+def render_price_mandarin_logo():
+	x, y = 114, 67
+	render.set_blend_mode2d(render.BlendAlpha)
+	render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
+					(amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/mandarin_logo.png")
+	render.set_blend_mode2d(render.BlendOpaque)
+
+def render_price():
+
+	y = 8
+	strings=[["AMOS will be available in",25 - y,1,0, "bilko-opti-bold", 40],
+	         ["March for £49.95 from ",38 - y,1,0, "bilko-opti-bold", 40],
+	         ["FOR DETAILED SPECIFICATIONS",85 - y,1,0, "amiga4ever-pro2", 18],
+	         ["WRITE TO:",95 - y,1,0, "amiga4ever-pro2", 18],
+	         ["AMOS INFORMATION",105 - y,1,0, "amiga4ever-pro2", 18],
+	         ["MANDARIN SOFTWARE",115 - y,1,0, "amiga4ever-pro2", 18],
+	         ["EUROPA HOUSE, ADLINGTON PARK",125 - y,1,0, "amiga4ever-pro2", 18],
+	         ["ADLINGTON, MACCLESFIELD",135 - y,1,0, "amiga4ever-pro2", 18],
+	         ["SK10 4NP",145 - y,1,0, "amiga4ever-pro2", 18],
+	         ["PHONE: (0625) 859333",160 - y,1,0, "amiga4ever-pro2", 18],
+	         ["Press space for more information",175 - y,1,0, "amiga4ever-pro2", 18],
+	         ["Any other key",185 - y,1,1, "amiga4ever-pro2", 18],
+	         ["restarts this demo.",195 - y,1,1, "amiga4ever-pro2", 18]]
+
+	render_text_screen(strings, duration=len(strings), fade_duration=0.2, render_callback=render_price_mandarin_logo)
+
 def render_title_page_bouncing():
 	fx_timer = 0.0
 	fx_duration = math.pi
@@ -396,16 +483,18 @@ def render_title_page_still():
 
 
 startup_sequence()
-resolution_requester()
+# resolution_requester()
 engine_init()
-render_title_page_bouncing()
-play_music()
-render_title_page_still()
-render_credits()
-render_title_page()
-render_hardsprite()
-render_hotdog_screen()
-render_gipper()
-render_gippers()
-render_star()
-change_fonts()
+# render_title_page_bouncing()
+# play_music()
+# render_title_page_still()
+# render_credits()
+# render_title_page()
+# render_hardsprite()
+# render_hotdog_screen()
+# render_gipper()
+# render_gippers()
+# render_star()
+render_overlay()
+# render_change_fonts()
+# render_price()
