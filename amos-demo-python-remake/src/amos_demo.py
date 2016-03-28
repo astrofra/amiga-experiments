@@ -458,6 +458,23 @@ def render_price():
 	render_text_screen(strings, duration=len(strings), fade_duration=0.2, render_callback=render_price_mandarin_logo)
 
 
+def render_hardscroll():
+	strings = [["Software and hardware",40,1,0, "bilko-opti-bold", 42],
+			   ["scrolling are present in",65,1,0, "bilko-opti-bold", 42],
+			   ["AMOS. Each type can be",90,1,0, "bilko-opti-bold", 42],
+			   ["activated with a single",115,1,0, "bilko-opti-bold", 42],
+			   ["command.",140,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=len(strings))
+
+	strings = [["It is possible to use",40,1,0, "bilko-opti-bold", 42],
+			   ["both SPRITES and BOBS",65,1,0, "bilko-opti-bold", 42],
+			   ["on any type of",90,1,0, "bilko-opti-bold", 42],
+			   ["scrolling screen.",115,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=len(strings))
+
+
 def render_dual_playfield():
 	strings = [["With AMOS you can easily",30,1,0, "bilko-opti-bold", 42],
 				["utilise the unique Amiga",55,1,0, "bilko-opti-bold", 42],
@@ -563,6 +580,7 @@ render_hotdog_screen()
 render_gipper()
 render_gippers()
 render_star()
+render_hardscroll()
 render_dual_playfield()
 render_overlay()
 render_change_fonts()
