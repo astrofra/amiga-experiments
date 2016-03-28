@@ -16,6 +16,7 @@ import gs
 import gs.plus.render as render
 import gs.plus.clock as clock
 import math
+import random
 import easygui
 from utils import *
 from graphic_routines import *
@@ -458,20 +459,20 @@ def render_price():
 
 
 def render_hardscroll():
-	# strings = [["Software and hardware",40,1,0, "bilko-opti-bold", 42],
-	# 		   ["scrolling are present in",65,1,0, "bilko-opti-bold", 42],
-	# 		   ["AMOS. Each type can be",90,1,0, "bilko-opti-bold", 42],
-	# 		   ["activated with a single",115,1,0, "bilko-opti-bold", 42],
-	# 		   ["command.",140,1,0, "bilko-opti-bold", 42]]
-	#
-	# render_text_screen(strings, duration=len(strings))
-	#
-	# strings = [["It is possible to use",40,1,0, "bilko-opti-bold", 42],
-	# 		   ["both SPRITES and BOBS",65,1,0, "bilko-opti-bold", 42],
-	# 		   ["on any type of",90,1,0, "bilko-opti-bold", 42],
-	# 		   ["scrolling screen.",115,1,0, "bilko-opti-bold", 42]]
-	#
-	# render_text_screen(strings, duration=len(strings))
+	strings = [["Software and hardware",40,1,0, "bilko-opti-bold", 42],
+			   ["scrolling are present in",65,1,0, "bilko-opti-bold", 42],
+			   ["AMOS. Each type can be",90,1,0, "bilko-opti-bold", 42],
+			   ["activated with a single",115,1,0, "bilko-opti-bold", 42],
+			   ["command.",140,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=len(strings))
+
+	strings = [["It is possible to use",40,1,0, "bilko-opti-bold", 42],
+			   ["both SPRITES and BOBS",65,1,0, "bilko-opti-bold", 42],
+			   ["on any type of",90,1,0, "bilko-opti-bold", 42],
+			   ["scrolling screen.",115,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=len(strings))
 
 	fx_timer = 0.0
 	phase_1_duration = 3.0
@@ -481,11 +482,18 @@ def render_hardscroll():
 	phase_5_duration = 2.0
 	phase_6_duration = 1.5
 	phase_7_duration = 0.5
-	phase_8_duration = 2.5
-	fx_duration = 18.0
+	phase_8_duration = 2.0
+	fx_duration = 17.5
 	screen_1 = [0, 200, 0]
 	sprite_0 = [-100, 110, 0, 0, 0]
 	sprite_1 = [400, 110, 0, 0, 15]
+	enemy_amount = 10
+	enemy_sprites = [[400, 110, 0, 0, 15] for _ in range(enemy_amount)]
+	for i in range(enemy_amount):
+		enemy_sprites[i][0] = random.randint(400, 500)
+		enemy_sprites[i][1] = random.randint(64, 200)
+		enemy_sprites[i][2] = -(1 + random.randint(1, 5) + random.randint(0, 1) * 0.5 + random.randint(0, 1) * 0.25)
+		enemy_sprites[i][4] = random.randint(15, 20)
 
 	while fx_timer < fx_duration:
 		dt_sec = clock.update()
@@ -523,11 +531,11 @@ def render_hardscroll():
 			screen_1[2] = -1
 		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration + phase_4_duration + phase_5_duration + phase_6_duration + phase_7_duration:
 			screen_1[2] = -0.5
-			sprite_0[2] = 1.5
+			sprite_0[2] = 2
 		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration + phase_4_duration + phase_5_duration + phase_6_duration + phase_7_duration + phase_8_duration:
 			screen_1[2] = 0
 			if abs(sprite_0[0] - sprite_1[0]) > 10:
-				sprite_1[2] = -2
+				sprite_1[2] = -3
 			else:
 				sprite_0[2] = sprite_1[2] = 0
 
@@ -574,6 +582,15 @@ def render_hardscroll():
 		if sprite_1[4] >= 0:
 			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_1[0] * zoom_size(),
 						(amiga_screen_size[1] - sprite_1[1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(sprite_1[4])) + ".png")
+
+		for i in range(enemy_amount):
+			enemy_sprites[i][0] += dt_sec * 60.0 * enemy_sprites[i][2]
+			enemy_sprites[i][1] += dt_sec * 60.0 * enemy_sprites[i][3]
+			enemy_sprites[i][4] += dt_sec * 10.0
+			if enemy_sprites[i][4] > 22:
+				enemy_sprites[i][4] = 15
+			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + enemy_sprites[i][0] * zoom_size(),
+						(amiga_screen_size[1] - enemy_sprites[i][1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(enemy_sprites[i][4])) + ".png")
 
 		render.set_blend_mode2d(render.BlendOpaque)
 		render.flip()
@@ -672,20 +689,20 @@ def render_title_page_still():
 
 
 startup_sequence()
-# resolution_requester()
+resolution_requester()
 engine_init()
-# render_title_page_bouncing()
-# play_music()
-# render_title_page_still()
-# render_credits()
-# render_title_page()
-# render_hardsprite()
-# render_hotdog_screen()
-# render_gipper()
-# render_gippers()
-# render_star()
+render_title_page_bouncing()
+play_music()
+render_title_page_still()
+render_credits()
+render_title_page()
+render_hardsprite()
+render_hotdog_screen()
+render_gipper()
+render_gippers()
+render_star()
 render_hardscroll()
-# render_dual_playfield()
-# render_overlay()
-# render_change_fonts()
-# render_price()
+render_dual_playfield()
+render_overlay()
+render_change_fonts()
+render_price()
