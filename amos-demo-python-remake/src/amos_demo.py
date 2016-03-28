@@ -263,7 +263,6 @@ def render_gipper():
 			x += dt_sec * 60.0 * 1.7
 			sprite_index = math.fmod(sprite_index + dt_sec * 8.0, 5)
 
-
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
 					   (amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
 
@@ -459,20 +458,125 @@ def render_price():
 
 
 def render_hardscroll():
-	strings = [["Software and hardware",40,1,0, "bilko-opti-bold", 42],
-			   ["scrolling are present in",65,1,0, "bilko-opti-bold", 42],
-			   ["AMOS. Each type can be",90,1,0, "bilko-opti-bold", 42],
-			   ["activated with a single",115,1,0, "bilko-opti-bold", 42],
-			   ["command.",140,1,0, "bilko-opti-bold", 42]]
+	# strings = [["Software and hardware",40,1,0, "bilko-opti-bold", 42],
+	# 		   ["scrolling are present in",65,1,0, "bilko-opti-bold", 42],
+	# 		   ["AMOS. Each type can be",90,1,0, "bilko-opti-bold", 42],
+	# 		   ["activated with a single",115,1,0, "bilko-opti-bold", 42],
+	# 		   ["command.",140,1,0, "bilko-opti-bold", 42]]
+	#
+	# render_text_screen(strings, duration=len(strings))
+	#
+	# strings = [["It is possible to use",40,1,0, "bilko-opti-bold", 42],
+	# 		   ["both SPRITES and BOBS",65,1,0, "bilko-opti-bold", 42],
+	# 		   ["on any type of",90,1,0, "bilko-opti-bold", 42],
+	# 		   ["scrolling screen.",115,1,0, "bilko-opti-bold", 42]]
+	#
+	# render_text_screen(strings, duration=len(strings))
 
-	render_text_screen(strings, duration=len(strings))
+	fx_timer = 0.0
+	phase_1_duration = 3.0
+	phase_2_duration = 2.0
+	phase_3_duration = 2.0
+	phase_4_duration = 2.5
+	phase_5_duration = 2.0
+	phase_6_duration = 1.5
+	phase_7_duration = 0.5
+	phase_8_duration = 2.5
+	fx_duration = 18.0
+	screen_1 = [0, 200, 0]
+	sprite_0 = [-100, 110, 0, 0, 0]
+	sprite_1 = [400, 110, 0, 0, 15]
 
-	strings = [["It is possible to use",40,1,0, "bilko-opti-bold", 42],
-			   ["both SPRITES and BOBS",65,1,0, "bilko-opti-bold", 42],
-			   ["on any type of",90,1,0, "bilko-opti-bold", 42],
-			   ["scrolling screen.",115,1,0, "bilko-opti-bold", 42]]
+	while fx_timer < fx_duration:
+		dt_sec = clock.update()
+		fx_timer += dt_sec
 
-	render_text_screen(strings, duration=len(strings))
+		if fx_timer < phase_1_duration:
+			screen_1[2] = 0
+			if sprite_0[0] < 60:
+				sprite_0[2] = 2
+			elif sprite_0[0] < 120:
+				sprite_0[2] = 2
+				sprite_0[3] = -2
+			elif sprite_0[1] < 180:
+				sprite_0[2] = 0
+				sprite_0[3] = 2
+		elif fx_timer < phase_1_duration + phase_2_duration:
+			screen_1[2] = -1
+			if sprite_0[1] > 110:
+				sprite_0[2] = -2
+				sprite_0[3] = -2
+			else:
+				sprite_0[2] = 0
+				sprite_0[3] = 0
+		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration:
+			screen_1[2] = -2
+			if sprite_0[0] > 10:
+				sprite_0[2] = -1
+			else:
+				sprite_0[2] = 0
+		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration + phase_4_duration:
+			screen_1[2] = -3
+		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration + phase_4_duration + phase_5_duration:
+			screen_1[2] = -2
+		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration + phase_4_duration + phase_5_duration + phase_6_duration:
+			screen_1[2] = -1
+		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration + phase_4_duration + phase_5_duration + phase_6_duration + phase_7_duration:
+			screen_1[2] = -0.5
+			sprite_0[2] = 1.5
+		elif fx_timer < phase_1_duration + phase_2_duration + phase_3_duration + phase_4_duration + phase_5_duration + phase_6_duration + phase_7_duration + phase_8_duration:
+			screen_1[2] = 0
+			if abs(sprite_0[0] - sprite_1[0]) > 10:
+				sprite_1[2] = -2
+			else:
+				sprite_0[2] = sprite_1[2] = 0
+
+				sprite_0[4] += dt_sec * 10.0
+				if sprite_0[4] < 6:
+					sprite_0[4] = 6
+				elif sprite_0[4] > 14:
+					sprite_0[4] = 14
+
+				sprite_1[4] = sprite_0[4] * 1.05
+		else:
+			sprite_0[4] = -1
+			sprite_1[4] = -1
+
+		render.clear()
+		render.set_blend_mode2d(render.BlendAlpha)
+
+		# front image
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] - amiga_screen_size[0]) * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0]) * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0] * 2) * zoom_size(),
+					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+
+		screen_1[0] += dt_sec * 60.0 * screen_1[2]
+		if screen_1[0] < -amiga_screen_size[0]:
+			screen_1[0] = 0
+
+		sprite_0[0] += dt_sec * 60.0 * sprite_0[2]
+		sprite_0[1] += dt_sec * 60.0 * sprite_0[3]
+		if sprite_0[4] >= 0:
+			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_0[0] * zoom_size(),
+						(amiga_screen_size[1] - sprite_0[1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(sprite_0[4])) + ".png")
+
+		sprite_1[0] += dt_sec * 60.0 * sprite_1[2]
+		sprite_1[1] += dt_sec * 60.0 * sprite_1[3]
+		if sprite_1[4] >= 0:
+			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_1[0] * zoom_size(),
+						(amiga_screen_size[1] - sprite_1[1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(sprite_1[4])) + ".png")
+
+		render.set_blend_mode2d(render.BlendOpaque)
+		render.flip()
 
 
 def render_dual_playfield():
@@ -505,17 +609,17 @@ def render_dual_playfield():
 
 		# back image
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] - amiga_screen_size[0]) * zoom_size(),
-					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY2.png")
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
-					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY2.png")
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
-					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY2.png")
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0] * 2) * zoom_size(),
-					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY2.png")
+					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY2.png")
 
 		screen_0[0] += dt_sec * 60.0 * screen_0[2]
 		if screen_0[0] < -amiga_screen_size[0]:
@@ -523,17 +627,17 @@ def render_dual_playfield():
 
 		# front image
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] - amiga_screen_size[0]) * zoom_size(),
-					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY1.png")
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
-					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY1.png")
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0]) * zoom_size(),
-					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY1.png")
 		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0] * 2) * zoom_size(),
-					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
-					   zoom_size() * 0.5, "@assets/DPLAY1.png")
+					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
+					zoom_size() * 0.5, "@assets/DPLAY1.png")
 
 		screen_1[0] += dt_sec * 60.0 * screen_1[2]
 		if screen_1[0] < -amiga_screen_size[0]:
@@ -568,20 +672,20 @@ def render_title_page_still():
 
 
 startup_sequence()
-resolution_requester()
+# resolution_requester()
 engine_init()
-render_title_page_bouncing()
-play_music()
-render_title_page_still()
-render_credits()
-render_title_page()
-render_hardsprite()
-render_hotdog_screen()
-render_gipper()
-render_gippers()
-render_star()
+# render_title_page_bouncing()
+# play_music()
+# render_title_page_still()
+# render_credits()
+# render_title_page()
+# render_hardsprite()
+# render_hotdog_screen()
+# render_gipper()
+# render_gippers()
+# render_star()
 render_hardscroll()
-render_dual_playfield()
-render_overlay()
-render_change_fonts()
-render_price()
+# render_dual_playfield()
+# render_overlay()
+# render_change_fonts()
+# render_price()
