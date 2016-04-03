@@ -17,6 +17,7 @@ import gs.plus.render as render
 import gs.plus.clock as clock
 import math
 import random
+import json
 import easygui
 from utils import *
 from graphic_routines import *
@@ -325,21 +326,25 @@ def render_gippers():
 
 
 def render_star():
-	strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
-			   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
-			   ["This method is very",80,1,0, "bilko-opti-bold", 42],
-			   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
-			   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
+	# strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
+	# 		   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
+	# 		   ["This method is very",80,1,0, "bilko-opti-bold", 42],
+	# 		   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
+	# 		   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
+	#
+	# render_text_screen(strings, duration=5.0)
+	#
+	# strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
+	# 		   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
+	# 		   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
+	# 		   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
+	# 		   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
+	#
+	# render_text_screen(strings, duration=5.0)
 
-	render_text_screen(strings, duration=5.0)
+	star_json = "@assets/star.json"
+	stat_segments = wireframe_json_to_segment_list(star_json)
 
-	strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
-			   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
-			   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
-			   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
-			   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
-
-	render_text_screen(strings, duration=5.0)
 
 
 def render_overlay():
@@ -689,20 +694,20 @@ def render_title_page_still():
 
 
 startup_sequence()
-resolution_requester()
+# resolution_requester()
 engine_init()
-render_title_page_bouncing()
-play_music()
-render_title_page_still()
-render_credits()
-render_title_page()
-render_hardsprite()
-render_hotdog_screen()
-render_gipper()
-render_gippers()
+# render_title_page_bouncing()
+# play_music()
+# render_title_page_still()
+# render_credits()
+# render_title_page()
+# render_hardsprite()
+# render_hotdog_screen()
+# render_gipper()
+# render_gippers()
 render_star()
-render_hardscroll()
-render_dual_playfield()
-render_overlay()
-render_change_fonts()
-render_price()
+# render_hardscroll()
+# render_dual_playfield()
+# render_overlay()
+# render_change_fonts()
+# render_price()
