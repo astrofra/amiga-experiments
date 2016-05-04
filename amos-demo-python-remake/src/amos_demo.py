@@ -34,7 +34,10 @@ def resolution_requester():
 
 def engine_init():
 	global al, channel
-	gs.LoadPlugins(gs.get_default_plugins_path())
+	try:
+		gs.LoadPlugins(gs.get_default_plugins_path())
+	except:
+		pass
 	render.init(demo_screen_size[0], demo_screen_size[1], "pkg.core")
 
 	# mount the system file driver
@@ -696,18 +699,18 @@ def render_title_page_still():
 startup_sequence()
 # resolution_requester()
 engine_init()
-# render_title_page_bouncing()
-# play_music()
-# render_title_page_still()
-# render_credits()
-# render_title_page()
-# render_hardsprite()
-# render_hotdog_screen()
-# render_gipper()
-# render_gippers()
+render_title_page_bouncing()
+play_music()
+render_title_page_still()
+render_credits()
+render_title_page()
+render_hardsprite()
+render_hotdog_screen()
+render_gipper()
+render_gippers()
 render_star()
-# render_hardscroll()
-# render_dual_playfield()
-# render_overlay()
-# render_change_fonts()
-# render_price()
+render_hardscroll()
+render_dual_playfield()
+render_overlay()
+render_change_fonts()
+render_price()
