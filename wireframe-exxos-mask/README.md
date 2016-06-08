@@ -9,4 +9,4 @@ The original EXXOS logo was designed by Didier Bouchon.
 * DXF
 
 ####Preview image :
-![Hata Hata Oglu Hulu](https://raw.githubusercontent.com/astrofra/wireframe-exxos-mask/master/model/preview.png "Exxos Mask")
+![Hata Hata Oglu Hulu](https://raw.githubusercontent.com/astrofra/amiga-experiments/master/wireframe-exxos-mask/model/preview.png "Exxos Mask")
