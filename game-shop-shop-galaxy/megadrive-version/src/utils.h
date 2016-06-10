@@ -1,5 +1,8 @@
 #include <genesis.h>
 
+#ifndef SHUFFLE_UTILS
+#define SHUFFLE_UTILS
+
 typedef struct
 {
     fix32 x;
@@ -17,3 +20,5 @@ fix32 fix32Clamp(fix32 x, fix32 in_lower, fix32 in_upper);
 fix32 fix32mapValueToArray(fix32 val, fix32 in_lower, fix32 in_upper, const fix32* mapping_array, const u16 mapping_array_len);
 
 void utils_unit_tests(void);
+
+#endif

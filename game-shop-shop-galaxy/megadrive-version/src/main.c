@@ -2,9 +2,14 @@
 #include <gfx.h>
 #include "utils.h"
 #include "game_shufflepuck.h"
+#include "game_ai.h"
+#include "game_player.h"
 #include "resources.h"
 
 static void game_ShufflePuck();
+
+extern shuffle_racket ai;
+extern shuffle_racket player;
 
 int main()
 {
@@ -12,48 +17,29 @@ int main()
 	return 0;
 }
 
-/*	
-	Ball game object
-*/
-struct {
-	fix32	inertia;
-
-	fix32	velocity_x,
-			velocity_z;
-
-	fix32	initial_pox_x,
-			initial_pox_z;
-
-	fix32	pos_x,
-			pos_z;
-
-	fix32	prev_pos_x,
-			prev_pos_z;
-
-	fix32 	radius;
-}ball;
-
-/*
-	Player game object
-*/
-shuffle_racket racket;
-
-/*
-	Enemy game object
-*/
-shuffle_racket ai;
-
 static void game_ShufflePuck()
 {
 	char str[32];	/* debug string */
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[16];
+	Vect3D_f32 pvect; 
 
 	/* Ball sprite coordinates */
 	int ball_2d_x,
 		ball_2d_y,
 		ball_2d_scale;
+
+	/* AI racket sprite coordinates */
+	int ai_2d_x,
+		ai_2d_y,
+		ai_2d_scale;
+
+	/* Player racket sprite coordinates */
+	int player_2d_x,
+		player_2d_y,
+		player_2d_scale;
+
 
 	const fix32 persp_coef[] = {fix32DivFloats(1.0, 132.0), fix32DivFloats(5, 132.0), fix32DivFloats(9, 132.0), fix32DivFloats(13, 132.0), fix32DivFloats(17, 132.0), 
 								fix32DivFloats(22, 132.0), fix32DivFloats(27, 132.0), fix32DivFloats(34, 132.0), fix32DivFloats(42, 132.0), fix32DivFloats(51, 132.0), 
@@ -199,33 +185,36 @@ static void game_ShufflePuck()
 	}
 
 	void renderAI(int ai_2d_x, int ai_2d_y, int ai_2d_scale){
+		SPR_setPosition(&sprites[2], ai_2d_x - 32, ai_2d_y + ((224 - 136) - 16));
 		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
 	}
 
 	u8 ballIsBehindRacket(void){
-		if (ball.pos_z < racket.pos_z)
+		if (ball.pos_z < player.pos_z)
 			return TRUE;
 		else
 			return FALSE;
 	}
 
 	u8 BallIsWithinXReach(void){
-		if (fix32Add(ball.pos_x, ball.radius) > fix32Sub(racket.pos_x, fix32Mul(racket.width, FIX32(0.5))) 
-			&& fix32Sub(ball.pos_x, ball.radius) < fix32Add(racket.pos_x, fix32Mul(racket.width, FIX32(0.5))))
+		if (fix32Add(ball.pos_x, ball.radius) > fix32Sub(player.pos_x, fix32Mul(player.width, FIX32(0.5))) 
+			&& fix32Sub(ball.pos_x, ball.radius) < fix32Add(player.pos_x, fix32Mul(player.width, FIX32(0.5))))
 			return TRUE;
 		else
 			return FALSE;
 	}
 
 	u8 BallWasWithinXReach(void){
-		if (fix32Add(ball.prev_pos_x, ball.radius) > fix32Sub(racket.prev_pos_x,  fix32Mul(racket.width, FIX32(0.5))) 
-			&& fix32Sub(ball.prev_pos_x, ball.radius) < fix32Add(racket.prev_pos_x, fix32Mul(racket.width, FIX32(0.5))))
+		if (fix32Add(ball.prev_pos_x, ball.radius) > fix32Sub(player.prev_pos_x,  fix32Mul(player.width, FIX32(0.5))) 
+			&& fix32Sub(ball.prev_pos_x, ball.radius) < fix32Add(player.prev_pos_x, fix32Mul(player.width, FIX32(0.5))))
 			return TRUE;
 		else
 			return FALSE;
 	}
 
 	void gameReset(void){		
+		ai_reset();
+		player_reset();
 		ball_reset();
 		ball_setImpulse(FIX32(10.0 * board_scale), FIX32(10.0 * board_scale));
 	}	
@@ -236,11 +225,11 @@ static void game_ShufflePuck()
 
 		/* Update the player motion */
 		// player_setMouse(mouse_device.GetValue(gs.InputDevice.InputAxisX) / SCR_DISP_WIDTH, mouse_device.GetValue(gs.InputDevice.InputAxisY) / SCR_DISP_HEIGHT);
-		// player_update(dt);
+		player_update(dt);
 
 		/* Update the AI */
-		// ai_updateGameData(ball.pos_x, ball.pos_z, board.board_width, board.board_length);
-		// ai_update(dt);
+		ai_updateGameData(ball.pos_x, ball.pos_z);
+		ai_update(dt);
 
 		/* Collisions */
 		// if (ball.velocity_z > 0.0)
@@ -254,7 +243,6 @@ static void game_ShufflePuck()
 		// }
 
 		/* Compute 3D/2D projections */
-		Vect3D_f32 pvect; 
 		pvect = project3DTo2D(ball.pos_x, ball.pos_z);
 		ball_2d_x = pvect.x;
 		ball_2d_y = pvect.y;
@@ -263,11 +251,17 @@ static void game_ShufflePuck()
 		// ball_2d_x *= SCR_SCALE_FACTOR
 		// ball_2d_y = SCR_DISP_HEIGHT - (ball_2d_y * SCR_SCALE_FACTOR)
 
-		// player_2d_x, player_2d_y, player_2d_scale = project3DTo2D(player.pos_x, player.pos_z, board.board_width, board.board_length)
+		pvect = project3DTo2D(player.pos_x, player.pos_z);
+		player_2d_x = pvect.x;
+		player_2d_y = pvect.y;
+		player_2d_scale =  pvect.z;
 		// player_2d_x *= SCR_SCALE_FACTOR
 		// player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
 
-		// ai_2d_x, ai_2d_y, ai_2d_scale = project3DTo2D(ai.pos_x, ai.pos_z, board.board_width, board.board_length)
+		pvect = project3DTo2D(ai.pos_x, ai.pos_z);
+		ai_2d_x = pvect.x;
+		ai_2d_y = pvect.y;
+		ai_2d_scale = pvect.z; 
 		// ai_2d_x *= SCR_SCALE_FACTOR
 		// ai_2d_y = SCR_DISP_HEIGHT - (ai_2d_y * SCR_SCALE_FACTOR)
 
@@ -283,12 +277,12 @@ static void game_ShufflePuck()
 		// render.image2d(SCR_MARGIN_X, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
 
 		/* Render moving items according to their Z position */
-		// renderAI(ai_2d_x, ai_2d_y, ai_2d_scale)
+		renderAI(fix32ToInt(ai_2d_x), fix32ToInt(ai_2d_y), ai_2d_scale);
 
 		// if (ball.pos_z - ball.radius < player.pos_z + player.length)
 		// {
 			renderBall(fix32ToInt(ball_2d_x), fix32ToInt(ball_2d_y), ball_2d_scale);
-		// 	renderPlayer(player_2d_x, player_2d_y, player_2d_scale)
+			renderPlayer(fix32ToInt(player_2d_x), fix32ToInt(player_2d_y), player_2d_scale);
 		// }
 		// else
 		// {
@@ -320,13 +314,20 @@ static void game_ShufflePuck()
 	VDP_setPalette(PAL1, game_board.palette->data);
 	VDP_setPalette(PAL2, game_ball.palette->data);
 
+	/* Ball sprite */
 	SPR_initSprite(&sprites[1], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 	SPR_setPosition(&sprites[1], 64, 64);
 
+	/* Player racket sprite */
 	SPR_initSprite(&sprites[0], &game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(&sprites[0], (320 / 2) - 32, 128);
+	SPR_setPosition(&sprites[0], (320 / 2) - 32, 224 - 32);
 
- 	SPR_update(sprites, 2);	
+	/* AI racket sprite */
+	SPR_initSprite(&sprites[2], &game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(&sprites[2], (320 / 2) - 32, 64);
+
+
+ 	SPR_update(sprites, 3);	
 
 	SYS_enableInts();
 
@@ -344,7 +345,7 @@ static void game_ShufflePuck()
 		// utils_unit_tests();
 
 		gameMainLoop(FIX32(1.0/60.0));
-		SPR_update(sprites, 2);	
+		SPR_update(sprites, 3);	
 		// vblCount++;
 	}
 }
