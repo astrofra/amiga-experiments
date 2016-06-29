@@ -27,7 +27,7 @@ void twistedMetal(void)
 		// VDP_setVerticalScroll(PLAN_A, scroll_jump_table[(GET_VCOUNTER + vcount) & ((TWISTER_TABLE_SIZE >> 2) - 1)] + (64 + sinFix16(vcount << 1)) << 1);
 
 	    *pl = CST_WRITE_VSRAM_ADDR(0);
-	    *pw = scroll_jump_table[(GET_VCOUNTER + vcount) & ((TWISTER_TABLE_SIZE >> 2) - 1)] + (64 + sinFix16(vcount << 1)) << 1;
+	    *pw = scroll_jump_table[(GET_VCOUNTER + vcount) & ((TWISTER_TABLE_SIZE >> 1) - 1)] + hblank_table[vcount];
 	}
 
 	static void vBlank(){
@@ -41,8 +41,8 @@ void twistedMetal(void)
 		hscroll_jump_table[i] = (sinFix16(i << 2) + 64) >> 2;
 	}
 
-	// for(i = 0; i < TWISTER_TABLE_SIZE; i++)
-	// 	hblank_table[i] = (64 + sinFix16(i << 1)) << 1;
+	for(i = 0; i < TWISTER_TABLE_SIZE; i++)
+		hblank_table[i] = (sinFix16(i << 2)) << 1;
 
 	SYS_disableInts();
 
