@@ -54,6 +54,7 @@ void twistedMetal2(void)
 	vramIndex += twister.tileset->numTile;
 
 	VDP_setPalette(PAL0, twister.palette->data);
+	VDP_setPaletteColor(0, 0x80A);
 
 	// /* Load the fond tiles */
 	// VDP_drawImageEx(BPLAN, &twister_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 8, 0, FALSE, FALSE);
@@ -76,10 +77,11 @@ void twistedMetal2(void)
 	while (TRUE)
 	{
 		VDP_waitVSync();
+		ang_speed_y = sinFix16(vcount) >> 4;
 		rot_y += ang_speed_y;
 		rot_y = rot_y & 0xFF;
 		twist_y = 0;
-		vcount += 2;
 		twist_inc = sinFix16(vcount);
+		vcount += 4;
 	}	
 }
