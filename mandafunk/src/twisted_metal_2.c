@@ -33,10 +33,7 @@ void twistedMetal2(void)
 
 	    *pl = CST_WRITE_VSRAM_ADDR(0);
 	    *pw = twister_jump_table[(GET_VCOUNTER + rot_y + (twist_y >> 6)) & ((TWISTER_TABLE_SIZE >> 1) - 1)];
-	    twist_y += twist_inc;
-
-	    // *pl = CST_WRITE_VSRAM_ADDR(2);
-	    // *pw = scroll_jump_table_bg[(GET_VCOUNTER + rot_y) & ((TWISTER_TABLE_SIZE >> 1) - 1)] + hblank_table_bg[rot_y];	    
+	    twist_y += twist_inc;    
 	}
 
 	SYS_disableInts();
@@ -56,13 +53,6 @@ void twistedMetal2(void)
 	VDP_setPalette(PAL0, twister.palette->data);
 	VDP_setPaletteColor(0, 0x80A);
 
-	// /* Load the fond tiles */
-	// VDP_drawImageEx(BPLAN, &twister_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 8, 0, FALSE, FALSE);
-	// VDP_drawImageEx(BPLAN, &twister_bg, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, vramIndex), 8, 256 / 8, FALSE, FALSE);
-	// vramIndex += twister_bg.tileset->numTile;
-
-	// VDP_setPalette(PAL1, twister_bg.palette->data);
-
 
     VDP_setHilightShadow(0);
 
@@ -74,14 +64,21 @@ void twistedMetal2(void)
 	VDP_setHInterrupt(1);
 	SYS_setHIntCallback(&hBlank);
 
-	while (TRUE)
-	{
-		VDP_waitVSync();
-		ang_speed_y = sinFix16(vcount) >> 4;
-		rot_y += ang_speed_y;
-		rot_y = rot_y & 0xFF;
-		twist_y = 0;
-		twist_inc = sinFix16(vcount);
-		vcount += 4;
-	}	
+    while (TRUE)
+    {
+        VDP_waitVSync();
+
+        ang_speed_y = sinFix16(vcount) >> 4;
+        rot_y += ang_speed_y;
+        rot_y = rot_y & 0xFF;
+        twist_y = 0;
+        twist_inc = sinFix16(vcount);
+        vcount += 4;
+
+        SYS_disableInts();
+        *pl = CST_WRITE_VSRAM_ADDR(0);
+        *pw = twister_jump_table[(0 + rot_y + (twist_y >> 6)) & ((TWISTER_TABLE_SIZE >> 1) - 1)];
+        twist_y += twist_inc;
+        SYS_enableInts();
+    }	
 }
