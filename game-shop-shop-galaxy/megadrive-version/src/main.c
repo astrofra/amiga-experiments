@@ -23,7 +23,8 @@ static void game_ShufflePuck()
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
 	Sprite sprites[16];
-	Vect3D_f32 pvect; 
+	Vect3D_f32 pvect;
+	fix32 joy_x, joy_y;
 
 	/* Ball sprite coordinates */
 	int ball_2d_x,
@@ -225,6 +226,21 @@ static void game_ShufflePuck()
 
 		/* Update the player motion */
 		// player_setMouse(mouse_device.GetValue(gs.InputDevice.InputAxisX) / SCR_DISP_WIDTH, mouse_device.GetValue(gs.InputDevice.InputAxisY) / SCR_DISP_HEIGHT);
+		joy_x = 0;
+		if (JOY_readJoypad(0) & BUTTON_LEFT)
+			joy_x = FIX32(-1.0);
+		else
+		if (JOY_readJoypad(0) & BUTTON_RIGHT)
+			joy_x = FIX32(1.0);
+
+		joy_y = 0;
+		if (JOY_readJoypad(0) & BUTTON_UP)
+			joy_y = FIX32(-1.0);
+		else
+		if (JOY_readJoypad(0) & BUTTON_DOWN)
+			joy_y = FIX32(1.0);		
+
+		player_setControler(joy_x, joy_y);
 		player_update(dt);
 
 		/* Update the AI */
