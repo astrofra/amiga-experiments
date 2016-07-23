@@ -71,7 +71,7 @@ static void game_ShufflePuck()
 
 		ret_tuple.x = fix32Add(fix32Mul(fix32InvCoef(norm_y), top_2d_x),  fix32Mul(norm_y, bottom_2d_x)); /* proj_2d_x */
 		ret_tuple.y = fix32Add(fix32Mul(fix32InvCoef(norm_y), top_y), fix32Mul(norm_y, bottom_y));	/* proj_2d_y */
-		ret_tuple.z = fix32RangeAdjust(norm_y, FIX32(0.0), FIX32(1.0), FIX32(0.285), FIX32(1.0));	/* proj_scale */
+		ret_tuple.z = fix32Sub(FIX32(1.0), norm_y); // fix32RangeAdjust(norm_y, FIX32(0.0), FIX32(1.0), FIX32(0.285), FIX32(1.0));	/* proj_scale */
 
 		return ret_tuple;
 	}
@@ -178,15 +178,18 @@ static void game_ShufflePuck()
 		// intToStr(ball_2d_y, str, 0);
 		// BMP_drawText(str, 10, 3);
 		SPR_setPosition(&sprites[1], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 8));
+		SPR_setFrame(&sprites[1], ball_2d_scale);
 	}
 
 	void renderPlayer(int player_2d_x, int player_2d_y, int player_2d_scale){
 		SPR_setPosition(&sprites[0], player_2d_x - 32, player_2d_y + ((224 - 136) - 16));
+		SPR_setFrame(&sprites[0], player_2d_scale);
 		// render.sprite2d(SCR_MARGIN_X + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
 	}
 
 	void renderAI(int ai_2d_x, int ai_2d_y, int ai_2d_scale){
 		SPR_setPosition(&sprites[2], ai_2d_x - 32, ai_2d_y + ((224 - 136) - 16));
+		SPR_setFrame(&sprites[2], ai_2d_scale);
 		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
 	}
 
@@ -262,7 +265,10 @@ static void game_ShufflePuck()
 		pvect = project3DTo2D(ball.pos_x, ball.pos_z);
 		ball_2d_x = pvect.x;
 		ball_2d_y = pvect.y;
-		ball_2d_scale = pvect.z;
+		ball_2d_scale = fix32ToInt(fix32Mul(pvect.z, FIX32(16.0)));
+		// intToStr(ball_2d_scale, str, 8);
+		// BMP_drawText(str, 6, 0);
+		// ball_2d_scale = 0;
 
 		// ball_2d_x *= SCR_SCALE_FACTOR
 		// ball_2d_y = SCR_DISP_HEIGHT - (ball_2d_y * SCR_SCALE_FACTOR)
@@ -270,14 +276,14 @@ static void game_ShufflePuck()
 		pvect = project3DTo2D(player.pos_x, player.pos_z);
 		player_2d_x = pvect.x;
 		player_2d_y = pvect.y;
-		player_2d_scale =  pvect.z;
+		player_2d_scale =  fix32ToInt(fix32Mul(pvect.z, FIX32(16.0)));
 		// player_2d_x *= SCR_SCALE_FACTOR
 		// player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
 
 		pvect = project3DTo2D(ai.pos_x, ai.pos_z);
 		ai_2d_x = pvect.x;
 		ai_2d_y = pvect.y;
-		ai_2d_scale = pvect.z; 
+		ai_2d_scale =fix32ToInt(fix32Mul(pvect.z, FIX32(16.0)));
 		// ai_2d_x *= SCR_SCALE_FACTOR
 		// ai_2d_y = SCR_DISP_HEIGHT - (ai_2d_y * SCR_SCALE_FACTOR)
 
