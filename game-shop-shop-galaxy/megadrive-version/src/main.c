@@ -6,6 +6,7 @@
 #include "game_player.h"
 #include "resources.h"
 
+extern void menu_MainScreen();
 static void game_ShufflePuck();
 
 extern shuffle_racket ai;
@@ -13,7 +14,8 @@ extern shuffle_racket player;
 
 int main()
 {
-	game_ShufflePuck();
+	menu_MainScreen();
+	// game_ShufflePuck();
 	return 0;
 }
 
@@ -22,7 +24,7 @@ static void game_ShufflePuck()
 	char str[32];	/* debug string */
 	u16 vblCount = 0;
 	u16 vramIndex = TILE_USERINDEX;
-	Sprite sprites[16];
+	Sprite *sprites[16];
 	Vect3D_f32 pvect;
 	fix32 joy_x, joy_y;
 
@@ -156,18 +158,18 @@ static void game_ShufflePuck()
 		// 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
 		// 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)	
 
-		// BMP_drawText("dt = ", 0, 0);
-		// fix32ToStr(dt, str, 8);
-		// BMP_drawText(str, 6, 0);	
+		BMP_drawText("dt = ", 0, 0);
+		fix32ToStr(dt, str, 8);
+		BMP_drawText(str, 6, 0);	
 
-		// fix32ToStr(ball.velocity_x, str, 8);
-		// BMP_drawText(str, 0, 1);	
-		// fix32ToStr(ball.velocity_z, str, 8);
-		// BMP_drawText(str, 10, 1);
-		// fix32ToStr(ball.pos_x, str, 8);
-		// BMP_drawText(str, 0, 2);	
-		// fix32ToStr(ball.pos_z, str, 8);
-		// BMP_drawText(str, 10, 2);			
+		fix32ToStr(ball.velocity_x, str, 8);
+		BMP_drawText(str, 0, 1);	
+		fix32ToStr(ball.velocity_z, str, 8);
+		BMP_drawText(str, 10, 1);
+		fix32ToStr(ball.pos_x, str, 8);
+		BMP_drawText(str, 0, 2);	
+		fix32ToStr(ball.pos_z, str, 8);
+		BMP_drawText(str, 10, 2);			
 	}
 
 	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale){
@@ -177,19 +179,19 @@ static void game_ShufflePuck()
 		// BMP_drawText(str, 0, 3);	
 		// intToStr(ball_2d_y, str, 0);
 		// BMP_drawText(str, 10, 3);
-		SPR_setPosition(&sprites[1], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 8));
-		SPR_setFrame(&sprites[1], ball_2d_scale);
+		SPR_setPosition(sprites[1], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 6));
+		SPR_setFrame(sprites[1], ball_2d_scale);
 	}
 
 	void renderPlayer(int player_2d_x, int player_2d_y, int player_2d_scale){
-		SPR_setPosition(&sprites[0], player_2d_x - 32, player_2d_y + ((224 - 136) - 16));
-		SPR_setFrame(&sprites[0], player_2d_scale);
+		SPR_setPosition(sprites[0], player_2d_x - 32, player_2d_y + ((224 - 136) - 16));
+		SPR_setFrame(sprites[0], player_2d_scale);
 		// render.sprite2d(SCR_MARGIN_X + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
 	}
 
 	void renderAI(int ai_2d_x, int ai_2d_y, int ai_2d_scale){
-		SPR_setPosition(&sprites[2], ai_2d_x - 32, ai_2d_y + ((224 - 136) - 16));
-		SPR_setFrame(&sprites[2], ai_2d_scale);
+		SPR_setPosition(sprites[2], ai_2d_x - 32, ai_2d_y + ((224 - 136) - 16));
+		SPR_setFrame(sprites[2], ai_2d_scale);
 		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
 	}
 
@@ -320,16 +322,16 @@ static void game_ShufflePuck()
 
 	/* Set a larger tileplan to be able to scroll */
 	VDP_setPlanSize(64, 32);
-	SPR_init(256);
+	SPR_init(0,0,0);
 
-	VDP_clearPlan(APLAN, 0);
-	VDP_clearPlan(BPLAN, 0);
+	VDP_clearPlan(PLAN_A, 0);
+	VDP_clearPlan(PLAN_B, 0);
 
 	/* Load the fond tiles */
-	VDP_drawImageEx(APLAN, &game_robot_5, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 112) / 16, (224 - 112) / 64	, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_A, &game_robot_5, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 112) / 16, (224 - 112) / 64	, FALSE, FALSE);
 	vramIndex += game_robot_5.tileset->numTile;
 
-	VDP_drawImageEx(BPLAN, &game_board, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 136) / 8, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_B, &game_board, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 136) / 8, FALSE, FALSE);
 	vramIndex += game_board.tileset->numTile;	
 
 	VDP_setPalette(PAL0, game_robot_5.palette->data);
@@ -337,19 +339,18 @@ static void game_ShufflePuck()
 	VDP_setPalette(PAL2, game_ball.palette->data);
 
 	/* Ball sprite */
-	SPR_initSprite(&sprites[1], &game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(&sprites[1], 64, 64);
+	sprites[1] = SPR_addSprite(&game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[1], 64, 64);
 
 	/* Player racket sprite */
-	SPR_initSprite(&sprites[0], &game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(&sprites[0], (320 / 2) - 32, 224 - 32);
+	sprites[0] = SPR_addSprite(&game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[0], (320 / 2) - 32, 224 - 32);
 
 	/* AI racket sprite */
-	SPR_initSprite(&sprites[2], &game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(&sprites[2], (320 / 2) - 32, 64);
+	sprites[2] = SPR_addSprite(&game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[2], (320 / 2) - 32, 64);
 
-
- 	SPR_update(sprites, 3);	
+ 	SPR_update();	
 
 	SYS_enableInts();
 
@@ -367,7 +368,7 @@ static void game_ShufflePuck()
 		// utils_unit_tests();
 
 		gameMainLoop(FIX32(1.0/60.0));
-		SPR_update(sprites, 3);	
+		SPR_update();	
 		// vblCount++;
 	}
 }
