@@ -145,22 +145,24 @@ void game_ShufflePuck()
 
 		/*	Limit the friction/damping to the areas
 			where the puck can be reached by one of the players */
-		// if (abs(pos_z) > board_length * 0.25):
-		// 	friction_x, friction_z = mulVectorByScalar(velocity_x, velocity_z, -inertia * dt)
-		// 	velocity_x, velocity_z = addVectors(velocity_x, velocity_z, friction_x, friction_z)	
+		if (abs(ball.pos_z) > RSE_fix32Mul(board_length , FIX32(0.25)))
+		{
+			ball.velocity_x = fix32Sub(ball.velocity_x, RSE_fix32Mul(RSE_fix32Mul(ball.velocity_x, ball.inertia), dt));
+			ball.velocity_z = fix32Sub(ball.velocity_z, RSE_fix32Mul(RSE_fix32Mul(ball.velocity_z, ball.inertia), dt));
+		}
 
-		BMP_drawText("dt = ", 0, 0);
-		fix32ToStr(dt, str, 8);
-		BMP_drawText(str, 6, 0);	
+		// BMP_drawText("dt = ", 0, 0);
+		// fix32ToStr(dt, str, 8);
+		// BMP_drawText(str, 6, 0);	
 
-		fix32ToStr(ball.velocity_x, str, 8);
-		BMP_drawText(str, 0, 1);	
-		fix32ToStr(ball.velocity_z, str, 8);
-		BMP_drawText(str, 10, 1);
-		fix32ToStr(ball.pos_x, str, 8);
-		BMP_drawText(str, 0, 2);	
-		fix32ToStr(ball.pos_z, str, 8);
-		BMP_drawText(str, 10, 2);			
+		// fix32ToStr(ball.velocity_x, str, 8);
+		// BMP_drawText(str, 0, 1);	
+		// fix32ToStr(ball.velocity_z, str, 8);
+		// BMP_drawText(str, 10, 1);
+		// fix32ToStr(ball.pos_x, str, 8);
+		// BMP_drawText(str, 0, 2);	
+		// fix32ToStr(ball.pos_z, str, 8);
+		// BMP_drawText(str, 10, 2);			
 	}
 
 	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale){
