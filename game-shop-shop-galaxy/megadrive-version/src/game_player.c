@@ -1,5 +1,6 @@
 #include <genesis.h>
 #include "utils.h"
+#include "fix32_patch.h"
 #include "game_shufflepuck.h"
 #include "resources.h"
 /*
@@ -37,8 +38,8 @@ void player_setControler(fix32 joy_x, fix32 joy_z)
 	// RangeAdjust(x, 0.0, 1.0, board.board_width * -0.5 + (width * 0.5), board.board_width * 0.5 - (width * 0.5))
 	// RangeAdjust(y, 0.0, 0.5, board.board_length * 0.5 - (length * 0.5), board.board_length * 0.35 - (length * 0.5))
 
-	player.target_pos_x = fix32Clamp(player.target_pos_x, fix32Mul(board_width, FIX32(-0.5)), fix32Mul(board_width, FIX32(0.5)));
-	player.target_pos_z = fix32Clamp(player.target_pos_z, fix32Mul(board_length, FIX32(-0.5)), fix32Mul(board_length, FIX32(0.5)));
+	player.target_pos_x = fix32Clamp(player.target_pos_x, RSE_fix32Mul(board_width, FIX32(-0.5)), RSE_fix32Mul(board_width, FIX32(0.5)));
+	player.target_pos_z = fix32Clamp(player.target_pos_z, RSE_fix32Mul(board_length, FIX32(-0.5)), RSE_fix32Mul(board_length, FIX32(0.5)));
 }
 
 void player_update(fix32 dt)
@@ -46,8 +47,8 @@ void player_update(fix32 dt)
 	player.prev_pos_x = player.pos_x;
 	player.prev_pos_z = player.pos_z;
 
-	player.pos_x = fix32Add(player.pos_x, fix32Mul(fix32Sub(player.target_pos_x, player.pos_x), fix32Mul(dt, player.racket_speed)));
-	player.pos_z = fix32Add(player.pos_z, fix32Mul(fix32Sub(player.target_pos_z, player.pos_z), fix32Mul(dt, player.racket_speed)));
+	player.pos_x = fix32Add(player.pos_x, RSE_fix32Mul(fix32Sub(player.target_pos_x, player.pos_x), RSE_fix32Mul(dt, player.racket_speed)));
+	player.pos_z = fix32Add(player.pos_z, RSE_fix32Mul(fix32Sub(player.target_pos_z, player.pos_z), RSE_fix32Mul(dt, player.racket_speed)));
 
 	player.velocity_x = fix32Sub(player.pos_x, player.prev_pos_x);
 	player.velocity_z = fix32Sub(player.pos_z, player.prev_pos_z);

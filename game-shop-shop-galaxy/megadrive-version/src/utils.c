@@ -1,4 +1,5 @@
 #include <genesis.h>
+#include "fix32_patch.h"
 
 fix32 inline fix32Min(fix32 a, fix32 b){
 	if (a < b)
@@ -16,7 +17,7 @@ fix32 inline fix32Max(fix32 a, fix32 b){
 
 fix32 inline fix32RangeAdjust(fix32 val, fix32 in_lower, fix32 in_upper, fix32 out_lower, fix32 out_upper){
 	/* return (val - in_lower) / (in_upper - in_lower) * (out_upper - out_lower) + out_lower */
-    return fix32Add(fix32Div(fix32Sub(val, in_lower), fix32Mul(fix32Sub(in_upper, in_lower), fix32Sub(out_upper, out_lower))), out_lower);
+    return fix32Add(RSE_fix32Div(fix32Sub(val, in_lower), RSE_fix32Mul(fix32Sub(in_upper, in_lower), fix32Sub(out_upper, out_lower))), out_lower);
 }
 
 fix32 inline fix32Clamp(fix32 x, fix32 in_lower, fix32 in_upper){
@@ -35,11 +36,11 @@ fix32 inline fix32InvCoef(fix32 x)
 fix32 fix32mapValueToArray(fix32 val, fix32 in_lower, fix32 in_upper, const fix32* mapping_array, const int mapping_array_len){
 	val = fix32RangeAdjust(val, in_lower, in_upper, FIX32(0.0), FIX32(1.0));
 	val = fix32Clamp(val, FIX32(0.0), FIX32(1.0));
-	fix32 array_pos = fix32Mul(val, FIX32(mapping_array_len - 1));
+	fix32 array_pos = RSE_fix32Mul(val, FIX32(mapping_array_len - 1));
 	int ceil_pos = fix32CeilToInt(array_pos);
 	int floor_pos = fix32FloorToInt(array_pos);
 	fix32 k = fix32Sub(FIX32(ceil_pos), array_pos);
-	return fix32Add(fix32Mul(mapping_array[floor_pos], k), fix32Mul(mapping_array[ceil_pos], fix32InvCoef(k)));
+	return fix32Add(RSE_fix32Mul(mapping_array[floor_pos], k), RSE_fix32Mul(mapping_array[ceil_pos], fix32InvCoef(k)));
 	// return mapping_array[floor_pos] * float(ceil_pos - array_pos) + mapping_array[ceil_pos] * (1.0 - (float(ceil_pos - array_pos)))
 }
 
