@@ -4,7 +4,7 @@
 #define SHUFFLE_GAME
 
 #define board_scale 2
-#define shuffle_speed_scale 1
+#define shuffle_speed_scale 3
 #define board_width FIX32(16.0 * board_scale)
 #define board_length FIX32(24.0 * board_scale)
 

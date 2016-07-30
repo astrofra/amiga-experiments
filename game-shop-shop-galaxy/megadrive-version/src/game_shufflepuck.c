@@ -218,7 +218,7 @@ void game_ShufflePuck()
 		ai_reset();
 		player_reset();
 		ball_reset();
-		ball_setImpulse(FIX32(10.0 * board_scale), FIX32(10.0 * board_scale));
+		ball_setImpulse(FIX32(10.0 * board_scale * shuffle_speed_scale), FIX32(10.0 * board_scale * shuffle_speed_scale));
 	}	
 
 	void gameMainLoop(fix32 dt){
@@ -254,7 +254,7 @@ void game_ShufflePuck()
 			if ((!ballIsBehindRacket()) && (BallWasWithinXReach() || BallIsWithinXReach()))
 			{
 				ball_setPosition(ball.pos_x, player.pos_z - RSE_fix32Mul(ball.velocity_z, dt) + RSE_fix32Mul(fix32Min(FIX32(0.0), player.velocity_z), dt));
-				player_setPosition(player.pos_x, ball.pos_z + player.length);
+				player_setTargetPosition(player.pos_x, ball.pos_z + player.length);
 				ball_bounceZ();
 			}
 		}
@@ -363,7 +363,7 @@ void game_ShufflePuck()
 
 		// utils_unit_tests();
 
-		gameMainLoop(FIX32(1.0/60.0));
+		gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)));
 		SPR_update();	
 		// vblCount++;
 	}

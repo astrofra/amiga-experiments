@@ -16,6 +16,12 @@ void player_setPosition(fix32 x,fix32 z)
 	player.target_pos_z = z;
 }
 
+void player_setTargetPosition(fix32 x,fix32 z)
+{
+	player.target_pos_x = x;
+	player.target_pos_z = z;
+}
+
 void player_reset(void)
 {
 	player.pos_x = player.initial_pox_x;
