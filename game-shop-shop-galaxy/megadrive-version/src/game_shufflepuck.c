@@ -72,8 +72,8 @@ void game_ShufflePuck()
 	/*	Ball logic */
 	void ball_reset(void){
 		// global pos_x, pos_z, initial_pox_x, initial_pox_z
-		ball.inertia = FIX32(0.1);
-		ball.radius = FIX32(0.5);
+		ball.inertia = FIX32(0.0); // FIX32(0.1);
+		ball.radius = FIX32(0.5 * board_scale);
 		ball.initial_pox_x = 0;
 		ball.initial_pox_z = 0;
 		ball.pos_x = ball.initial_pox_x;
@@ -145,10 +145,13 @@ void game_ShufflePuck()
 
 		/*	Limit the friction/damping to the areas
 			where the puck can be reached by one of the players */
-		if (abs(ball.pos_z) > RSE_fix32Mul(board_length , FIX32(0.25)))
+		if (ball.inertia > FIX32(0.0))
 		{
-			ball.velocity_x = fix32Sub(ball.velocity_x, RSE_fix32Mul(RSE_fix32Mul(ball.velocity_x, ball.inertia), dt));
-			ball.velocity_z = fix32Sub(ball.velocity_z, RSE_fix32Mul(RSE_fix32Mul(ball.velocity_z, ball.inertia), dt));
+			if (abs(ball.pos_z) > RSE_fix32Mul(board_length , FIX32(0.25)))
+			{
+				ball.velocity_x = fix32Sub(ball.velocity_x, RSE_fix32Mul(RSE_fix32Mul(ball.velocity_x, ball.inertia), dt));
+				ball.velocity_z = fix32Sub(ball.velocity_z, RSE_fix32Mul(RSE_fix32Mul(ball.velocity_z, ball.inertia), dt));
+			}
 		}
 
 		// BMP_drawText("dt = ", 0, 0);
@@ -246,15 +249,15 @@ void game_ShufflePuck()
 		ai_update(dt);
 
 		/* Collisions */
-		// if (ball.velocity_z > 0.0)
-		// {
-		// 	if (!ballIsBehindRacket(ball, player)) && (BallWasWithinXReach(ball, player) or BallIsWithinXReach(ball, player))
-		// 	{
-		// 		ball.setPosition(ball.pos_x, player.pos_z - ball.velocity_z * dt + min(0.0, player.velocity_z) * dt);
-		// 		player.setPosition(player.pos_x, ball.pos_z + player.length);
-		// 		ball.bounceZ();
-		// 	}
-		// }
+		if (ball.velocity_z > FIX32(0.0))
+		{
+			if ((!ballIsBehindRacket()) && (BallWasWithinXReach() || BallIsWithinXReach()))
+			{
+				ball_setPosition(ball.pos_x, player.pos_z - RSE_fix32Mul(ball.velocity_z, dt) + RSE_fix32Mul(fix32Min(FIX32(0.0), player.velocity_z), dt));
+				player_setPosition(player.pos_x, ball.pos_z + player.length);
+				ball_bounceZ();
+			}
+		}
 
 		/* Compute 3D/2D projections */
 		pvect = project3DTo2D(ball.pos_x, ball.pos_z);
@@ -347,8 +350,8 @@ void game_ShufflePuck()
 
 	SYS_enableInts();
 
-	SND_startPlay_XGM(maak_music_2);
-	SND_setMusicTempo_XGM(50);		
+	// SND_startPlay_XGM(maak_music_2);
+	// SND_setMusicTempo_XGM(50);		
 
 	gameReset();
 

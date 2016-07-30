@@ -22,8 +22,8 @@ void player_reset(void)
 	player.pos_z = player.initial_pox_z;
 	player.prev_pos_x = player.pos_x;
 	player.prev_pos_z = player.pos_z;
-	player.width = FIX32(2.0);
-	player.length = FIX32(0.5);
+	player.width = FIX32(2.0 * board_scale);
+	player.length = FIX32(0.5 * board_scale);
 	player.max_racket_speed = FIX32(50.0); 
 	player.racket_speed = FIX32(50.0);
 }
