@@ -8,7 +8,7 @@ extern void game_ShufflePuck();
 
 int main()
 {
-	// menu_MainScreen();
+	menu_MainScreen();
 	game_ShufflePuck();
 	return 0;
 }

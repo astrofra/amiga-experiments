@@ -9,5 +9,7 @@ extern const Image game_board;
 extern const SpriteDefinition game_ball;
 extern const SpriteDefinition game_racket;
 extern const Image game_robot_5;
+extern const SpriteDefinition menu_press;
+extern const SpriteDefinition menu_start;
 
 #endif // _RES_GFX_H_
