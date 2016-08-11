@@ -1,11 +1,15 @@
 #ifndef MENU_MAIN_SCREEN_H
 #define MENU_MAIN_SCREEN_H
 
-#define SPRITE_MAX		4
+#define SPRITE_MAX		5
 #define	TABLE_LEN	 	(224 >> 3)
 #define PLAN_A_X	 	-200
 #define PRESS_START_X	204
 #define PRESS_START_Y	192
+#define BAR_X			128
+#define BAR_Y			210
+#define TIME_TO_STORY	200
+
 const u16 palettes_white[64] = {0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
 								0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
 								0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,0xEEE,
@@ -18,4 +22,6 @@ struct coordS16{
 	s16 x;
 	s16 y;
 };
+
+void resetScrolling();
 #endif

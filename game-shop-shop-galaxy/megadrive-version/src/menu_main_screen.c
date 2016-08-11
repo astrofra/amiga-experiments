@@ -7,6 +7,16 @@ s16 scroll_PLAN_A[TABLE_LEN];
 s16 scroll_PLAN_B[TABLE_LEN];
 u8 scroll_speed[TABLE_LEN];
 
+void resetScrolling(){
+	SYS_disableInts();
+	VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
+	VDP_setHorizontalScroll(PLAN_A, 0);
+	VDP_setVerticalScroll(PLAN_A, 0);
+	VDP_setHorizontalScroll(PLAN_B, 0);
+	VDP_setVerticalScroll(PLAN_B, 0);			
+	SYS_enableInts();	
+}
+
 void menu_MainScreen()
 {
 	u16 vramIndex = TILE_USERINDEX;
@@ -14,7 +24,6 @@ void menu_MainScreen()
 	u16 vbl_count = 0;
 	u16 press_start_vis = 0;
 	u16 start_is_pressed = 0;
-	u16 fade_lock = 0;
 	u16 seq = 0;
 	
 	struct coordS16 title_0_coord; //shop shop logo
@@ -24,6 +33,10 @@ void menu_MainScreen()
 	struct coordS16 title_1_coord; //galaxy logo
 	title_1_coord.x = 400;
 	title_1_coord.y = 64;
+	
+	struct coordS16 bar_coord;
+	bar_coord.x = 320;
+	bar_coord.y = BAR_Y;
 
 	//backup palettes
 	u16 palettes[64];
@@ -56,17 +69,22 @@ void menu_MainScreen()
 	// set all palettes to black
 	VDP_setPaletteColors(0, (u16*) palette_black, 64);
 
-	sprites[0] = SPR_addSprite(&title_0, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	sprites[0] = SPR_addSprite(&title_0, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
 	SPR_setPosition(sprites[0], (320 - 256) >> 1, 0);
 	
-	sprites[1] = SPR_addSprite(&title_1, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, vramIndex));
+	sprites[1] = SPR_addSprite(&title_1, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
 	SPR_setPosition(sprites[1], (320 - 168) >> 1, 64);
 
 	sprites[2] = SPR_addSprite(&menu_press, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
-	SPR_setPosition(sprites[2], 0, -16);
+	SPR_setPosition(sprites[2], 0, -8);
 
 	sprites[3] = SPR_addSprite(&menu_start, 0, 0, TILE_ATTR(PAL2, TRUE, FALSE, FALSE));
-	SPR_setPosition(sprites[3], 0, -16);
+	SPR_setPosition(sprites[3], 0, -8);
+	
+	sprites[4] = SPR_addSprite(&menu_bar, 0, 0, TILE_ATTR_FULL(PAL2, FALSE, FALSE, FALSE, vramIndex));
+	SPR_setVisibility(sprites[4], FALSE);
+	SPR_setPosition(sprites[4], 0, 224);	
+
 	
 	SPR_update();
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
@@ -87,17 +105,16 @@ void menu_MainScreen()
 		scroll_speed[i] = ns;
 		s = ns;
 	}
-	while (start_is_pressed == 0)
+	while (start_is_pressed == 0 && seq <= 5) 
 	{
 		VDP_waitVSync();
 		vbl_count++;
-		if(fade_lock != 0) fade_lock--;
 		BMP_showFPS(1);
 		VDP_setHorizontalScrollTile(PLAN_A, 1, scroll_PLAN_A, TABLE_LEN, TRUE);	
 		VDP_setHorizontalScrollTile(PLAN_B, 2, scroll_PLAN_B, TABLE_LEN, TRUE);
+		VDP_setVerticalScroll(PLAN_A, -20 + (sinFix16(vbl_count & 511) >> 1));
 		SPR_setPosition(sprites[0], title_0_coord.x, title_0_coord.y);
 		SPR_setPosition(sprites[1], title_1_coord.x, title_1_coord.y);
-		
 		switch(seq){
 			case 0:
 			seq++;
@@ -118,28 +135,50 @@ void menu_MainScreen()
 			if(!VDP_isDoingFade()) seq++;
 			break;
 			
-			case 4: //restore originals palettes
+			case 4: //restore orgiginals palettes
 			VDP_fadeAllTo(palettes, 150, TRUE);
+			//BPLAN change scrolling speed
+			for(i = 0; i < TABLE_LEN; i++){
+				//Change speed PLANB
+				do{
+					ns = -((random() % 6) + 1);
+				}
+				while (ns == s);
+					scroll_speed[i] = ns;
+					s = ns;			
+			}
+			SPR_setPosition(sprites[2], PRESS_START_X, PRESS_START_Y);
+			SPR_setPosition(sprites[3], PRESS_START_X + 48, PRESS_START_Y);													
 			seq++;			
 			break;
 			
 			case 5:
 			// press start flash
-			// i ve a problem with SPR_setVisibilty function ...
-			// i move "press start" in offscreen for flashing "effect"
 			if(vbl_count % 40 == 0){ 
-				if(!press_start_vis){
-					SPR_setPosition(sprites[2], 0, -16);
-					SPR_setPosition(sprites[3], 48, -16);					
-				}else{
-					if(press_start_vis){
-						SPR_setPosition(sprites[2], PRESS_START_X, PRESS_START_Y);
-						SPR_setPosition(sprites[3], PRESS_START_X + 48, PRESS_START_Y);										
-					}
-				}
 				press_start_vis = !press_start_vis;
+				SPR_setVisibility(sprites[2], press_start_vis);
+				SPR_setVisibility(sprites[3], press_start_vis);
 			}
-			break;
+			//APLAN SCROLLING 
+			s16 val = sinFix16( -20 + (sinFix16(vbl_count & 511) >> 1));
+			for(i = 0; i < TABLE_LEN; i++){
+				scroll_PLAN_A[i] = val;
+			}
+			//BAR
+			if(bar_coord.x > BAR_X){
+				bar_coord.x -= 2;
+				SPR_setPosition(sprites[4], bar_coord.x, bar_coord.y);	
+			}
+			/*
+			if(vbl_count % TIME_TO_STORY == 0{
+				seq++;
+				for(i = 0; i < SPRITE_MAX; i++){
+					SPR_setVisibility(sprites[0], FALSE);
+				}
+				VDP_waitVSync();
+			}
+			*/
+			break;			
 			
 			default:
 			break;
@@ -152,14 +191,21 @@ void menu_MainScreen()
 		SPR_update();
 		if(JOY_readJoypad(0) == BUTTON_START){
 			start_is_pressed = 1;
-			SYS_disableInts();
-			VDP_setScrollingMode(HSCROLL_PLANE,VSCROLL_PLANE);
-			VDP_setHorizontalScroll(PLAN_A, 0);
-			VDP_setVerticalScroll(PLAN_A, 0);
-			VDP_setHorizontalScroll(PLAN_B, 0);
-			VDP_setVerticalScroll(PLAN_B, 0);			
-			SYS_enableInts();
+			resetScrolling();
 			SPR_end();
 		}
+	}
+	if(start_is_pressed == 0 && seq == 6){ //clear
+		resetScrolling();
+		SYS_disableInts();
+		VDP_clearPlan(PLAN_A, 0);
+		VDP_clearPlan(PLAN_B, 0);		
+		SYS_enableInts();
+		VDP_waitVSync();
+		seq++;
+	}
+	while(start_is_pressed == 0 && seq >= 7){ //story
+		VDP_waitVSync();
+		VDP_drawText("BLA BLA BLA BLA", 0, 0);
 	}
 }
