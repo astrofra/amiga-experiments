@@ -9,3 +9,4 @@ IMAGE game_robot_5 "game_robot_5.png" 0
 SPRITE menu_press "menu_press.png" 5 1 0
 SPRITE menu_start "menu_start.png" 5 1 0
 SPRITE menu_bar "menu_bar.png" 24 1 0
+IMAGE menu_bgstory "menu_bgstory.png" 0

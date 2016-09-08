@@ -12,5 +12,6 @@ extern const Image game_robot_5;
 extern const SpriteDefinition menu_press;
 extern const SpriteDefinition menu_start;
 extern const SpriteDefinition menu_bar;
+extern const Image menu_bgstory;
 
 #endif // _RES_GFX_H_
