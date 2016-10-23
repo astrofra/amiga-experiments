@@ -8,6 +8,13 @@
 #define board_width FIX32(16.0 * board_scale)
 #define board_length FIX32(24.0 * board_scale)
 
+#define SFL_GAME_PRELAUNCH 0
+#define SFL_GAME_LAUNCH 1
+#define SFL_GAME_PLAY 2
+#define SFL_GAME_GOAL 3
+#define SFL_GAME_POSTGOAL 4
+#define SFL_GAME_SCORE_UPD 5
+
 /*
 	Racket game object
 */

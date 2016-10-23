@@ -45,7 +45,7 @@ void player_setControler(fix32 joy_x, fix32 joy_z)
 	// RangeAdjust(y, 0.0, 0.5, board.board_length * 0.5 - (length * 0.5), board.board_length * 0.35 - (length * 0.5))
 
 	player.target_pos_x = fix32Clamp(player.target_pos_x, RSE_fix32Mul(board_width, FIX32(-0.5)), RSE_fix32Mul(board_width, FIX32(0.5)));
-	player.target_pos_z = fix32Clamp(player.target_pos_z, RSE_fix32Mul(board_length, FIX32(-0.5)), RSE_fix32Mul(board_length, FIX32(0.5)));
+	player.target_pos_z = fix32Clamp(player.target_pos_z, RSE_fix32Mul(board_length, FIX32(-0.475)), RSE_fix32Mul(board_length, FIX32(0.475)));
 }
 
 void player_update(fix32 dt)

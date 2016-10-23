@@ -34,6 +34,12 @@ void game_ShufflePuck()
 		player_2d_y,
 		player_2d_scale;
 
+	/* Gameplay data */
+	short sfl_game_state;
+	int player_score = 0,
+		ai_score = 0;
+
+	u16 slf_game_timer = 0;
 
 	const fix32 persp_coef[] = {fix32DivFloats(1.0, 132.0), fix32DivFloats(5, 132.0), fix32DivFloats(9, 132.0), fix32DivFloats(13, 132.0), fix32DivFloats(17, 132.0), 
 								fix32DivFloats(22, 132.0), fix32DivFloats(27, 132.0), fix32DivFloats(34, 132.0), fix32DivFloats(42, 132.0), fix32DivFloats(51, 132.0), 
@@ -125,14 +131,20 @@ void game_ShufflePuck()
 			}
 		}
 
+		/*	Ball hits player's goal */
 		if (ball.pos_z > RSE_fix32Mul(board_length, FIX32(0.5))){
 			ball.pos_z = RSE_fix32Mul(board_length, FIX32(0.5));
 			ball_bounceZ();
+			ball.inertia = FIX32(10.0);
+			ai_score++;
+			sfl_game_state = SFL_GAME_GOAL;
 		}
 		else{
+			/*	Ball hits ai's goal */
 			if (ball.pos_z < RSE_fix32Mul(board_length, FIX32(-0.5))){
 				ball.pos_z = RSE_fix32Mul(board_length, FIX32(-0.5));
 				ball_bounceZ();
+				// player_score++;
 			}
 		}
 
@@ -218,35 +230,36 @@ void game_ShufflePuck()
 		ai_reset();
 		player_reset();
 		ball_reset();
-		ball_setImpulse(FIX32(10.0 * board_scale * shuffle_speed_scale), FIX32(10.0 * board_scale * shuffle_speed_scale));
 	}	
 
-	void gameMainLoop(fix32 dt){
+	void gameMainLoop(fix32 dt, u8 upd_player_motion){
 		/* Update the ball motion */
 		ball_update(dt);
 
-		/* Update the player motion */
-		// player_setMouse(mouse_device.GetValue(gs.InputDevice.InputAxisX) / SCR_DISP_WIDTH, mouse_device.GetValue(gs.InputDevice.InputAxisY) / SCR_DISP_HEIGHT);
-		joy_x = 0;
-		if (JOY_readJoypad(0) & BUTTON_LEFT)
-			joy_x = FIX32(-1.0);
-		else
-		if (JOY_readJoypad(0) & BUTTON_RIGHT)
-			joy_x = FIX32(1.0);
+		if (upd_player_motion)
+		{
+			/* Update the player motion */
+			joy_x = 0;
+			if (JOY_readJoypad(0) & BUTTON_LEFT)
+				joy_x = FIX32(-1.0);
+			else
+			if (JOY_readJoypad(0) & BUTTON_RIGHT)
+				joy_x = FIX32(1.0);
 
-		joy_y = 0;
-		if (JOY_readJoypad(0) & BUTTON_UP)
-			joy_y = FIX32(-1.0);
-		else
-		if (JOY_readJoypad(0) & BUTTON_DOWN)
-			joy_y = FIX32(1.0);		
+			joy_y = 0;
+			if (JOY_readJoypad(0) & BUTTON_UP)
+				joy_y = FIX32(-1.0);
+			else
+			if (JOY_readJoypad(0) & BUTTON_DOWN)
+				joy_y = FIX32(1.0);		
 
-		player_setControler(joy_x, joy_y);
-		player_update(dt);
+			player_setControler(joy_x, joy_y);
+			player_update(dt);
 
-		/* Update the AI */
-		ai_updateGameData(ball.pos_x, ball.pos_z);
-		ai_update(dt);
+			/* Update the AI */
+			ai_updateGameData(ball.pos_x, ball.pos_z);
+			ai_update(dt);
+		}
 
 		/* Collisions */
 		if (ball.velocity_z > FIX32(0.0))
@@ -264,29 +277,17 @@ void game_ShufflePuck()
 		ball_2d_x = pvect.x;
 		ball_2d_y = pvect.y;
 		ball_2d_scale = fix32ToInt(RSE_fix32Mul(pvect.z, FIX32(16.0)));
-		// intToStr(ball_2d_scale, str, 8);
-		// BMP_drawText(str, 6, 0);
-		// ball_2d_scale = 0;
-
-		// ball_2d_x *= SCR_SCALE_FACTOR
-		// ball_2d_y = SCR_DISP_HEIGHT - (ball_2d_y * SCR_SCALE_FACTOR)
 
 		pvect = project3DTo2D(player.pos_x, player.pos_z);
 		player_2d_x = pvect.x;
 		player_2d_y = pvect.y;
 		player_2d_scale =  fix32ToInt(RSE_fix32Mul(pvect.z, FIX32(16.0)));
-		// player_2d_x *= SCR_SCALE_FACTOR
-		// player_2d_y = SCR_DISP_HEIGHT - (player_2d_y * SCR_SCALE_FACTOR)
 
 		pvect = project3DTo2D(ai.pos_x, ai.pos_z);
 		ai_2d_x = pvect.x;
 		ai_2d_y = pvect.y;
 		ai_2d_scale =fix32ToInt(RSE_fix32Mul(pvect.z, FIX32(16.0)));
-		// ai_2d_x *= SCR_SCALE_FACTOR
-		// ai_2d_y = SCR_DISP_HEIGHT - (ai_2d_y * SCR_SCALE_FACTOR)
 
-		// render.clear()
-		// render.set_blend_mode2d(render.BlendAlpha)
 		// /* Opponent */
 		// render.sprite2d(SCR_MARGIN_X + (320 * 0.5) * SCR_SCALE_FACTOR, (SCR_PHYSIC_HEIGHT - 96 * 0.5) * SCR_SCALE_FACTOR, 106 * SCR_SCALE_FACTOR, "@assets/robot5.png")
 
@@ -311,6 +312,14 @@ void game_ShufflePuck()
 		// }
 
 		// render.set_blend_mode2d(render.BlendOpaque)
+	}
+
+	void gameUpdateScoreDisplay(void)
+	{
+		intToStr(player_score, str, 2);
+		BMP_drawText(str, 6, 0);
+		intToStr(ai_score, str, 2);
+		BMP_drawText(str, 6, 1);
 	}
 
 	/*	System stuff */
@@ -354,16 +363,59 @@ void game_ShufflePuck()
 	// SND_setMusicTempo_XGM(50);		
 
 	gameReset();
+	gameUpdateScoreDisplay();
 
+	sfl_game_state = SFL_GAME_PRELAUNCH;
 
 	while (TRUE)
 	{
 		VDP_waitVSync();
-		BMP_showFPS(1);
-
+		slf_game_timer++;
+		// BMP_showFPS(1);
 		// utils_unit_tests();
 
-		gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)));
+		switch(sfl_game_state)
+		{
+			case SFL_GAME_PRELAUNCH:
+				gameReset();
+				slf_game_timer = 0;
+				sfl_game_state = SFL_GAME_LAUNCH;
+				break;
+
+			case SFL_GAME_LAUNCH:
+				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), 0);
+
+				if (slf_game_timer > 1 * 60)
+				{
+					ball_setImpulse(FIX32(10.0 * board_scale * shuffle_speed_scale), FIX32(10.0 * board_scale * shuffle_speed_scale));
+					sfl_game_state = SFL_GAME_PLAY;
+				}
+
+				break;
+
+			case SFL_GAME_PLAY:
+				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), 1);
+				break;
+
+			case SFL_GAME_GOAL:
+				slf_game_timer = 0;
+				sfl_game_state = SFL_GAME_POSTGOAL;
+				break;
+
+			case SFL_GAME_POSTGOAL:
+				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), 0);
+
+				if (slf_game_timer > 2 * 60)
+					sfl_game_state = SFL_GAME_SCORE_UPD;
+
+				break;
+
+			case SFL_GAME_SCORE_UPD:
+				gameUpdateScoreDisplay();
+				sfl_game_state = SFL_GAME_PRELAUNCH;
+				break;
+		}
+
 		SPR_update();	
 		// vblCount++;
 	}
