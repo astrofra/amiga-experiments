@@ -144,7 +144,9 @@ void game_ShufflePuck()
 			if (ball.pos_z < RSE_fix32Mul(board_length, FIX32(-0.5))){
 				ball.pos_z = RSE_fix32Mul(board_length, FIX32(-0.5));
 				ball_bounceZ();
-				// player_score++;
+				ball.inertia = FIX32(10.0);
+				player_score++;
+				sfl_game_state = SFL_GAME_GOAL;
 			}
 		}
 
@@ -203,6 +205,8 @@ void game_ShufflePuck()
 		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
 	}
 
+	/*	Collision detection */
+	/* 	Player */
 	u8 ballIsBehindRacket(void){
 		if (ball.pos_z < player.pos_z)
 			return TRUE;
@@ -225,6 +229,31 @@ void game_ShufflePuck()
 		else
 			return FALSE;
 	}
+
+	/* AI */
+	u8 ballIsBehindAIRacket(void){
+		if (ball.pos_z > ai.pos_z)
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	u8 BallIsWithinAIXReach(void){
+		if (fix32Add(ball.pos_x, ball.radius) > fix32Sub(ai.pos_x, RSE_fix32Mul(ai.width, FIX32(0.5))) 
+			&& fix32Sub(ball.pos_x, ball.radius) < fix32Add(ai.pos_x, RSE_fix32Mul(ai.width, FIX32(0.5))))
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	u8 BallWasWithinAIXReach(void){
+		if (fix32Add(ball.prev_pos_x, ball.radius) > fix32Sub(ai.prev_pos_x,  RSE_fix32Mul(ai.width, FIX32(0.5))) 
+			&& fix32Sub(ball.prev_pos_x, ball.radius) < fix32Add(ai.prev_pos_x, RSE_fix32Mul(ai.width, FIX32(0.5))))
+			return TRUE;
+		else
+			return FALSE;
+	}
+
 
 	void gameReset(void){		
 		ai_reset();
@@ -264,10 +293,21 @@ void game_ShufflePuck()
 		/* Collisions */
 		if (ball.velocity_z > FIX32(0.0))
 		{
+			/* Ball vs Player */
 			if ((!ballIsBehindRacket()) && (BallWasWithinXReach() || BallIsWithinXReach()))
 			{
 				ball_setPosition(ball.pos_x, player.pos_z - RSE_fix32Mul(ball.velocity_z, dt) + RSE_fix32Mul(fix32Min(FIX32(0.0), player.velocity_z), dt));
 				player_setTargetPosition(player.pos_x, ball.pos_z + player.length);
+				ball_bounceZ();
+			}
+		}
+		else
+		{
+			/* Ball vs AI */
+			if ((!ballIsBehindAIRacket()) && (BallWasWithinAIXReach() || BallIsWithinAIXReach()))
+			{
+				ball_setPosition(ball.pos_x, ai.pos_z + RSE_fix32Mul(ball.velocity_z, dt) - RSE_fix32Mul(fix32Min(FIX32(0.0), ai.velocity_z), dt));
+				ai_setTargetPosition(ai.pos_x, ball.pos_z - ai.length);
 				ball_bounceZ();
 			}
 		}
@@ -383,7 +423,7 @@ void game_ShufflePuck()
 				break;
 
 			case SFL_GAME_LAUNCH:
-				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), 0);
+				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), FALSE);
 
 				if (slf_game_timer > 1 * 60)
 				{
@@ -394,7 +434,7 @@ void game_ShufflePuck()
 				break;
 
 			case SFL_GAME_PLAY:
-				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), 1);
+				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), TRUE);
 				break;
 
 			case SFL_GAME_GOAL:
@@ -403,7 +443,7 @@ void game_ShufflePuck()
 				break;
 
 			case SFL_GAME_POSTGOAL:
-				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), 0);
+				gameMainLoop(FIX32(1.0/(shuffle_speed_scale * 60.0)), FALSE);
 
 				if (slf_game_timer > 2 * 60)
 					sfl_game_state = SFL_GAME_SCORE_UPD;

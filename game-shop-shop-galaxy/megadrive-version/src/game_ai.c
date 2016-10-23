@@ -17,6 +17,12 @@ void ai_setPosition(fix32 x,fix32 z)
 	ai.target_pos_z = z;
 }
 
+void ai_setTargetPosition(fix32 x,fix32 z)
+{
+	ai.target_pos_x = x;
+	ai.target_pos_z = z;
+}
+
 void ai_reset(void)
 {
 	ai.pos_x = ai.initial_pox_x;
@@ -25,14 +31,14 @@ void ai_reset(void)
 	ai.prev_pos_z = ai.pos_z;
 	ai.width = FIX32(2.0);
 	ai.length = FIX32(0.5);
-	ai.max_racket_speed = FIX32(50.0); 
-	ai.racket_speed = FIX32(50.0);
+	ai.max_racket_speed = FIX32(15.0); 
+	ai.racket_speed = FIX32(0.0);
 }
 
 void ai_updateGameData(fix32 ball_pos_x, fix32 ball_pos_z)
 {
 	ai.target_pos_x = ball_pos_x;
-	ai.target_pos_z = RSE_fix32Mul(board_length, FIX32(-0.5));
+	ai.target_pos_z = RSE_fix32Mul(board_length, FIX32(-0.25));
 
 	ai.racket_speed = fix32RangeAdjust(ball_pos_z, RSE_fix32Mul(board_length, FIX32(-0.5)), RSE_fix32Mul(board_length, FIX32(-0.35)), FIX32(0.0), FIX32(1.0));
 	ai.racket_speed = fix32Clamp(ai.racket_speed, FIX32(0.0), FIX32(1.0));
