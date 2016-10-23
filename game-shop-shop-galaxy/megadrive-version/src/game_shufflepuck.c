@@ -208,7 +208,7 @@ void game_ShufflePuck()
 	/*	Collision detection */
 	/* 	Player */
 	u8 ballIsBehindRacket(void){
-		if (ball.pos_z < player.pos_z)
+		if (ball.pos_z > player.pos_z)
 			return TRUE;
 		else
 			return FALSE;
@@ -232,7 +232,7 @@ void game_ShufflePuck()
 
 	/* AI */
 	u8 ballIsBehindAIRacket(void){
-		if (ball.pos_z > ai.pos_z)
+		if (ball.pos_z < ai.pos_z)
 			return TRUE;
 		else
 			return FALSE;
@@ -294,7 +294,7 @@ void game_ShufflePuck()
 		if (ball.velocity_z > FIX32(0.0))
 		{
 			/* Ball vs Player */
-			if ((!ballIsBehindRacket()) && (BallWasWithinXReach() || BallIsWithinXReach()))
+			if (ballIsBehindRacket() && (BallWasWithinXReach() || BallIsWithinXReach()))
 			{
 				ball_setPosition(ball.pos_x, player.pos_z - RSE_fix32Mul(ball.velocity_z, dt) + RSE_fix32Mul(fix32Min(FIX32(0.0), player.velocity_z), dt));
 				player_setTargetPosition(player.pos_x, ball.pos_z + player.length);
@@ -304,7 +304,7 @@ void game_ShufflePuck()
 		else
 		{
 			/* Ball vs AI */
-			if ((!ballIsBehindAIRacket()) && (BallWasWithinAIXReach() || BallIsWithinAIXReach()))
+			if (ballIsBehindAIRacket() && (BallWasWithinAIXReach() || BallIsWithinAIXReach()))
 			{
 				ball_setPosition(ball.pos_x, ai.pos_z + RSE_fix32Mul(ball.velocity_z, dt) - RSE_fix32Mul(fix32Min(FIX32(0.0), ai.velocity_z), dt));
 				ai_setTargetPosition(ai.pos_x, ball.pos_z - ai.length);
