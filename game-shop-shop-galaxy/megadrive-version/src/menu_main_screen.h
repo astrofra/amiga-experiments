@@ -9,6 +9,8 @@
 #define BAR_X			128
 #define BAR_Y			210
 #define TIME_TO_STORY	1000 //vbl
+#define STORY_TEXT01 "BLABLABLA BLA BLA BLABLABLA BLA BLA"
+#define STORY_TEXT02 "BLABLABLA BLA BLA BLABLABLA BLA BLA"
 #define STORY_TEXT01_X	0
 #define STORY_TEXT01_Y	0
 #define STORY_TEXT02_X	20
@@ -33,4 +35,6 @@ struct storyTexter_{
 
 u16 storyTexter_update(const char *text, struct storyTexter_ *p_storyTexter, u16 len, u16 vbl);
 void resetScrolling();
+u16 start_is_pressed();
+u16 textLen(const char *text);
 #endif
