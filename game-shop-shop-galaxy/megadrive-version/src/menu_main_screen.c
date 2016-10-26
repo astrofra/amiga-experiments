@@ -2,6 +2,7 @@
 #include <gfx.h>
 #include "menu_main_screen.h"
 #include "transition_helper.h"
+#include "kdebug.h"
 
 s16 scroll_PLAN_A[TABLE_LEN];
 s16 scroll_PLAN_B[TABLE_LEN];
@@ -16,7 +17,24 @@ void resetScrolling(){
 	VDP_setVerticalScroll(PLAN_B, 0);
 	SYS_enableInts();
 }
-
+u16 start_is_pressed(){
+	if(JOY_readJoypad(0) == BUTTON_START){
+		resetScrolling();
+		SPR_end();
+		return 1;
+	}else{
+		return 0;
+	}
+}
+u16 textLen(const char *text){
+	u16 count = 0;
+	char t = text[count];
+	while(t != '\0'){
+		count++;
+		t = text[count];
+	}
+	return count;
+}
 u16 storyTexter_update(const char *text, struct storyTexter_ *p_storyTexter, u16 len, u16 vbl){
 	/*
 	if(vbl % p_storyTexter->vbl_delta >> 1 == 0){
@@ -45,8 +63,10 @@ void menu_MainScreen(){
 	s16 i, ns, s;
 	u16 vbl_count = 0;
 	u16 press_start_vis = 0;
-	u16 start_is_pressed = 0;
 
+ 	//debug
+	KDebug_AlertNumber(textLen(STORY_TEXT01));
+	 //debug
 	struct storyTexter_ storyTexter;
 	storyTexter.vbl_delta = 7;
 	storyTexter.x = STORY_TEXT01_X;
@@ -120,7 +140,6 @@ void menu_MainScreen(){
 	SPR_setVisibility(sprites[4], FALSE);
 	SPR_setPosition(sprites[4], 0, 224);
 
-
 	SPR_update();
 	VDP_setScrollingMode(HSCROLL_TILE, VSCROLL_PLANE);
 	SYS_enableInts();
@@ -128,8 +147,7 @@ void menu_MainScreen(){
 	VDP_fadeInAll(palettes, 20, TRUE);
 
 	s = 1;
-	for(i = 0; i < TABLE_LEN; i++)
-	{
+	for(i = 0; i < TABLE_LEN; i++){
 		scroll_PLAN_A[i] = PLAN_A_X;
 		scroll_PLAN_B[i] = 0;
 		do
@@ -140,8 +158,7 @@ void menu_MainScreen(){
 		scroll_speed[i] = ns;
 		s = ns;
 	}
-	while (start_is_pressed == 0 && seq <= 5)
-	{
+	while (start_is_pressed() == 0 && seq <= 5){
 		VDP_waitVSync();
 		vbl_count++;
 		BMP_showFPS(1);
@@ -152,6 +169,7 @@ void menu_MainScreen(){
 		SPR_setPosition(sprites[1], title_1_coord.x, title_1_coord.y);
 		switch(seq){
 			case 0:
+			//if(vbl_count % 300 == 0 )seq++;
 			seq++;
 			break;
 
@@ -222,14 +240,16 @@ void menu_MainScreen(){
 			scroll_PLAN_B[i] = (scroll_PLAN_B[i] + scroll_speed[i]) & 0xFF;
 		}
 		SPR_update();
+		/*
 		if(JOY_readJoypad(0) == BUTTON_START){
 			start_is_pressed = 1;
 			resetScrolling();
 			SPR_end();
 		}
+		*/
 	}
 	story:
-	if(start_is_pressed == 0 && seq == 6){ //clear
+	if(start_is_pressed() == 0 && seq == 6){ //clear
 		resetScrolling();
 		SYS_disableInts();
 		VDP_clearPlan(PLAN_A, 0);
@@ -252,7 +272,7 @@ void menu_MainScreen(){
 		VDP_waitVSync();
 		seq++;
 	}
-	while(start_is_pressed == 0 && seq >= 7){ //story
+	while(start_is_pressed() == 0 && seq >= 7){ //story
 		VDP_waitVSync();
 		vbl_count++;
 		switch(seq){
@@ -266,7 +286,7 @@ void menu_MainScreen(){
 			break;
 
 			case 8:
-			if(storyTexter_update("BLABLABLA BLA BLA BLABLABLA BLA BLA", &storyTexter, 35, vbl_count)) seq++;
+			if(storyTexter_update(STORY_TEXT01, &storyTexter, textLen(STORY_TEXT01), vbl_count)) seq++;
 			break;
 
 			case 9:
@@ -289,7 +309,7 @@ void menu_MainScreen(){
 			break;
 
 			case 11:
-			if(storyTexter_update("BLABLABLA BLA BLA BLABLABLA BLA BLA", &storyTexter, 35, vbl_count)) seq++;
+			if(storyTexter_update(STORY_TEXT02, &storyTexter, textLen(STORY_TEXT02), vbl_count)) seq++;
 			break;
 
 			case 12:
