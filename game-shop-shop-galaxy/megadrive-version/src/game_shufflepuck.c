@@ -384,6 +384,13 @@ void game_ShufflePuck()
 	VDP_setPalette(PAL2, game_ball.palette->data);
 
 	/* Ball sprite */
+	/*
+		0	      |    O    |
+		1	[ ]   |   [ ]   |   [ ]
+		2	 O    |         |
+		3	[ ]   |   [ ]   |   [ ]
+		4	      |         |    O
+	*/
 	sprites[1] = SPR_addSprite(&game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
 	SPR_setPosition(sprites[1], 64, 64);
 
