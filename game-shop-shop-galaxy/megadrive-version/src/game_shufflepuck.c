@@ -182,26 +182,41 @@ void game_ShufflePuck()
 		// BMP_drawText(str, 10, 2);			
 	}
 
-	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale){
+	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale, int z_level){
 		// ball_2d_y += (240 - 136);
 
-		// intToStr(ball_2d_x, str, 0);
-		// BMP_drawText(str, 0, 3);	
-		// intToStr(ball_2d_y, str, 0);
-		// BMP_drawText(str, 10, 3);
-		SPR_setPosition(sprites[1], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 6));
-		SPR_setFrame(sprites[1], ball_2d_scale);
+		BMP_drawText("000", 0, 3);
+		intToStr(z_level, str, 0);
+		BMP_drawText(str, 0, 3);	
+
+		u8 i;
+		for(i = 0; i < 5; i+=2)
+			SPR_setVisibility(sprites[i], 1);
+
+		if (z_level < 0)
+			z_level = 4;
+		else
+		{
+			if (z_level == 0)
+				z_level = 2;
+			else
+				z_level = 0;
+		}
+
+		SPR_setPosition(sprites[z_level], ball_2d_x - 12, ball_2d_y + ((224 - 136) - 6));
+		SPR_setVisibility(sprites[z_level], 0);
+		SPR_setFrame(sprites[z_level], ball_2d_scale);
 	}
 
 	void renderPlayer(int player_2d_x, int player_2d_y, int player_2d_scale){
-		SPR_setPosition(sprites[0], player_2d_x - 32, player_2d_y + ((224 - 136) - 16));
-		SPR_setFrame(sprites[0], player_2d_scale);
+		SPR_setPosition(sprites[1], player_2d_x - 32, player_2d_y + ((224 - 136) - 16));
+		SPR_setFrame(sprites[1], player_2d_scale);
 		// render.sprite2d(SCR_MARGIN_X + player_2d_x, player_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * player_2d_scale, "@assets/game_racket.png")
 	}
 
 	void renderAI(int ai_2d_x, int ai_2d_y, int ai_2d_scale){
-		SPR_setPosition(sprites[2], ai_2d_x - 32, ai_2d_y + ((224 - 136) - 16));
-		SPR_setFrame(sprites[2], ai_2d_scale);
+		SPR_setPosition(sprites[3], ai_2d_x - 32, ai_2d_y + ((224 - 136) - 16));
+		SPR_setFrame(sprites[3], ai_2d_scale);
 		// render.sprite2d(SCR_MARGIN_X + ai_2d_x, ai_2d_y - (65 * SCR_SCALE_FACTOR), 64 * SCR_SCALE_FACTOR * ai_2d_scale, "@assets/game_racket.png")
 	}
 
@@ -321,37 +336,26 @@ void game_ShufflePuck()
 		pvect = project3DTo2D(player.pos_x, player.pos_z);
 		player_2d_x = pvect.x;
 		player_2d_y = pvect.y;
-		player_2d_scale =  fix32ToInt(RSE_fix32Mul(pvect.z, FIX32(16.0)));
+		player_2d_scale = fix32ToInt(RSE_fix32Mul(pvect.z, FIX32(16.0)));
 
 		pvect = project3DTo2D(ai.pos_x, ai.pos_z);
 		ai_2d_x = pvect.x;
 		ai_2d_y = pvect.y;
-		ai_2d_scale =fix32ToInt(RSE_fix32Mul(pvect.z, FIX32(16.0)));
-
-		// /* Opponent */
-		// render.sprite2d(SCR_MARGIN_X + (320 * 0.5) * SCR_SCALE_FACTOR, (SCR_PHYSIC_HEIGHT - 96 * 0.5) * SCR_SCALE_FACTOR, 106 * SCR_SCALE_FACTOR, "@assets/robot5.png")
-
-		// /* Game board */
-		// render.image2d(SCR_MARGIN_X, 0, SCR_SCALE_FACTOR, "@assets/game_board.png")
-
-		// /* Score panel */
-		// render.image2d(SCR_MARGIN_X, SCR_DISP_HEIGHT - (32 * SCR_SCALE_FACTOR), SCR_SCALE_FACTOR, "@assets/game_score_panel.png")
+		ai_2d_scale = fix32ToInt(RSE_fix32Mul(pvect.z, FIX32(16.0)));
 
 		/* Render moving items according to their Z position */
 		renderAI(fix32ToInt(ai_2d_x), fix32ToInt(ai_2d_y), ai_2d_scale);
+		renderPlayer(fix32ToInt(player_2d_x), fix32ToInt(player_2d_y), player_2d_scale);
 
-		// if (ball.pos_z - ball.radius < player.pos_z + player.length)
-		// {
-			renderBall(fix32ToInt(ball_2d_x), fix32ToInt(ball_2d_y), ball_2d_scale);
-			renderPlayer(fix32ToInt(player_2d_x), fix32ToInt(player_2d_y), player_2d_scale);
-		// }
-		// else
-		// {
-		// 	renderPlayer(player_2d_x, player_2d_y, player_2d_scale)
-		// 	renderBall(ball_2d_x, ball_2d_y, ball_2d_scale)
-		// }
-
-		// render.set_blend_mode2d(render.BlendOpaque)
+		if (ball.pos_z < ai.pos_z) // (ball.pos_z - ball.radius < ai.pos_z + ai.length)
+			renderBall(fix32ToInt(ball_2d_x), fix32ToInt(ball_2d_y), ball_2d_scale, -1);
+		else
+		{
+			if (ball.pos_z < player.pos_z)
+				renderBall(fix32ToInt(ball_2d_x), fix32ToInt(ball_2d_y), ball_2d_scale, 0);
+			else
+				renderBall(fix32ToInt(ball_2d_x), fix32ToInt(ball_2d_y), ball_2d_scale, 1);
+		}
 	}
 
 	void gameUpdateScoreDisplay(void)
@@ -391,16 +395,22 @@ void game_ShufflePuck()
 		3	[ ]   |   [ ]   |   [ ]
 		4	      |         |    O
 	*/
-	sprites[1] = SPR_addSprite(&game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(sprites[1], 64, 64);
-
-	/* Player racket sprite */
-	sprites[0] = SPR_addSprite(&game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(sprites[0], (320 / 2) - 32, 224 - 32);
+	sprites[0] = SPR_addSprite(&game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[0], 64, 64);
 
 	/* AI racket sprite */
-	sprites[2] = SPR_addSprite(&game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
-	SPR_setPosition(sprites[2], (320 / 2) - 32, 64);
+	sprites[1] = SPR_addSprite(&game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[1], (320 / 2) - 32, 64);
+
+	sprites[2] = SPR_addSprite(&game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[2], 64, 64);
+
+	/* Player racket sprite */
+	sprites[3] = SPR_addSprite(&game_racket, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[3], (320 / 2) - 32, 224 - 32);
+
+	sprites[4] = SPR_addSprite(&game_ball, 0, 0, TILE_ATTR_FULL(PAL2, TRUE, FALSE, FALSE, 0));
+	SPR_setPosition(sprites[4], 64, 64);
 
  	SPR_update();	
 
