@@ -185,9 +185,9 @@ void game_ShufflePuck()
 	void renderBall(int ball_2d_x, int ball_2d_y, int ball_2d_scale, int z_level){
 		// ball_2d_y += (240 - 136);
 
-		BMP_drawText("000", 0, 3);
-		intToStr(z_level, str, 0);
-		BMP_drawText(str, 0, 3);	
+		// BMP_drawText("000", 0, 3);
+		// intToStr(z_level, str, 0);
+		// BMP_drawText(str, 0, 3);	
 
 		u8 i;
 		for(i = 0; i < 5; i+=2)
@@ -229,6 +229,13 @@ void game_ShufflePuck()
 			return FALSE;
 	}
 
+	u8 ballIsCloseToRacket(void){
+		if (abs(ball.pos_z - player.pos_z) < RSE_fix32Mul(ball.radius, FIX32(2)))
+			return TRUE;
+		else
+			return FALSE;
+	}	
+
 	u8 BallIsWithinXReach(void){
 		if (fix32Add(ball.pos_x, ball.radius) > fix32Sub(player.pos_x, RSE_fix32Mul(player.width, FIX32(0.5))) 
 			&& fix32Sub(ball.pos_x, ball.radius) < fix32Add(player.pos_x, RSE_fix32Mul(player.width, FIX32(0.5))))
@@ -252,6 +259,13 @@ void game_ShufflePuck()
 		else
 			return FALSE;
 	}
+
+	u8 ballIsCloseToAIRacket(void){
+		if (abs(ball.pos_z - ai.pos_z) < RSE_fix32Mul(ball.radius, FIX32(2)))
+			return TRUE;
+		else
+			return FALSE;
+	}	
 
 	u8 BallIsWithinAIXReach(void){
 		if (fix32Add(ball.pos_x, ball.radius) > fix32Sub(ai.pos_x, RSE_fix32Mul(ai.width, FIX32(0.5))) 
@@ -309,7 +323,7 @@ void game_ShufflePuck()
 		if (ball.velocity_z > FIX32(0.0))
 		{
 			/* Ball vs Player */
-			if (ballIsBehindRacket() && (BallWasWithinXReach() || BallIsWithinXReach()))
+			if (ballIsBehindRacket() && ballIsCloseToRacket() && (BallWasWithinXReach() || BallIsWithinXReach()))
 			{
 				ball_setPosition(ball.pos_x, player.pos_z - RSE_fix32Mul(ball.velocity_z, dt) + RSE_fix32Mul(fix32Min(FIX32(0.0), player.velocity_z), dt));
 				player_setTargetPosition(player.pos_x, ball.pos_z + player.length);
@@ -319,13 +333,18 @@ void game_ShufflePuck()
 		else
 		{
 			/* Ball vs AI */
-			if (ballIsBehindAIRacket() && (BallWasWithinAIXReach() || BallIsWithinAIXReach()))
+			if (ballIsBehindAIRacket() && ballIsCloseToAIRacket() && (BallWasWithinAIXReach() || BallIsWithinAIXReach()))
 			{
 				ball_setPosition(ball.pos_x, ai.pos_z + RSE_fix32Mul(ball.velocity_z, dt) - RSE_fix32Mul(fix32Min(FIX32(0.0), ai.velocity_z), dt));
 				ai_setTargetPosition(ai.pos_x, ball.pos_z - ai.length);
 				ball_bounceZ();
 			}
 		}
+
+		if (ballIsCloseToRacket())
+			BMP_drawText("--Close--", 0, 3);
+		else
+			BMP_drawText("Not-close", 0, 3);
 
 		/* Compute 3D/2D projections */
 		pvect = project3DTo2D(ball.pos_x, ball.pos_z);
