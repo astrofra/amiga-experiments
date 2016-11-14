@@ -341,10 +341,10 @@ void game_ShufflePuck()
 			}
 		}
 
-		if (ballIsCloseToRacket())
-			BMP_drawText("--Close--", 0, 3);
-		else
-			BMP_drawText("Not-close", 0, 3);
+		// if (ballIsCloseToRacket())
+		// 	BMP_drawText("--Close--", 0, 3);
+		// else
+		// 	BMP_drawText("Not-close", 0, 3);
 
 		/* Compute 3D/2D projections */
 		pvect = project3DTo2D(ball.pos_x, ball.pos_z);
@@ -396,7 +396,7 @@ void game_ShufflePuck()
 	VDP_clearPlan(PLAN_B, 0);
 
 	/* Load the fond tiles */
-	VDP_drawImageEx(PLAN_A, &game_robot_5, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 112) / 16, (224 - 112) / 64	, FALSE, FALSE);
+	VDP_drawImageEx(PLAN_A, &game_robot_5, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, vramIndex), (320 - 152) / 16, (224 - 112) / 64	, FALSE, FALSE);
 	vramIndex += game_robot_5.tileset->numTile;
 
 	VDP_drawImageEx(PLAN_B, &game_board, TILE_ATTR_FULL(PAL1, TRUE, FALSE, FALSE, vramIndex), 0, (224 - 136) / 8, FALSE, FALSE);
