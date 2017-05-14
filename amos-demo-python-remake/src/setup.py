@@ -27,12 +27,12 @@ options = {
 	'build_exe': {
 		'compressed': True,
 		'packages': ['gs'],
-		'include_files': ['pkg.core/', 'assets/'] + extra_redist
+		'include_files': ['file_id.diz', 'screenshot.png', 'openal32.dll', 'assets/'] + extra_redist
 	}
 }
 
-setup(  name = "Amos Demo",
+setup(  name = "AMOS Demo",
 		version = "1.0",
-		description = "Amos Demo",
+		description = "PC version of the original AMOS demo released in 1989 by Mandarin Software.",
 		options = options,
-		executables = [Executable("amos_demo.py")])
+		executables = [Executable("main.py", targetName="AMOD-Demo.exe", icon="icon.ico")])

@@ -13,32 +13,67 @@
 # ---------------------------------------------------------------------
 
 import gs
-import gs.plus.render as render
-import gs.plus.clock as clock
+# import gs.plus.render as render
+# import gs.plus.clock as clock
 import math
+import sys
 import random
+import pymsgbox
 import json
-import easygui
 from utils import *
 from graphic_routines import *
 from screen_specs import *
+from os.path import dirname, realpath
 
+plus = None
 
 def resolution_requester():
-	res_list = ["320x200", "640x400", "800x600", "1280x720", "1600x900", "1920x1080", "1920x1200"]
-	choice = easygui.choicebox(msg='Select your screen resolution', title='Screen Resolution', choices=(res_list))
-	if choice is not None:
-		demo_screen_size[0] = int(choice.split("x")[0])
-		demo_screen_size[1] = int(choice.split("x")[1])
+	# res_list = ["320x200", "640x400", "800x600", "1280x720", "1600x900", "1920x1080", "1920x1200"]
+	# choice = easygui.choicebox(msg='Select your screen resolution', title='Screen Resolution', choices=(res_list))
+	# if choice is not None:
+	# 	demo_screen_size[0] = int(choice.split("x")[0])
+	# 	demo_screen_size[1] = int(choice.split("x")[1])
+
+	window_mode = pymsgbox.confirm(text='Select your screen mode', title='AMOS DEMO', buttons=['Windowed', 'Fullscreen'])
+
+	if window_mode == 'Windowed':
+		pc_screen_windowed = True
+		screen_resolutions = ['640x480', '720x568', '800x600', '1280x800']
+	elif window_mode == 'Fullscreen':
+		pc_screen_windowed = False
+		screen_resolutions = ['640x480', '800x600', '1280x720', '1280x800', '1920x1080']
+	else:
+		return False
+
+	screen_res = pymsgbox.confirm(text='Select your screen resolution', title='AMOS DEMO',
+								   buttons=screen_resolutions)
+
+	if screen_res is not None:
+		demo_screen_size[0] = int(screen_res.split('x')[0])
+		demo_screen_size[1] = int(screen_res.split('x')[1])
+	else:
+		return False
+
+	return True
+
+
+def demo_exit_test():
+	global plus
+	if plus.IsAppEnded(plus.EndOnDefaultWindowClosed) or plus.KeyPress(gs.InputDevice.KeyEscape):
+		plus.RenderUninit()
+		exit()
 
 
 def engine_init():
-	global al, channel
+	global al, channel, plus
 	try:
 		gs.LoadPlugins(gs.get_default_plugins_path())
 	except:
 		pass
-	render.init(demo_screen_size[0], demo_screen_size[1], "pkg.core")
+
+	plus = gs.GetPlus()
+	plus.RenderInit(demo_screen_size[0], demo_screen_size[1], 1, pc_screen_windowed)
+	# render.init(demo_screen_size[0], demo_screen_size[1], "pkg.core", 1, pc_screen_windowed)
 
 	# mount the system file driver
 	gs.MountFileDriver(gs.StdFileDriver("assets/"), "@assets/")
@@ -48,6 +83,8 @@ def engine_init():
 
 
 def startup_sequence():
+	global plus
+
 	print("")
 	print("                           =========")
 	print("                           AMOS DEMO")
@@ -76,9 +113,8 @@ def startup_sequence():
 	print("")
 
 
-
 def play_music():
-	global al, channel
+	global al, channel, plus
 	# create an OpenAL mixer and wrap it with the MixerAsync interface
 	al = gs.MixerAsync(gs.ALMixer())
 	al.Open()
@@ -87,6 +123,8 @@ def play_music():
 
 
 def render_credits():
+	global plus
+
 	strings = [["THE AMOS DEMO", 25, 1, 1, "bilko-opti-bold", 42],
 			["PROGRAMMING BY", 60, 1, 0 ,"bilko-opti-bold", 42],
 			["Peter Hickman", 75, 1, 0, "bilko-opti-bold", 42],
@@ -97,7 +135,7 @@ def render_credits():
 			["There is an IMPORTANT text file", 185, 1,0, "amiga4ever-pro2", 18],
 			["on this disk, please read it.", 195, 1,0, "amiga4ever-pro2", 18]]
 
-	render_text_screen(strings, duration=9.0)
+	render_text_screen(strings, duration=9.0, plus=plus, exit_callback=demo_exit_test)
 
 	strings = [["On some of the",40,1,0, "bilko-opti-bold", 42],
 			["demonstrations you",65,1,0, "bilko-opti-bold", 42],
@@ -105,7 +143,7 @@ def render_credits():
 			["some of the SPRITES or",115,1,0, "bilko-opti-bold", 42],
 			["BOBS with the mouse.",140,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=5.0)
+	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
 
 
 def render_title_page():
@@ -114,16 +152,18 @@ def render_title_page():
 			["design the game",90,1,0, "bilko-opti-bold", 42],
 			["of your dreams.",115,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, plus=plus, exit_callback=demo_exit_test)
 
 	strings = [["Over 400 commands",40,1,0, "bilko-opti-bold", 42],
 			["to unleash the raw power",65,1,0, "bilko-opti-bold", 42],
 			["hidden inside your Amiga.",90,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, plus=plus, exit_callback=demo_exit_test)
 
 
 def render_hardsprite():
+	global plus
+
 	strings = [["By pushing your Amiga to",40,1,0, "bilko-opti-bold", 42],
 			["its limit AMOS allows you",65,1,0, "bilko-opti-bold", 42],
 			["to exceed the maximum",90,1,0, "bilko-opti-bold", 42],
@@ -131,7 +171,7 @@ def render_hardsprite():
 			["SPRITES normally",140,1,0, "bilko-opti-bold", 42],
 			["available to the user.",165,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=6.0)
+	render_text_screen(strings, duration=6.0, plus=plus, exit_callback=demo_exit_test)
 
 	sprites = ["sprite_bike_", "sprite_skate_", "sprite_glide_", "sprite_plane_"]
 	image_data = [230,-1,2, 60,0,0, 180,30,3, 100,25,1,
@@ -146,12 +186,13 @@ def render_hardsprite():
 	expose_duration = 1.0
 	total_duration = 10.0
 	while fx_timer < total_duration:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
 
-		render.clear()
+		plus.Clear()
 
-		render.set_blend_mode2d(render.BlendAlpha)
+		plus.SetBlend2D(gs.BlendAlpha)
 
 		if fx_timer < intro_duration:
 			v_max_sprites = int(RangeAdjust(fx_timer, 0.0, intro_duration, 1, max_sprites))
@@ -163,10 +204,10 @@ def render_hardsprite():
 			v_max_sprites = max_sprites
 			if fx_timer >= intro_duration and fx_timer < intro_duration + expose_duration:
 				strings = [["ANIMATE!", 13 * 8, 1, 0, "amiga4ever-pro2", 18]]
-				render_strings_array(strings)
+				render_strings_array(strings, plus=plus)
 			else:
 				strings = [["MOVE IT!", 13 * 8, 1, 0, "amiga4ever-pro2", 18]]
-				render_strings_array(strings)
+				render_strings_array(strings, plus=plus)
 
 		for spr_index in range(v_max_sprites):
 			spr_name = sprites[image_data[spr_index * 3 + 2]]
@@ -180,22 +221,24 @@ def render_hardsprite():
 			if fx_timer > intro_duration + expose_duration:
 				sprite_data[spr_index]['x'] += dt_sec * 60.0 * sprite_data[spr_index]['x_velocity']
 
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (sprite_data[spr_index]['x'] * zoom_size()),
+			plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (sprite_data[spr_index]['x'] * zoom_size()),
 						(amiga_screen_size[1] - sprite_data[spr_index]['y']) * zoom_size(), zoom_size() / 2,
 						"@assets/" + spr_name + str(int(sprite_data[spr_index]['frame_index'])) + ".png")
-		render.set_blend_mode2d(render.BlendOpaque)
+		plus.SetBlend2D(gs.BlendOpaque)
 
-		render.flip()
+		plus.Flip()
 
 
 def render_hotdog_screen():
+	global plus
+
 	strings = [["Software SPRITES (BOBS)",30,1,0, "bilko-opti-bold", 42],
 			["are also available. Their",55,1,0, "bilko-opti-bold", 42],
 			["size and range of colours",80,1,0, "bilko-opti-bold", 42],
 			["are limited only by the",105,1,0, "bilko-opti-bold", 42],
 			["amount of free memory!",130,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=5.0)
+	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
 
 	bobs = [[120, 40, "jumbo_dog_quarter", 0.5],
 			[400, 60, "jumbo_dog_quarter", -0.5],
@@ -209,15 +252,16 @@ def render_hotdog_screen():
 	fx_timer = 0.0
 	fx_duration = 15.0
 	while fx_timer < fx_duration:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
-		render.clear()
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size() * 3) * 0.5, 0, zoom_size(), "@assets/backgr.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/backgr.png")
-		render.image2d((demo_screen_size[0] + amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/backgr.png")
-		render.set_blend_mode2d(render.BlendAlpha)
+		plus.Clear()
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size() * 3) * 0.5, 0, zoom_size(), "@assets/backgr.png")
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/backgr.png")
+		plus.Image2D((demo_screen_size[0] + amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/backgr.png")
+		plus.SetBlend2D(gs.BlendAlpha)
 		for b in bobs:
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + b[0] * zoom_size(),
+			plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + b[0] * zoom_size(),
 						   (amiga_screen_size[1] - b[1]) * zoom_size(), zoom_size(), "@assets/" + b[2] + ".png")
 			b[0] += dt_sec * 60.0 * b[3]
 			if b[0] > 440:
@@ -226,31 +270,33 @@ def render_hotdog_screen():
 				if b[0] < -340:
 					b[0] = 440
 
-		render.set_blend_mode2d(render.BlendOpaque)
-		render.flip()
+		plus.SetBlend2D(gs.BlendOpaque)
+		plus.Flip()
 
 
 def render_gipper():
+	global plus
 
 	strings = [["Software SPRITES (BOBS)",40,1,0, "bilko-opti-bold", 42],
 			  ["can be used in many",65,1,0, "bilko-opti-bold", 42],
 			   ["different ways.",90,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, plus=plus, exit_callback=demo_exit_test)
 
 	fx_timer = 0.0
 	run_duration = 1.5
 	brake_duration = 0.5
 	shoot_duration = 2.5
 	fx_duration = 7.0
-	render.set_blend_mode2d(render.BlendAlpha)
+	plus.SetBlend2D(gs.BlendAlpha)
 
 	x, y, sprite_index = -55, 75 + 48, 0
 
 	while fx_timer < fx_duration:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
-		render.clear()
+		plus.Clear()
 
 		if fx_timer < run_duration:
 			x += dt_sec * 60.0 * 1.7
@@ -268,15 +314,16 @@ def render_gipper():
 			x += dt_sec * 60.0 * 1.7
 			sprite_index = math.fmod(sprite_index + dt_sec * 8.0, 5)
 
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
 					   (amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
 
-		render.flip()
+		plus.Flip()
 
-	render.set_blend_mode2d(render.BlendOpaque)
+	plus.SetBlend2D(gs.BlendOpaque)
 
 
 def render_gippers():
+	global plus
 
 	strings = [["There is no limit to the",40,1,0, "bilko-opti-bold", 42],
 				["amount of images you can",65,1,0, "bilko-opti-bold", 42],
@@ -284,21 +331,22 @@ def render_gippers():
 				["one BOB dozens can be",115,1,0, "bilko-opti-bold", 42],
 				["displayed with ease.",140,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=5.0)
+	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
 
 	fx_timer = 0.0
 	run_duration = 1.5
 	brake_duration = 0.5
 	shoot_duration = 2.5
 	fx_duration = 8.5
-	render.set_blend_mode2d(render.BlendAlpha)
+	plus.SetBlend2D(gs.BlendAlpha)
 
 	x, y, sprite_index = -55, 74 + 50, 0
 
 	while fx_timer < fx_duration:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
-		render.clear()
+		plus.Clear()
 
 		if fx_timer < run_duration:
 			x += dt_sec * 60.0 * 1.7
@@ -320,49 +368,53 @@ def render_gippers():
 			for i in range(6):
 				xx = x + (i - 2.5) * 48.0
 				yy = y + (j - 1.5) * 50.0
-				render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + xx * zoom_size(),
+				plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + xx * zoom_size(),
 							   (amiga_screen_size[1] - yy) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_gipper_" + str(int(sprite_index)) + ".png")
 
-		render.flip()
+		plus.Flip()
 
-	render.set_blend_mode2d(render.BlendOpaque)
+	plus.SetBlend2D(gs.BlendOpaque)
 
 
 def render_star():
-	# strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
-	# 		   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
-	# 		   ["This method is very",80,1,0, "bilko-opti-bold", 42],
-	# 		   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
-	# 		   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
-	#
-	# render_text_screen(strings, duration=5.0)
-	#
-	# strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
-	# 		   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
-	# 		   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
-	# 		   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
-	# 		   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
-	#
-	# render_text_screen(strings, duration=5.0)
+	global plus
 
-	star_json = "@assets/star.json"
-	stat_segments = wireframe_json_to_segment_list(star_json)
+	strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
+			   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
+			   ["This method is very",80,1,0, "bilko-opti-bold", 42],
+			   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
+			   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
+
+	strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
+			   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
+			   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
+			   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
+			   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
+
+	# star_json = "@assets/star.json"
+	# stat_segments = wireframe_json_to_segment_list(star_json)
 
 
 
 def render_overlay():
+	global plus
+
 	strings = [["AMOS allows up to",40,1,0, "bilko-opti-bold", 42],
 			   ["eight screens to be",65,1,0, "bilko-opti-bold", 42],
 			   ["displayed at any",90,1,0, "bilko-opti-bold", 42],
 			   ["one time.",115,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, plus=plus, exit_callback=demo_exit_test)
 
 	strings = [["Each screen can",40,1,0, "bilko-opti-bold", 42],
 			   ["be manipulated in a",65,1,0, "bilko-opti-bold", 42],
 			   ["variety of unusual ways.",90,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, plus=plus, exit_callback=demo_exit_test)
 
 	strings = [["OVERLAPPING SCREENS WITH DIFFERENT SIZES, RESOLUTIONS AND COLOURS IS EASY", 40, 1, 0, "topaz-a500", 20]]
 
@@ -373,15 +425,16 @@ def render_overlay():
 	screen_2 = [0, 0, 1.25]
 
 	while fx_timer < fx_duration:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
-		render.clear()
+		plus.Clear()
 
 		# back image
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
 					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
 					   zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
 					   (amiga_screen_size[1] - screen_0[1]) * zoom_size(),
 					   zoom_size() * 0.5, "@assets/multiscreen_pixelart.png")
 
@@ -394,7 +447,7 @@ def render_overlay():
 			screen_0[2] *= -1
 
 		# front image
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
 			   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 			   zoom_size() * 0.5, "@assets/multiscreen_ham.png")
 
@@ -403,26 +456,29 @@ def render_overlay():
 			screen_1[1] = -amiga_screen_size[1]
 
 		strings[0][1] = screen_2[1]
-		render_strings_array(strings)
+		render_strings_array(strings, plus=plus)
 
 		screen_2[1] += dt_sec * 60.0 * screen_2[2]
 		if screen_2[1] > amiga_screen_size[1] * 1.25:
 			screen_2[1] = -amiga_screen_size[1] * 0.25
 
-		render.flip()
+		plus.Flip()
+
 
 def render_change_fonts():
+	global plus
+
 	strings = [["AMOS is much more flexible",40,1,0, "bilko-opti-bold", 42],
 			   ["then any other Amiga",65,1,0, "bilko-opti-bold", 42],
 			   ["programming language.",90,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, plus=plus, exit_callback=demo_exit_test)
 
 	strings = [["You can even use",40,1,0, "bilko-opti-bold", 42],
 			   ["standard Deluxe Paint",65,1,0, "bilko-opti-bold", 42],
 			   ["compatible fonts.",90,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings)
+	render_text_screen(strings, plus=plus, exit_callback=demo_exit_test)
 
 	fonts = [["common6", 42, 13],
 			 ["bilko-opti-bold", 42, 13], ["bilko-opti-bold", 32, 17],
@@ -436,18 +492,22 @@ def render_change_fonts():
 		for i in range(_font[2]):
 			strings.append(["AMOS FONTS", (i + 1) * _font[1] / 3, 1, 0, _font[0], _font[1]])
 
-		render_text_screen(strings, fade_duration=0.1)
+		render_text_screen(strings, fade_duration=0.1, plus=plus, exit_callback=demo_exit_test)
 
 
 def render_price_mandarin_logo():
+	global plus
+
 	x, y = 114, 67
-	render.set_blend_mode2d(render.BlendAlpha)
-	render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
+	plus.SetBlend2D(gs.BlendAlpha)
+	plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + x * zoom_size(),
 					(amiga_screen_size[1] - y) * zoom_size(), zoom_size() / 2.0, "@assets/mandarin_logo.png")
-	render.set_blend_mode2d(render.BlendOpaque)
+	plus.SetBlend2D(gs.BlendOpaque)
 
 
 def render_price():
+	global plus
+
 	y = 8
 	strings = [["AMOS will be available in",25 - y,1,0, "bilko-opti-bold", 40],
 				["March for £49.95 from ",38 - y,1,0, "bilko-opti-bold", 40],
@@ -463,24 +523,27 @@ def render_price():
 				["Any other key",185 - y,1,1, "amiga4ever-pro2", 18],
 				["restarts this demo.",195 - y,1,1, "amiga4ever-pro2", 18]]
 
-	render_text_screen(strings, duration=len(strings), fade_duration=0.2, render_callback=render_price_mandarin_logo)
+	render_text_screen(strings, duration=len(strings), fade_duration=0.2, render_callback=render_price_mandarin_logo,
+					   plus=plus, exit_callback=demo_exit_test)
 
 
 def render_hardscroll():
+	global plus
+
 	strings = [["Software and hardware",40,1,0, "bilko-opti-bold", 42],
 			   ["scrolling are present in",65,1,0, "bilko-opti-bold", 42],
 			   ["AMOS. Each type can be",90,1,0, "bilko-opti-bold", 42],
 			   ["activated with a single",115,1,0, "bilko-opti-bold", 42],
 			   ["command.",140,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=len(strings))
+	render_text_screen(strings, duration=len(strings), plus=plus, exit_callback=demo_exit_test)
 
 	strings = [["It is possible to use",40,1,0, "bilko-opti-bold", 42],
 			   ["both SPRITES and BOBS",65,1,0, "bilko-opti-bold", 42],
 			   ["on any type of",90,1,0, "bilko-opti-bold", 42],
 			   ["scrolling screen.",115,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=len(strings))
+	render_text_screen(strings, duration=len(strings), plus=plus, exit_callback=demo_exit_test)
 
 	fx_timer = 0.0
 	phase_1_duration = 3.0
@@ -504,6 +567,7 @@ def render_hardscroll():
 		enemy_sprites[i][4] = random.randint(15, 20)
 
 	while fx_timer < fx_duration:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
 
@@ -558,20 +622,20 @@ def render_hardscroll():
 			sprite_0[4] = -1
 			sprite_1[4] = -1
 
-		render.clear()
-		render.set_blend_mode2d(render.BlendAlpha)
+		plus.Clear()
+		plus.SetBlend2D(gs.BlendAlpha)
 
 		# front image
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] - amiga_screen_size[0]) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] - amiga_screen_size[0]) * zoom_size(),
 					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					   zoom_size() * 0.5, "@assets/DPLAY1.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
 					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					   zoom_size() * 0.5, "@assets/DPLAY1.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0]) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0]) * zoom_size(),
 					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					   zoom_size() * 0.5, "@assets/DPLAY1.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0] * 2) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0] * 2) * zoom_size(),
 					   (amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					   zoom_size() * 0.5, "@assets/DPLAY1.png")
 
@@ -582,13 +646,13 @@ def render_hardscroll():
 		sprite_0[0] += dt_sec * 60.0 * sprite_0[2]
 		sprite_0[1] += dt_sec * 60.0 * sprite_0[3]
 		if sprite_0[4] >= 0:
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_0[0] * zoom_size(),
+			plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_0[0] * zoom_size(),
 						(amiga_screen_size[1] - sprite_0[1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(sprite_0[4])) + ".png")
 
 		sprite_1[0] += dt_sec * 60.0 * sprite_1[2]
 		sprite_1[1] += dt_sec * 60.0 * sprite_1[3]
 		if sprite_1[4] >= 0:
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_1[0] * zoom_size(),
+			plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_1[0] * zoom_size(),
 						(amiga_screen_size[1] - sprite_1[1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(sprite_1[4])) + ".png")
 
 		for i in range(enemy_amount):
@@ -597,14 +661,16 @@ def render_hardscroll():
 			enemy_sprites[i][4] += dt_sec * 10.0
 			if enemy_sprites[i][4] > 22:
 				enemy_sprites[i][4] = 15
-			render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + enemy_sprites[i][0] * zoom_size(),
+			plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + enemy_sprites[i][0] * zoom_size(),
 						(amiga_screen_size[1] - enemy_sprites[i][1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(enemy_sprites[i][4])) + ".png")
 
-		render.set_blend_mode2d(render.BlendOpaque)
-		render.flip()
+		plus.SetBlend2D(gs.BlendOpaque)
+		plus.Flip()
 
 
 def render_dual_playfield():
+	global plus
+
 	strings = [["With AMOS you can easily",30,1,0, "bilko-opti-bold", 42],
 				["utilise the unique Amiga",55,1,0, "bilko-opti-bold", 42],
 				["Dual Playfield mode, Which",80,1,0, "bilko-opti-bold", 42],
@@ -612,14 +678,14 @@ def render_dual_playfield():
 				["overlayed on top of each",130,1,0, "bilko-opti-bold", 42],
 				["each other.",155,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=len(strings))
+	render_text_screen(strings, duration=len(strings), plus=plus, exit_callback=demo_exit_test)
 
 	strings = [["This allows you to create",30,1,0, "bilko-opti-bold", 42],
 				["stunning parallax scrolling",55,1,0, "bilko-opti-bold", 42],
 				["games like XENON II and",80,1,0, "bilko-opti-bold", 42],
 				["SILKWORM.",105,1,0, "bilko-opti-bold", 42]]
 
-	render_text_screen(strings, duration=len(strings))
+	render_text_screen(strings, duration=len(strings), plus=plus, exit_callback=demo_exit_test)
 
 	fx_timer = 0.0
 	fx_duration = 15.0
@@ -627,22 +693,25 @@ def render_dual_playfield():
 	screen_1 = [0, 200, -2]
 
 	while fx_timer < fx_duration:
+		global plus
+
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
-		render.clear()
-		render.set_blend_mode2d(render.BlendAlpha)
+		plus.Clear()
+		plus.SetBlend2D(gs.BlendAlpha)
 
 		# back image
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] - amiga_screen_size[0]) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] - amiga_screen_size[0]) * zoom_size(),
 					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY2.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_0[0] * zoom_size(),
 					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY2.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0]) * zoom_size(),
 					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY2.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0] * 2) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_0[0] + amiga_screen_size[0] * 2) * zoom_size(),
 					(amiga_screen_size[1] - screen_0[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY2.png")
 
@@ -651,16 +720,16 @@ def render_dual_playfield():
 			screen_0[0] = 0
 
 		# front image
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] - amiga_screen_size[0]) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] - amiga_screen_size[0]) * zoom_size(),
 					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY1.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + screen_1[0] * zoom_size(),
 					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY1.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0]) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0]) * zoom_size(),
 					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY1.png")
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0] * 2) * zoom_size(),
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + (screen_1[0] + amiga_screen_size[0] * 2) * zoom_size(),
 					(amiga_screen_size[1] - screen_1[1]) * zoom_size(),
 					zoom_size() * 0.5, "@assets/DPLAY1.png")
 
@@ -668,49 +737,67 @@ def render_dual_playfield():
 		if screen_1[0] < -amiga_screen_size[0]:
 			screen_1[0] = 0
 
-		render.set_blend_mode2d(render.BlendOpaque)
-		render.flip()
+		plus.SetBlend2D(gs.BlendOpaque)
+		plus.Flip()
+
 
 def render_title_page_bouncing():
+	global plus
+
 	fx_timer = 0.0
 	fx_duration = math.pi
 	while fx_timer < 4.0:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
 		y_damping = RangeAdjust(fx_timer, 0.0, fx_duration, 1.0, 0.0)
 		y_damping = Clamp(y_damping, 0.0, 1.0)
 		y_damping = EaseInOutQuick(y_damping)
 		y_scr = abs(math.sin((fx_timer + 1.2) * 4.0)) * y_damping
-		render.clear()
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, y_scr * demo_screen_size[1], zoom_size(), "@assets/titlepage.png")
-		render.flip()
+		plus.Clear()
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, y_scr * demo_screen_size[1], zoom_size(), "@assets/titlepage.png")
+		plus.Flip()
 
 
 def render_title_page_still():
+	global plus
+
 	fx_timer = 0.0
 	while fx_timer < 4.0:
+		demo_exit_test()
 		dt_sec = clock.update()
 		fx_timer += dt_sec
-		render.clear()
-		render.image2d((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/titlepage.png")
-		render.flip()
+		plus.Clear()
+		plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5, 0, zoom_size(), "@assets/titlepage.png")
+		plus.Flip()
 
 
-startup_sequence()
-# resolution_requester()
-engine_init()
-render_title_page_bouncing()
-play_music()
-render_title_page_still()
-render_credits()
-render_title_page()
-render_hardsprite()
-render_hotdog_screen()
-render_gipper()
-render_gippers()
-render_star()
-render_hardscroll()
-render_dual_playfield()
-render_overlay()
-render_change_fonts()
-render_price()
+def main():
+	if getattr(sys, 'frozen', False):
+	    # frozen
+	    dir_ = dirname(sys.executable)
+	else:
+	    # unfrozen
+	    dir_ = dirname(realpath(__file__))
+
+	startup_sequence()
+	if resolution_requester():
+		engine_init()
+		# render_title_page_bouncing()
+		play_music()
+		# render_title_page_still()
+		# render_credits()
+		# render_title_page()
+		# render_hardsprite()
+		# render_hotdog_screen()
+		# render_gipper()
+		# render_gippers()
+		render_star()
+		# render_hardscroll()
+		# render_dual_playfield()
+		# render_overlay()
+		# render_change_fonts()
+		# render_price()
+
+if __name__ == "__main__":
+	main()
