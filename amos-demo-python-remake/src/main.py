@@ -24,18 +24,14 @@ from utils import *
 from graphic_routines import *
 from screen_specs import *
 from os.path import dirname, realpath
+from random import uniform
 
 plus = None
 
+
 def resolution_requester():
-	# res_list = ["320x200", "640x400", "800x600", "1280x720", "1600x900", "1920x1080", "1920x1200"]
-	# choice = easygui.choicebox(msg='Select your screen resolution', title='Screen Resolution', choices=(res_list))
-	# if choice is not None:
-	# 	demo_screen_size[0] = int(choice.split("x")[0])
-	# 	demo_screen_size[1] = int(choice.split("x")[1])
-
 	window_mode = pymsgbox.confirm(text='Select your screen mode', title='AMOS DEMO', buttons=['Windowed', 'Fullscreen'])
-
+	
 	if window_mode == 'Windowed':
 		pc_screen_windowed = True
 		screen_resolutions = ['640x480', '720x568', '800x600', '1280x800']
@@ -44,10 +40,10 @@ def resolution_requester():
 		screen_resolutions = ['640x480', '800x600', '1280x720', '1280x800', '1920x1080']
 	else:
 		return False
-
+	
 	screen_res = pymsgbox.confirm(text='Select your screen resolution', title='AMOS DEMO',
 								   buttons=screen_resolutions)
-
+	
 	if screen_res is not None:
 		demo_screen_size[0] = int(screen_res.split('x')[0])
 		demo_screen_size[1] = int(screen_res.split('x')[1])
@@ -376,27 +372,86 @@ def render_gippers():
 	plus.SetBlend2D(gs.BlendOpaque)
 
 
+def rvect(r):
+	return gs.Vector3(uniform(-r, r), uniform(-r, r), uniform(-r, r))
+
+
 def render_star():
 	global plus
 
-	strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
-			   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
-			   ["This method is very",80,1,0, "bilko-opti-bold", 42],
-			   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
-			   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
+	# strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
+	# 		   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
+	# 		   ["This method is very",80,1,0, "bilko-opti-bold", 42],
+	# 		   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
+	# 		   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
+	#
+	# render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
+	#
+	# strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
+	# 		   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
+	# 		   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
+	# 		   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
+	# 		   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
+	#
+	# render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
 
-	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
+	scn = plus.NewScene()
+	scn.Load("@assets/star.scn", gs.SceneLoadContext(plus.GetRenderSystem()))
+	cam = plus.AddCamera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, -45, -100)))
+	cam.GetTransform().SetRotation(gs.Vector3(math.pi * -24 / 180, 0, 0))
+	cam.GetComponent("Camera").SetZoomFactor(22.0) ## * 0.5)
+	# plus.AddEnvironment(scn, gs.Color.Black, gs.Color.White)
+	plus.AddLight(scn, gs.Matrix4.TranslationMatrix((6, 4, -6)))
 
-	strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
-			   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
-			   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
-			   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
-			   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
+	while not scn.IsReady():
+		dt = plus.UpdateClock()
+		plus.UpdateScene(scn, dt)
 
-	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
+	scn.GetPhysicSystem().SetForceRigidBodyAxisLockOnCreation(gs.LockZ + gs.LockRotX + gs.LockRotY + gs.LockRotZ)
+	scn.GetPhysicSystem().SetGravity(gs.Vector3(0,0,0))
 
-	# star_json = "@assets/star.json"
-	# stat_segments = wireframe_json_to_segment_list(star_json)
+	prev_pos = None
+	for i in range(15):
+		if uniform(0,1) < 0.25:
+			pos = gs.Vector3(-10, -10, 0)
+		elif uniform(0,1) < 0.5:
+			pos = gs.Vector3(10, -10, 0)
+		elif uniform(0,1) < 0.75:
+			pos = gs.Vector3(10, 10, 0)
+		else:
+			pos = gs.Vector3(-10, 10, 0)
+
+		while prev_pos is not None and gs.Vector3.Dist(prev_pos, pos) < 2.0:
+			pos += rvect(2.0)
+			pos.z = 0
+
+		prev_pos = pos
+
+		ball = plus.AddPhysicSphere(scn, gs.Matrix4.TranslationMatrix(pos)) # , 0.2, 3, 8, 1.0, "assets/materials/grey.mat")
+
+		ball[1].ApplyLinearImpulse(pos * -1.0 * uniform(0.05, 0.5))
+		ball[1].SetRestitution(1)
+
+	star = scn.GetNode("star_mesh")
+	rb = gs.MakeRigidBody()
+	rb.SetRestitution(1)
+	star.AddComponent(rb)
+
+	star_geo = gs.LoadCoreGeometry("@assets/star_mesh.geo")
+	star_col = gs.MakeMeshCollision()
+	star_col.SetGeometry(star_geo)
+	star_col.SetMass(10)
+	star.AddComponent(star_col)
+
+	fx_timer = 0.0
+	fx_duration = 12.0
+
+	while fx_timer < fx_duration:
+		demo_exit_test()
+		dt = plus.UpdateClock()
+		plus.UpdateScene(scn, dt)
+		fx_timer += dt.to_sec()
+		plus.Flip()
 
 
 
@@ -783,21 +838,21 @@ def main():
 	startup_sequence()
 	if resolution_requester():
 		engine_init()
-		# render_title_page_bouncing()
+		render_title_page_bouncing()
 		play_music()
-		# render_title_page_still()
-		# render_credits()
-		# render_title_page()
-		# render_hardsprite()
-		# render_hotdog_screen()
-		# render_gipper()
-		# render_gippers()
+		render_title_page_still()
+		render_credits()
+		render_title_page()
+		render_hardsprite()
+		render_hotdog_screen()
+		render_gipper()
+		render_gippers()
 		render_star()
-		# render_hardscroll()
-		# render_dual_playfield()
-		# render_overlay()
-		# render_change_fonts()
-		# render_price()
+		render_hardscroll()
+		render_dual_playfield()
+		render_overlay()
+		render_change_fonts()
+		render_price()
 
 if __name__ == "__main__":
 	main()

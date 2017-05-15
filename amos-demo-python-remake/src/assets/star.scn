@@ -1,0 +1,59 @@
+{
+	"Scene": {
+		"Components": {
+			"gs::core::Environment": {
+				"AmbientColor": {
+					"r": 0.4001,
+					"g": 0.4001,
+					"b": 0.4001
+				},
+				"FogColor": {
+					"r": 1.0,
+					"g": 1.0,
+					"b": 1.0
+				}
+			}
+		},
+		"Nodes": {
+			"Node": {
+				"Uid": 1,
+				"Name": "star_mesh",
+				"Components": {
+					"gs::core::Transform": {
+						"Position": {
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0001
+						},
+						"Rotation": {
+							"x": 0.0,
+							"y": 0.0,
+							"z": 0.0
+						}
+					},
+					"gs::core::Object": {
+						"Geometry": "@assets/star_mesh.geo"
+					}
+				}
+			},
+			"Node": {
+				"Uid": 2,
+				"Name": "star_mesh_edges",
+				"Components": {
+					"gs::core::Transform": {},
+					"gs::core::Object": {
+						"Geometry": "@assets/star_mesh_edges.geo"
+					}
+				}
+			}
+		},
+		"NodeHierarchy": {
+			"Link": {
+				"Node": 2,
+				"Parent": 1
+			}
+		},
+		"Skeletons": {},
+		"State": {}
+	}
+}
