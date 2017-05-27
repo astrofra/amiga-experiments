@@ -45,11 +45,25 @@
 						"Geometry": "@assets/star_mesh_edges.geo"
 					}
 				}
+			},
+			"Node": {
+				"Uid": 3,
+				"Name": "star_bitmap",
+				"Components": {
+					"gs::core::Transform": {},
+					"gs::core::Object": {
+						"Geometry": "@assets/star_bitmap.geo"
+					}
+				}
 			}
 		},
 		"NodeHierarchy": {
 			"Link": {
 				"Node": 2,
+				"Parent": 1
+			},
+			"Link": {
+				"Node": 3,
 				"Parent": 1
 			}
 		},

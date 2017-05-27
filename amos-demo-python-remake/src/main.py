@@ -1,15 +1,15 @@
 # ---------------------------------------------------------------------
-#                            AMOS DEMO V3! 
-#    
+#                            AMOS DEMO V3!
+#
 #                          BY Peter Hickman
 #                       Python port by Astrofra
 #
 #            Music composed and written by Allister Brimble
-#  
-# You cannot change this demo, but you may view it (its a bit untidy-  
-#     sorry) and you may use some of the commands from direct mode.  
-#    For more information please examine the text file on this disk  
-#                its called "IMPORTANT_TEXT_FILE.ASC".       
+#
+# You cannot change this demo, but you may view it (its a bit untidy-
+#     sorry) and you may use some of the commands from direct mode.
+#    For more information please examine the text file on this disk
+#                its called "IMPORTANT_TEXT_FILE.ASC".
 # ---------------------------------------------------------------------
 
 import gs
@@ -27,28 +27,30 @@ from os.path import dirname, realpath
 from random import uniform
 
 plus = None
+pc_screen_windowed = False
 
+def resolution_requester(open_gui=True):
+	global pc_screen_windowed
+	if open_gui:
+		window_mode = pymsgbox.confirm(text='Select your screen mode', title='AMOS DEMO', buttons=['Windowed', 'Fullscreen'])
 
-def resolution_requester():
-	window_mode = pymsgbox.confirm(text='Select your screen mode', title='AMOS DEMO', buttons=['Windowed', 'Fullscreen'])
-	
-	if window_mode == 'Windowed':
-		pc_screen_windowed = True
-		screen_resolutions = ['640x480', '720x568', '800x600', '1280x800']
-	elif window_mode == 'Fullscreen':
-		pc_screen_windowed = False
-		screen_resolutions = ['640x480', '800x600', '1280x720', '1280x800', '1920x1080']
-	else:
-		return False
-	
-	screen_res = pymsgbox.confirm(text='Select your screen resolution', title='AMOS DEMO',
-								   buttons=screen_resolutions)
-	
-	if screen_res is not None:
-		demo_screen_size[0] = int(screen_res.split('x')[0])
-		demo_screen_size[1] = int(screen_res.split('x')[1])
-	else:
-		return False
+		if window_mode == 'Windowed':
+			pc_screen_windowed = True
+			screen_resolutions = ['640x480', '720x568', '800x600', '1280x800']
+		elif window_mode == 'Fullscreen':
+			pc_screen_windowed = False
+			screen_resolutions = ['640x480', '800x600', '1280x720', '1280x800', '1920x1080']
+		else:
+			return False
+
+		screen_res = pymsgbox.confirm(text='Select your screen resolution', title='AMOS DEMO',
+									   buttons=screen_resolutions)
+
+		if screen_res is not None:
+			demo_screen_size[0] = int(screen_res.split('x')[0])
+			demo_screen_size[1] = int(screen_res.split('x')[1])
+		else:
+			return False
 
 	return True
 
@@ -258,7 +260,7 @@ def render_hotdog_screen():
 		plus.SetBlend2D(gs.BlendAlpha)
 		for b in bobs:
 			plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + b[0] * zoom_size(),
-						   (amiga_screen_size[1] - b[1]) * zoom_size(), zoom_size(), "@assets/" + b[2] + ".png")
+						   (amiga_screen_size[1] - b[1]) * zoom_size(), zoom_size(), "@assets/" + b[2] + ".tga")
 			b[0] += dt_sec * 60.0 * b[3]
 			if b[0] > 440:
 				b[0] = -340
@@ -379,25 +381,25 @@ def rvect(r):
 def render_star():
 	global plus
 
-	# strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
-	# 		   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
-	# 		   ["This method is very",80,1,0, "bilko-opti-bold", 42],
-	# 		   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
-	# 		   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
-	#
-	# render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
-	#
-	# strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
-	# 		   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
-	# 		   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
-	# 		   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
-	# 		   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
-	#
-	# render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
+	strings = [["Collision detection in AMOS",30,1,0, "bilko-opti-bold", 42],
+			   ["uses special masks.",55,1,0, "bilko-opti-bold", 42],
+			   ["This method is very",80,1,0, "bilko-opti-bold", 42],
+			   ["fast and gives 100%",105,1,0, "bilko-opti-bold", 42],
+			   ["accuracy.",130,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
+
+	strings = [["Watch the balls in this",30,1,0, "bilko-opti-bold", 42],
+			   ["next demo. They only",55,1,0, "bilko-opti-bold", 42],
+			   ["change colour when in",80,1,0, "bilko-opti-bold", 42],
+			   ["contact with a solid",105,1,0, "bilko-opti-bold", 42],
+			   ["part of the large star.",130,1,0, "bilko-opti-bold", 42]]
+
+	render_text_screen(strings, duration=5.0, plus=plus, exit_callback=demo_exit_test)
 
 	scn = plus.NewScene()
 	scn.Load("@assets/star.scn", gs.SceneLoadContext(plus.GetRenderSystem()))
-	cam = plus.AddCamera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, -45, -100)))
+	cam = plus.AddCamera(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0, -45, -100) * 1))
 	cam.GetTransform().SetRotation(gs.Vector3(math.pi * -24 / 180, 0, 0))
 	cam.GetComponent("Camera").SetZoomFactor(22.0) ## * 0.5)
 	# plus.AddEnvironment(scn, gs.Color.Black, gs.Color.White)
@@ -407,19 +409,41 @@ def render_star():
 		dt = plus.UpdateClock()
 		plus.UpdateScene(scn, dt)
 
-	scn.GetPhysicSystem().SetForceRigidBodyAxisLockOnCreation(gs.LockZ + gs.LockRotX + gs.LockRotY + gs.LockRotZ)
-	scn.GetPhysicSystem().SetGravity(gs.Vector3(0,0,0))
+	_w = 15
 
+	pos = gs.Vector3(0, -_w * 0.75, 0)
+	rb = plus.AddPhysicCube(scn, gs.Matrix4.TranslationMatrix(pos), _w * 2, 1, 1, 0)
+	rb[1].SetRestitution(1.0)
+
+	pos = gs.Vector3(0, _w * 0.75, 0)
+	rb = plus.AddPhysicCube(scn, gs.Matrix4.TranslationMatrix(pos), _w * 2, 1, 1, 0)
+	rb[1].SetRestitution(1.0)
+
+	pos = gs.Vector3(_w, 0, 0)
+	rb = plus.AddPhysicCube(scn, gs.Matrix4.TranslationMatrix(pos), 1, _w * 2, 1, 0)
+	rb[1].SetRestitution(1.0)
+
+	pos = gs.Vector3(-_w, 0, 0)
+	rb = plus.AddPhysicCube(scn, gs.Matrix4.TranslationMatrix(pos), 1, _w * 2, 1, 0)
+	rb[1].SetRestitution(1.0)
+
+	_w = 8
+
+	scn.GetPhysicSystem().SetForceRigidBodyAxisLockOnCreation(gs.LockZ + gs.LockRotX + gs.LockRotY + gs.LockRotZ)
+	scn.GetPhysicSystem().SetGravity(gs.Vector3(0, 0, 0))
+
+	balls = {}
 	prev_pos = None
 	for i in range(15):
-		if uniform(0,1) < 0.25:
-			pos = gs.Vector3(-10, -10, 0)
-		elif uniform(0,1) < 0.5:
-			pos = gs.Vector3(10, -10, 0)
-		elif uniform(0,1) < 0.75:
-			pos = gs.Vector3(10, 10, 0)
+		_rnd = uniform(0, 1)
+		if _rnd < 0.25:
+			pos = gs.Vector3(-_w, -_w, 0)
+		elif _rnd < 0.5:
+			pos = gs.Vector3(_w, -_w, 0)
+		elif _rnd< 0.75:
+			pos = gs.Vector3(_w, _w, 0)
 		else:
-			pos = gs.Vector3(-10, 10, 0)
+			pos = gs.Vector3(-_w, _w, 0)
 
 		while prev_pos is not None and gs.Vector3.Dist(prev_pos, pos) < 2.0:
 			pos += rvect(2.0)
@@ -427,15 +451,29 @@ def render_star():
 
 		prev_pos = pos
 
-		ball = plus.AddPhysicSphere(scn, gs.Matrix4.TranslationMatrix(pos)) # , 0.2, 3, 8, 1.0, "assets/materials/grey.mat")
+		ball = plus.AddPhysicSphere(scn, gs.Matrix4.TranslationMatrix(pos), 0.5, 6, 16, 1, "@assets/blue.mat")
 
 		ball[1].ApplyLinearImpulse(pos * -1.0 * uniform(0.05, 0.5))
-		ball[1].SetRestitution(1)
+		ball[1].SetRestitution(1.1)
+
+		col_ball = plus.AddSphere(scn, gs.Matrix4.TranslationMatrix(gs.Vector3(0,0,0)), 0.5, 6, 16, "@assets/red.mat")
+		col_ball.GetTransform().SetParent(ball[0])
+		col_ball.GetComponent("Object").SetEnabled(False)
+
+		plus.UpdateScene(scn, plus.UpdateClock())
+		balls[str(ball[0].GetUid())] = [ball[0], col_ball, 0.0]
+
+	star_mesh_edges = scn.GetNode("star_mesh_edges")
+	star_mesh_edges.RemoveComponent(star_mesh_edges.GetComponent("Object"))
 
 	star = scn.GetNode("star_mesh")
 	rb = gs.MakeRigidBody()
-	rb.SetRestitution(1)
+	rb.SetRestitution(1.0)
 	star.AddComponent(rb)
+	star.RemoveComponent(star.GetComponent("Object"))
+
+	star_bitmap = scn.GetNode("star_bitmap")
+	star_bitmap.GetTransform().SetRotation(gs.Vector3(-0.15, 0, 0))
 
 	star_geo = gs.LoadCoreGeometry("@assets/star_mesh.geo")
 	star_col = gs.MakeMeshCollision()
@@ -446,11 +484,33 @@ def render_star():
 	fx_timer = 0.0
 	fx_duration = 12.0
 
+	ps = scn.GetPhysicSystem()
 	while fx_timer < fx_duration:
 		demo_exit_test()
 		dt = plus.UpdateClock()
 		plus.UpdateScene(scn, dt)
 		fx_timer += dt.to_sec()
+
+		for colp in ps.GetCollisionPairs(star):
+			if colp.GetNodeA().GetName == "star_mesh":
+				col_node = colp.GetNodeB()
+			else:
+				col_node = colp.GetNodeA()
+
+			balls[str(col_node.GetUid())][2] = 1.0
+
+		for ball_key in balls:
+			ball = balls[ball_key]
+			if ball[2] > 0.0:
+				ball[1].GetComponent("Object").SetEnabled(True)
+				ball[0].GetComponent("Object").SetEnabled(False)
+			else:
+				ball[1].GetComponent("Object").SetEnabled(False)
+				ball[0].GetComponent("Object").SetEnabled(True)
+
+			ball[2] = max(0.0, ball[2] - dt.to_sec())
+
+
 		plus.Flip()
 
 
@@ -474,7 +534,7 @@ def render_overlay():
 	strings = [["OVERLAPPING SCREENS WITH DIFFERENT SIZES, RESOLUTIONS AND COLOURS IS EASY", 40, 1, 0, "topaz-a500", 20]]
 
 	fx_timer = 0.0
-	fx_duration = 6.0
+	fx_duration = 8.0
 	screen_0 = [0, 200, -2]
 	screen_1 = [0, 0, 3]
 	screen_2 = [0, 0, 1.25]
@@ -510,6 +570,11 @@ def render_overlay():
 		if screen_1[1] > amiga_screen_size[1] * 2:
 			screen_1[1] = -amiga_screen_size[1]
 
+		text_bg_y = (amiga_screen_size[1] - screen_2[1]) * zoom_size() - 3
+		text_bg_col = gs.Color(0.1, 0.1, 0.1, 1.0)
+		plus.Quad2D(0, text_bg_y, 0, text_bg_y + 32, demo_screen_size[0], text_bg_y + 32, demo_screen_size[0], text_bg_y,
+					text_bg_col, text_bg_col, text_bg_col, text_bg_col)
+		plus.Commit2D()
 		strings[0][1] = screen_2[1]
 		render_strings_array(strings, plus=plus)
 
@@ -612,6 +677,7 @@ def render_hardscroll():
 	fx_duration = 17.5
 	screen_1 = [0, 200, 0]
 	sprite_0 = [-100, 110, 0, 0, 0]
+	prev_y = sprite_0[1]
 	sprite_1 = [400, 110, 0, 0, 15]
 	enemy_amount = 10
 	enemy_sprites = [[400, 110, 0, 0, 15] for _ in range(enemy_amount)]
@@ -700,9 +766,17 @@ def render_hardscroll():
 
 		sprite_0[0] += dt_sec * 60.0 * sprite_0[2]
 		sprite_0[1] += dt_sec * 60.0 * sprite_0[3]
+		ship_flicker = int((fx_timer*2)%2)
+		spr_vel_y = prev_y - sprite_0[1]
+		prev_y = sprite_0[1]
+		if spr_vel_y > 0:
+			ship_flicker += 2
+		elif spr_vel_y < 0:
+			ship_flicker += 4
+
 		if sprite_0[4] >= 0:
 			plus.Image2D((demo_screen_size[0] - amiga_screen_size[0] * zoom_size()) * 0.5 + sprite_0[0] * zoom_size(),
-						(amiga_screen_size[1] - sprite_0[1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(sprite_0[4])) + ".png")
+						(amiga_screen_size[1] - sprite_0[1]) * zoom_size(), zoom_size() / 2.0, "@assets/sprite_spaceship_" + str(int(sprite_0[4] + ship_flicker)) + ".png")
 
 		sprite_1[0] += dt_sec * 60.0 * sprite_1[2]
 		sprite_1[1] += dt_sec * 60.0 * sprite_1[3]
@@ -836,7 +910,7 @@ def main():
 	    dir_ = dirname(realpath(__file__))
 
 	startup_sequence()
-	if resolution_requester():
+	if resolution_requester(open_gui=True):
 		engine_init()
 		render_title_page_bouncing()
 		play_music()
