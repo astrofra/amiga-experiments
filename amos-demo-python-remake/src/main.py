@@ -27,18 +27,16 @@ from os.path import dirname, realpath
 from random import uniform
 
 plus = None
-pc_screen_windowed = False
 
 def resolution_requester(open_gui=True):
-	global pc_screen_windowed
 	if open_gui:
 		window_mode = pymsgbox.confirm(text='Select your screen mode', title='AMOS DEMO', buttons=['Windowed', 'Fullscreen'])
 
 		if window_mode == 'Windowed':
-			pc_screen_windowed = True
+			demo_screen_size[2] = gs.Window.Windowed
 			screen_resolutions = ['640x480', '720x568', '800x600', '1280x800']
 		elif window_mode == 'Fullscreen':
-			pc_screen_windowed = False
+			demo_screen_size[2] = gs.Window.Fullscreen
 			screen_resolutions = ['640x480', '800x600', '1280x720', '1280x800', '1920x1080']
 		else:
 			return False
@@ -70,8 +68,7 @@ def engine_init():
 		pass
 
 	plus = gs.GetPlus()
-	plus.RenderInit(demo_screen_size[0], demo_screen_size[1], 1, pc_screen_windowed)
-	# render.init(demo_screen_size[0], demo_screen_size[1], "pkg.core", 1, pc_screen_windowed)
+	plus.RenderInit(demo_screen_size[0], demo_screen_size[1], 1, demo_screen_size[2])
 
 	# mount the system file driver
 	gs.MountFileDriver(gs.StdFileDriver("assets/"), "@assets/")
