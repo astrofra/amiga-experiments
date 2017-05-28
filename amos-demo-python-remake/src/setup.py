@@ -27,7 +27,7 @@ options = {
 	'build_exe': {
 		'compressed': True,
 		'packages': ['gs'],
-		'include_files': ['file_id.diz', 'screenshot.png', 'openal32.dll', 'assets/'] + extra_redist
+		'include_files': ['file_id.diz', 'screenshot.png', 'ad_coupon_AF_issue_06.jpg', 'openal32.dll', 'assets/'] + extra_redist
 	}
 }
 
